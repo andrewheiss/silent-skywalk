@@ -1,0 +1,120 @@
+project:
+  title: "Why Donors Donate"
+  type: website
+
+  preview: 
+    port: 7777
+    browser: true
+    watch-inputs: false
+    navigate: true
+
+  render:
+    # Render all .qmd files
+    - "**/*.qmd"
+
+    # Don't render anything in the manuscript folder because otherwise all the 
+    # output gets placed in _site/ only, which is annoying. Instead this folder 
+    # needs to be rendered separately, and *before* the overall website project 
+    # (which is doable since this whole build process is orchestrated by targets)
+    - "!manuscript/"
+  
+  resources: 
+    # But *do* place the outputs from the manuscript in the rendered site folder
+    - "manuscript/output/"
+    - "manuscript/output-ms/"
+
+execute:
+  freeze: auto  # Re-render only when source changes
+
+bibliography: manuscript/references.bib
+csl: manuscript/csl/chicago-author-date.csl
+
+website:
+  repo-url: "https://github.com/andrewheiss/silent-skywalk"
+  repo-actions: [edit, issue]
+
+  page-navigation: true
+
+  navbar:
+    pinned: true
+    background: "#1D6996"
+    search: true
+    left:
+      - text: "Basic AMCEs and MMs"
+        file: basic-amces-mms.qmd
+      - text: "Hypotheses"
+        file: hypotheses.qmd
+    
+    right:
+      - icon: github
+        aria-label: github
+        href: https://github.com/andrewheiss/silent-skywalk
+  
+  sidebar:
+    - title: "Data"
+      style: docked
+      background: dark
+      contents:
+        - notebook/data.qmd
+        - notebook/data-final.qmd
+    
+    - title: "Survey"
+      contents:
+        - section: "Survey questions"
+          contents:
+            - notebook/survey-static.qmd
+            - notebook/survey-questions.qmd
+        - section: "Survey details"
+          contents:
+            - text: "Invitations"
+              file: notebook/survey-invitations.qmd
+            - text: "Technical details"
+              file: notebook/survey-technical-details.qmd
+            - text: "Completion rates"
+              file: notebook/survey-completion-rates.qmd
+            - test: "Countries"
+              file: notebook/survey-countries.qmd
+
+    - title: "Analysis"
+      contents:
+        - notebook/analysis.qmd
+        - section: "Descriptive details"
+          contents:
+            - notebook/desc-details.qmd
+            - notebook/desc-work.qmd
+            - notebook/desc-instrumental.qmd
+            - notebook/desc-governments.qmd
+            - notebook/desc-restrictions.qmd
+        - section: "Analysis"
+          contents:
+            - notebook/desc-work.qmd
+        - section: "Other details"
+          contents:
+            - notebook/targets.qmd
+            - notebook/environment.qmd
+    
+    - title: "Empty space lol"
+    
+  page-footer:
+    left: |
+      Content {{< fa brands creative-commons >}} 2018–2023 by Suparna Chaudhry, Marc Dotson, and Andrew Heiss<br>
+      All content licensed under a {{< fa brands creative-commons >}}
+      {{< fa brands creative-commons-by >}} {{< fa brands creative-commons-nc >}}
+      [Creative Commons Attribution-NonCommercial 4.0 International license (CC BY-NC 4.0)](https://creativecommons.org/licenses/by-nc/4.0/)
+    right: |
+      Made with {{< fa brands r-project >}} and [Quarto](https://quarto.org/)<br>
+      [View the source at {{< fa brands github >}} GitHub](https://github.com/andrewheiss/silent-skywalk)
+
+format:
+  html:
+    theme:
+      - zephyr
+      - notebook/html/custom.scss
+    toc: true
+    toc-location: right
+    code-fold: true
+    code-tools: true
+    highlight-style: monokai
+
+language: 
+  title-block-published: "Date"

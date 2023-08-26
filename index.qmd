@@ -1,0 +1,16 @@
+---
+title: "Why Donors Donate"
+author: "Suparna Chaudhry, Marc Dotson, and Andrew Heiss"
+format:
+  html:
+    code-tools: false
+    toc: false
+---
+
+## Abstract
+
+Abstract goes here
+
+## Code
+
+All the raw code and data for this paper is available in a [GitHub repository](https://github.com/andrewheiss/silent-skywalk).

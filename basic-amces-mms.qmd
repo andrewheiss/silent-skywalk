@@ -1,0 +1,72 @@
+---
+title: Basic polisci-style AMCEs and MMs
+format:
+  html:
+    code-fold: show
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center", fig.retina = 3,
+  fig.width = 6, fig.height = (6 * 0.618),
+  out.width = "80%", collapse = TRUE,
+  dev = "ragg_png"
+)
+
+options(
+  digits = 3, width = 220,
+  dplyr.summarise.inform = FALSE,
+  knitr.kable.NA = ""
+)
+```
+
+```{r libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(cregg)
+
+results_long <- readRDS("original_data.rds") %>% 
+  mutate(choice_binary = ifelse(choice == alt, 1, 0)) %>% 
+  mutate(
+    feat_transp = fct_relabel(feat_transp, ~paste("Transparency: ", .x)),
+    feat_acc = fct_relabel(feat_acc, ~paste("Accountability: ", .x)),
+  )
+```
+
+The `results_long` data frame contains 1 row per alternative, and features are stored as factors:
+
+```{r show-structure}
+results_long %>% count(id)
+results_long %>% count(id, task)
+```
+
+In political science, we just want the AMCEs and marginal means, so this is all we really do:
+
+```{r calculate-amces}
+amces <- amce(
+  results_long,
+  choice_binary ~ feat_org + feat_issue + feat_transp + feat_acc + feat_funding + feat_govt,
+  id = ~id
+)
+
+amces
+```
+
+```{r plot-amce, fig.width=7, fig.height=5}
+plot(amces) + guides(color = "none")
+```
+
+
+
+```{r calculate-mm}
+mms <- mm(
+  results_long,
+  choice_binary ~ feat_org + feat_issue + feat_transp + feat_acc + feat_funding + feat_govt,
+  id = ~id
+)
+
+mms
+```
+
+```{r plot-mm, fig.width=7, fig.height=5}
+plot(mms) + guides(color = "none") + geom_vline(xintercept = 0.25, linewidth = 0.25, color = "grey50")
+```

@@ -1,0 +1,30 @@
+# R stuff
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Quarto stuff
+/.quarto/
+/.luarc.json
+_site/
+_freeze/
+manuscript/output/
+
+*.pdf
+*.html
+*.docx
+
+# Data stuff
+data/raw_data/
+data/derived_data/
+data/private_data/
+original_data.rds
+
+models/
+
+# Miscellaneous
+*.~lock.*
+.DS_Store
+.dropbox
+Icon?
