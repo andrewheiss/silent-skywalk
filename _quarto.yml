@@ -40,10 +40,16 @@ website:
     background: "#1D6996"
     search: true
     left:
-      - text: "Basic AMCEs and MMs"
-        file: basic-amces-mms.qmd
+      - text: "Experiment"
+        file: experiment.qmd
+      - text: "Methods"
+        file: methods.qmd
+      - text: "Results"
+        file: results.qmd
       - text: "Hypotheses"
         file: hypotheses.qmd
+      - text: "Basic AMCEs and MMs"
+        file: basic-amces-mms.qmd
     
     right:
       - icon: github
@@ -58,40 +64,33 @@ website:
         - notebook/data.qmd
         - notebook/data-final.qmd
     
-    - title: "Survey"
+    - title: "Experiment"
       contents:
-        - section: "Survey questions"
+        - section: "Preregistration"
           contents:
-            - notebook/survey-static.qmd
-            - notebook/survey-questions.qmd
+            - notebook/survey-prereg.qmd
+            - notebook/survey-irb.qmd
         - section: "Survey details"
           contents:
-            - text: "Invitations"
-              file: notebook/survey-invitations.qmd
-            - text: "Technical details"
-              file: notebook/survey-technical-details.qmd
-            - text: "Completion rates"
-              file: notebook/survey-completion-rates.qmd
-            - test: "Countries"
-              file: notebook/survey-countries.qmd
+            - text: "Design"
+              file: notebook/survey-design.qmd
+            - text: "Actual survey"
+              file: notebook/survey-experiment.qmd
+    
+    - title: "Methods"
+      contents:
+        - notebook/marginal-means.qmd
 
-    - title: "Analysis"
+    - title: "Results"
       contents:
         - notebook/analysis.qmd
-        - section: "Descriptive details"
+        - section: "Hypotheses"
           contents:
-            - notebook/desc-details.qmd
-            - notebook/desc-work.qmd
-            - notebook/desc-instrumental.qmd
-            - notebook/desc-governments.qmd
-            - notebook/desc-restrictions.qmd
-        - section: "Analysis"
-          contents:
-            - notebook/desc-work.qmd
-        - section: "Other details"
-          contents:
-            - notebook/targets.qmd
-            - notebook/environment.qmd
+            - notebook/results-branding.qmd
+            - notebook/results-crackdown.qmd
+            - notebook/results-issue.qmd
+            - notebook/results-funding.qmd
+            - notebook/results-practices.qmd
     
     - title: "Empty space lol"
     
