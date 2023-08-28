@@ -49,6 +49,8 @@ invisible(list2env(tar_read(table_functions), .GlobalEnv))
 theme_set(theme_ngo())
 ```
 
+# H~1~: Branding
+
 ::: {.callout-tip}
 ## H~1~: Branding
 
@@ -57,7 +59,7 @@ theme_set(theme_ngo())
 *Mechanism: awareness of need and contentiousness of issue area*
 :::
 
-### Estimand
+## Estimand
 
 $$
 \begin{aligned}
@@ -77,7 +79,7 @@ h1_amces <- h1_mms %>%
 ```
 
 ```{r plot-h1-mm-amce, fig.width=10, fig.height=4, out.width="100%"}
-#| column: page-inset-right
+#| column: body-outset-right
 p_h1_mms <- h1_mms %>% 
   ggplot(aes(x = avg, y = feat_org, fill = feat_org)) +
   stat_halfeye() +
@@ -116,7 +118,7 @@ p_h1_mms | p_h1_amces
 ```
 
 ```{r table-h1-mm-amce}
-#| column: page-inset-right
+#| column: body-outset-right
 h1_tbl_mm <- h1_mms %>% 
   group_by(feat_org) %>% 
   median_qi() %>% 

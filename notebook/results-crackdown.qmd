@@ -1,0 +1,330 @@
+---
+title: "H~2~: Government crackdown"
+format:
+  html:
+    code-fold: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center", fig.retina = 3,
+  fig.width = 6, fig.height = (6 * 0.618),
+  out.width = "80%", collapse = TRUE,
+  dev = "ragg_png"
+)
+
+options(
+  digits = 3, width = 120,
+  dplyr.summarise.inform = FALSE,
+  knitr.kable.NA = ""
+)
+```
+
+```{r libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(targets)
+library(tidybayes)
+library(patchwork)
+library(scales)
+library(glue)
+library(gt)
+library(gtExtras)
+library(here)
+
+# Helpful functions
+label_pp <- label_number(accuracy = 1, scale = 100, 
+  suffix = " pp.", style_negative = "minus")
+
+fmt_decimal <- label_number(accuracy = 0.001, style_negative = "minus")
+
+# Targets stuff
+tar_config_set(store = here('_targets'),
+               script = here('_targets.R'))
+
+tar_load(c(means_features_only))
+
+invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
+invisible(list2env(tar_read(table_functions), .GlobalEnv))
+
+theme_set(theme_ngo())
+```
+
+# H~2a~: Relationship with host government
+
+::: {.callout-tip}
+## H~2a~: Relationship with host government
+
+**Donors will show increased willingness to donate to NGOs that are facing government crackdown or criticism.**
+
+*Mechanism: Governments wouldn't be cracking down on them if they didn't perceive a threat from them which means organizations implementing their missions effectively. This perception of efficacy leads to increased donations.*
+:::
+
+## Estimand
+
+$$
+\begin{aligned}
+\theta =&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Relationship} = \text{Under crackdown} \right) \bigr] - 
+\textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Relationship} = \text{Friendly} \right) \bigr] \\[10pt]
+\theta =&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Relationship} = \text{Criticized} \right) \bigr] - \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Relationship} = \text{Friendly} \right) \bigr]
+\end{aligned}
+$$
+
+```{r h2a-calc-estimands}
+h2a_mms <- means_features_only %>% 
+  group_by(feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+h2a_amces <- h2a_mms %>% 
+  group_by(feat_govt) %>% 
+  compare_levels(variable = avg, by = feat_govt, comparison = "control")
+```
+
+```{r plot-h2a-mm-amce, fig.width=10, fig.height=4, out.width="100%"}
+#| column: body-outset-right
+p_h2a_mms <- h2a_mms %>% 
+  ggplot(aes(x = avg, y = feat_govt, fill = feat_govt)) +
+  stat_halfeye() +
+  scale_x_continuous(labels = label_percent()) +
+  scale_y_discrete(labels = label_wrap(10)) +
+  scale_fill_manual(values = clrs$peach[c(2, 5, 7)], guide = "none") +
+  labs(
+    x = "Overall average predicted probability",
+    y = NULL,
+    fill = NULL,
+    title = "Estimated marginal means"
+  )
+
+p_h2a_amces <- h2a_amces %>% 
+  ungroup() %>% 
+  separate_wider_delim(
+    feat_govt,
+    delim = " - ", 
+    names = c("feat_govt", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feat_govt = "Friendly") %>%
+  mutate(feat_govt = factor(feat_govt, levels = levels(h2a_mms$feat_govt))) %>% 
+  ggplot(aes(x = avg, y = feat_govt, fill = feat_govt)) +
+  stat_halfeye() +
+  geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  scale_x_continuous(labels = label_pp) +
+  scale_y_discrete(labels = label_wrap(10)) +
+  scale_fill_manual(values = clrs$peach[c(2, 5, 7)], guide = "none") +
+  labs(
+    x = "Percentage point change in probability of choice selection",
+    y = NULL,
+    fill = NULL,
+    title = "Average marginal component effects (AMCEs)"
+  )
+
+p_h2a_mms | p_h2a_amces
+```
+
+```{r table-h2a-mm-amce}
+#| column: body-outset-right
+h2a_tbl_mm <- h2a_mms %>% 
+  group_by(feat_govt) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  arrange(desc(feat_govt)) %>% 
+  select(feat_govt, nice)
+
+h2a_tbl_amces <- h2a_amces %>% 
+  group_by(feat_govt) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>%
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0)) %>% 
+  mutate(nice = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_govt = str_replace(feat_govt, " - ", "−<br>")) %>% 
+  mutate(across(starts_with("p_"), ~fmt_decimal(.))) %>% 
+  arrange(desc(feat_govt)) %>% 
+  select(contrast = feat_govt, amce_nice = nice, p_neq_0)
+
+bind_cols(
+  h2a_tbl_mm, 
+  add_row(h2a_tbl_amces, contrast = "*(Reference)*")
+) %>% 
+  gt() %>% 
+  sub_missing(columns = everything(), missing_text = "—") %>% 
+  fmt_markdown(columns = c(nice, amce_nice, contrast)) %>%
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = c(feat_govt, contrast)) %>% 
+  cols_label(
+    feat_govt = "Relationship", 
+    nice = "Posterior EMM",
+    contrast = "Contrast",
+    amce_nice = "Posterior AMCE",
+    p_neq_0 = "*p*~direction~",
+    .fn = md
+  ) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  tab_footnote(
+    footnote = "Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.",
+    locations = cells_column_labels(columns = c(nice, amce_nice))
+  ) %>% 
+  tab_footnote(
+    footnote = md("The probability of direction (*p*~direction~) is the probability that the posterior AMCE is strictly positive or negative—it is the proportion of the posterior AMCE that is the sign of the median."),
+    locations = cells_column_labels(columns = p_neq_0)
+  ) %>% 
+  gt_add_divider(columns = nice, style = "dashed", weight = px(1)) %>% 
+  opt_footnote_marks(marks = "standard") %>% 
+  opt_horizontal_padding(3) %>% 
+  opts_theme()
+```
+
+
+# H~2b~: Organization and relationship with host government
+
+::: {.callout-tip}
+## H~2b~: Organization and relationship with host government
+
+**Donors will show increased willingness to donate to Oxfam and Red Cross when they are facing government crackdown or criticism compared to when Amnesty or Greenpeace is facing crackdown.**
+:::
+
+## Estimand
+
+$$
+\begin{aligned}
+\theta =&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Organization} = \text{Oxfam or Red Cross}  \mid \text{Relationship = Under crackdown or Criticized} \right) \bigr] - \\
+&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Organization} = \text{Amnesty International or Greenpeace} \mid \text{Relationship = Under crackdown or Criticized} \right) \bigr]
+\end{aligned}
+$$
+
+```{r h2b-calc-estimands}
+h2b_mms <- means_features_only %>% 
+  mutate(org_collapsed = fct_collapse(feat_org, 
+    `Oxfam & Red Cross` = c("Oxfam", "Red Cross"),
+    `Amnesty International & Greenpeace` = c("Amnesty International", "Greenpeace"))) %>% 
+  group_by(org_collapsed, feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+h2b_amces <- h2b_mms %>% 
+  group_by(feat_govt) %>% 
+  compare_levels(variable = avg, by = org_collapsed, comparison = "control")
+```
+
+```{r plot-h2b-mm-amce, fig.width=6.5, fig.height=7, out.width="70%"}
+#| column: body-outset-right
+p_h2b_mms <- h2b_mms %>% 
+  ggplot(aes(x = avg, y = feat_govt, fill = feat_govt)) +
+  stat_halfeye(aes(slab_alpha = org_collapsed)) +
+  scale_x_continuous(labels = label_percent()) +
+  scale_y_discrete(labels = label_wrap(10)) +
+  scale_fill_manual(values = clrs$peach[c(2, 5, 7)], guide = "none") +
+  scale_slab_alpha_discrete(
+    range = c(0.4, 1),
+    guide = guide_legend(
+      reverse = TRUE, override.aes = list(fill = "grey10"), 
+      keywidth = 0.8, keyheight = 0.8, nrow = 1
+    )
+  ) +
+  labs(
+    x = "Overall average predicted probability",
+    y = NULL,
+    fill = NULL,
+    slab_alpha = NULL,
+    title = "Estimated marginal means"
+  ) +
+  theme(
+    legend.position = "top",
+    legend.justification = "left",
+    legend.margin = margin(l = -7, t = 0)
+  )
+
+p_h2b_amces <- h2b_amces %>% 
+  ungroup() %>% 
+  separate_wider_delim(
+    org_collapsed,
+    delim = " - ", 
+    names = c("org_collapsed", "reference_level")
+  ) %>% 
+  mutate(feat_govt = factor(feat_govt, levels = levels(h2a_mms$feat_govt))) %>% 
+  ggplot(aes(x = avg, y = feat_govt, fill = feat_govt)) +
+  stat_halfeye() +
+  geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  scale_x_continuous(labels = label_pp) +
+  scale_y_discrete(labels = label_wrap(10)) +
+  scale_fill_manual(values = clrs$peach[c(2, 5, 7)], guide = "none") +
+  facet_wrap(vars(paste(org_collapsed, "−", reference_level))) +
+  labs(
+    x = "Percentage point change in probability of choice selection",
+    y = NULL,
+    fill = NULL,
+    title = "Difference in estimated marginal means",
+    subtitle = "Positive values indicate greater preference for Oxfam & Red Cross"
+  )
+
+(p_h2b_mms / plot_spacer() / p_h2b_amces) +
+  plot_layout(ncol = 1, heights = c(0.49, 0.02, 0.49))
+```
+
+```{r table-h2b-mm-amce}
+#| column: body-outset-right
+h2b_tbl_mm <- h2b_mms %>% 
+  group_by(feat_govt, org_collapsed) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  arrange(desc(feat_govt), desc(org_collapsed)) %>% 
+  select(org_collapsed, feat_govt, nice)
+
+h2b_tbl_amces <- h2b_amces %>% 
+  group_by(feat_govt, org_collapsed) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>%
+  ungroup() %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0)) %>% 
+  mutate(nice = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")) %>% 
+  mutate(org_collapsed = str_replace(org_collapsed, " - ", "−<br>")) %>% 
+  mutate(across(starts_with("p_"), ~fmt_decimal(.))) %>% 
+  arrange(desc(feat_govt)) %>% 
+  select(contrast = org_collapsed, diff_nice = nice, p_neq_0)
+
+bind_cols(
+  h2b_tbl_mm, 
+  h2b_tbl_amces %>% 
+    add_row(contrast = NA, .after = 1) %>% 
+    add_row(contrast = NA, .after = 3) %>% 
+    add_row(contrast = NA, .after = 5)
+) %>% 
+  mutate(feat_govt = fct_relabel(feat_govt, ~paste("Relationship with government:", .x))) %>% 
+  group_by(feat_govt) %>% 
+  gt() %>% 
+  sub_missing(columns = everything(), missing_text = "—") %>% 
+  fmt_markdown(columns = c(nice, diff_nice, contrast)) %>%
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = c(org_collapsed, contrast)) %>% 
+  cols_label(
+    org_collapsed = "Organizations", 
+    nice = "Posterior EMM",
+    contrast = "Contrast",
+    diff_nice = "Posterior ∆",
+    p_neq_0 = "*p*~direction~",
+    .fn = md
+  ) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  tab_style(
+    style = cell_fill(color = "grey90"),
+    locations = cells_row_groups()
+  ) %>% 
+  tab_footnote(
+    footnote = "Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.",
+    locations = cells_column_labels(columns = c(nice, diff_nice))
+  ) %>% 
+  tab_footnote(
+    footnote = md("The probability of direction (*p*~direction~) is the probability that the posterior difference in marginal means is strictly positive or negative—it is the proportion of the posterior difference in marginal means that is the sign of the median."),
+    locations = cells_column_labels(columns = p_neq_0)
+  ) %>% 
+  gt_add_divider(columns = nice, style = "dashed", weight = px(1)) %>% 
+  opt_footnote_marks(marks = "standard") %>% 
+  opt_horizontal_padding(3) %>% 
+  opts_theme()
+```

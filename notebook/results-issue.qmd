@@ -1,0 +1,320 @@
+---
+title: "H~3~: Issue area"
+format:
+  html:
+    code-fold: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center", fig.retina = 3,
+  fig.width = 6, fig.height = (6 * 0.618),
+  out.width = "80%", collapse = TRUE,
+  dev = "ragg_png"
+)
+
+options(
+  digits = 3, width = 120,
+  dplyr.summarise.inform = FALSE,
+  knitr.kable.NA = ""
+)
+```
+
+```{r libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(targets)
+library(tidybayes)
+library(patchwork)
+library(scales)
+library(glue)
+library(gt)
+library(gtExtras)
+library(here)
+
+# Helpful functions
+label_pp <- label_number(accuracy = 1, scale = 100, 
+  suffix = " pp.", style_negative = "minus")
+
+fmt_decimal <- label_number(accuracy = 0.001, style_negative = "minus")
+
+# Targets stuff
+tar_config_set(store = here('_targets'),
+               script = here('_targets.R'))
+
+tar_load(c(means_features_only))
+
+invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
+invisible(list2env(tar_read(table_functions), .GlobalEnv))
+
+theme_set(theme_ngo())
+```
+
+# H~3a~: Issue area
+
+::: {.callout-tip}
+## H~3a~: Issue area
+
+**Donors will show increased willingness to donate to NGOs working in less contentious issue areas (emergency response and refugee relief) over more contentious issue areas (environment and human rights).**
+:::
+
+## Estimand
+
+$$
+\begin{aligned}
+\theta =&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Issue} = \text{More contentious} \right) \bigr] -
+\textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Issue} = \text{Less contentious} \right) \bigr]
+\end{aligned}
+$$
+
+```{r h3a-calc-estimands}
+h3a_mms <- means_features_only %>% 
+  group_by(feat_issue, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+h3a_amces <- h3a_mms %>% 
+  group_by(feat_issue) %>% 
+  compare_levels(variable = avg, by = feat_issue, comparison = "control")
+```
+
+```{r plot-h3a-mm-amce, fig.width=10, fig.height=4, out.width="100%"}
+#| column: body-outset-right
+p_h3a_mms <- h3a_mms %>% 
+  ggplot(aes(x = avg, y = feat_issue, fill = feat_issue)) +
+  stat_halfeye() +
+  scale_x_continuous(labels = label_percent()) +
+  scale_y_discrete(labels = label_wrap(10)) +
+  scale_fill_manual(values = clrs$prism[c(2, 6, 8, 10)], guide = "none") +
+  labs(
+    x = "Overall average predicted probability",
+    y = NULL,
+    fill = NULL,
+    title = "Estimated marginal means"
+  )
+
+p_h3a_amces <- h3a_amces %>% 
+  ungroup() %>% 
+  separate_wider_delim(
+    feat_issue,
+    delim = " - ", 
+    names = c("feat_issue", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feat_issue = "Emergency response") %>%
+  mutate(feat_issue = factor(feat_issue, levels = levels(h3a_mms$feat_issue))) %>% 
+  ggplot(aes(x = avg, y = feat_issue, fill = feat_issue)) +
+  stat_halfeye() +
+  geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  scale_x_continuous(labels = label_pp) +
+  scale_y_discrete(labels = label_wrap(10)) +
+  scale_fill_manual(values = clrs$prism[c(2, 6, 8, 10)], guide = "none") +
+  labs(
+    x = "Percentage point change in probability of choice selection",
+    y = NULL,
+    fill = NULL,
+    title = "Average marginal component effects (AMCEs)"
+  )
+
+p_h3a_mms | p_h3a_amces
+```
+
+```{r table-h3a-mm-amce}
+#| column: body-outset-right
+h3a_tbl_mm <- h3a_mms %>% 
+  group_by(feat_issue) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  arrange(desc(feat_issue)) %>% 
+  select(feat_issue, nice)
+
+h3a_tbl_amces <- h3a_amces %>% 
+  group_by(feat_issue) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>%
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0)) %>% 
+  mutate(nice = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_issue = str_replace(feat_issue, " - ", "−<br>")) %>% 
+  mutate(across(starts_with("p_"), ~fmt_decimal(.))) %>% 
+  arrange(desc(feat_issue)) %>% 
+  select(contrast = feat_issue, amce_nice = nice, p_neq_0)
+
+bind_cols(
+  h3a_tbl_mm, 
+  add_row(h3a_tbl_amces, contrast = "*(Reference)*")
+) %>% 
+  gt() %>% 
+  sub_missing(columns = everything(), missing_text = "—") %>% 
+  fmt_markdown(columns = c(nice, amce_nice, contrast)) %>%
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = c(feat_issue, contrast)) %>% 
+  cols_label(
+    feat_issue = "Issue area", 
+    nice = "Posterior EMM",
+    contrast = "Contrast",
+    amce_nice = "Posterior AMCE",
+    p_neq_0 = "*p*~direction~",
+    .fn = md
+  ) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  tab_footnote(
+    footnote = "Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.",
+    locations = cells_column_labels(columns = c(nice, amce_nice))
+  ) %>% 
+  tab_footnote(
+    footnote = md("The probability of direction (*p*~direction~) is the probability that the posterior AMCE is strictly positive or negative—it is the proportion of the posterior AMCE that is the sign of the median."),
+    locations = cells_column_labels(columns = p_neq_0)
+  ) %>% 
+  gt_add_divider(columns = nice, style = "dashed", weight = px(1)) %>% 
+  opt_footnote_marks(marks = "standard") %>% 
+  opt_horizontal_padding(3) %>% 
+  opts_theme()
+```
+
+
+# H~3b~: Relationship with host government and issue area
+
+::: {.callout-tip}
+## H~3b~: Relationship with host government and issue area
+
+**Donors will show increased willingness to donate to NGOs facing government crackdown/criticism working in less contentious issue areas (emergency response and refugee relief) over more contentious issue areas (environment and human rights)**
+
+*Mechanisms: Perceptions of deservingness of NGOs dealing with emergency response and refugee relief. Donors are also more likely to donate to programs that are compatible with government preferences and have easily measurable outputs, which environment and human rights programs often lack. NGOs working on more contentious issue areas may be expelled or shut down, which would be a waste of donor resources, make it less likely that they donate to these groups.*
+:::
+
+## Estimand
+
+$$
+\begin{aligned}
+\theta =&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Issue} = \text{More contentious}  \mid \text{Relationship = Under crackdown or Criticized} \right) \bigr] - \\
+&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Issue} = \text{Less contentnious} \mid \text{Relationship = Under crackdown or Criticized} \right) \bigr]
+\end{aligned}
+$$
+
+```{r h3b-calc-estimands}
+h3b_mms <- means_features_only %>% 
+  group_by(feat_issue, feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+h3b_amces <- h3b_mms %>% 
+  group_by(feat_govt) %>% 
+  compare_levels(variable = avg, by = feat_issue, comparison = "control")
+```
+
+```{r plot-h3b-mm-amce, fig.width=10, fig.height=6.5, out.width="100%"}
+#| column: body-outset-right
+p_h3b_mms <- h3b_mms %>% 
+  ggplot(aes(x = avg, y = feat_issue, fill = feat_issue)) +
+  stat_halfeye() +
+  scale_x_continuous(labels = label_percent()) +
+  scale_y_discrete(labels = label_wrap(10)) +
+  scale_fill_manual(values = clrs$prism[c(2, 6, 8, 10)], guide = "none") +
+  facet_wrap(vars(feat_govt), ncol = 1) +
+  labs(
+    x = "Overall average predicted probability",
+    y = NULL,
+    fill = NULL,
+    title = "Estimated marginal means"
+  ) +
+  theme(
+    legend.position = "top",
+    legend.justification = "left",
+    legend.margin = margin(l = -7, t = 0)
+  )
+
+p_h3b_amces <- h3b_amces %>% 
+  ungroup() %>% 
+  separate_wider_delim(
+    feat_issue,
+    delim = " - ", 
+    names = c("feat_issue", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Friendly") %>%
+  add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Criticized") %>%
+  add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Under crackdown") %>%
+  mutate(feat_issue = factor(feat_issue, levels = levels(h3b_mms$feat_issue))) %>% 
+  ggplot(aes(x = avg, y = feat_issue, fill = feat_issue)) +
+  stat_halfeye() +
+  geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  scale_x_continuous(labels = label_pp) +
+  scale_y_discrete(labels = label_wrap(10)) +
+  scale_fill_manual(values = clrs$prism[c(2, 6, 8, 10)], guide = "none") +
+  facet_wrap(vars(feat_govt), ncol = 1) +
+  labs(
+    x = "Percentage point change in probability of choice selection",
+    y = NULL,
+    fill = NULL,
+    title = "Difference in estimated marginal means"
+  )
+
+p_h3b_mms | p_h3b_amces
+```
+
+```{r table-h3b-mm-amce}
+#| column: body-outset-right
+h3b_tbl_mm <- h3b_mms %>% 
+  group_by(feat_govt, feat_issue) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  arrange(desc(feat_govt), desc(feat_issue)) %>% 
+  select(feat_issue, feat_govt, nice)
+
+h3b_tbl_amces <- h3b_amces %>% 
+  group_by(feat_govt, feat_issue) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>%
+  ungroup() %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0)) %>% 
+  mutate(nice = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_issue = str_replace(feat_issue, " - ", "−<br>")) %>% 
+  mutate(across(starts_with("p_"), ~fmt_decimal(.))) %>% 
+  arrange(desc(feat_govt)) %>% 
+  select(contrast = feat_issue, diff_nice = nice, p_neq_0)
+
+bind_cols(
+  h3b_tbl_mm, 
+  h3b_tbl_amces %>% 
+    add_row(contrast = NA, .after = 3) %>% 
+    add_row(contrast = NA, .after = 7) %>% 
+    add_row(contrast = NA, .after = 12)
+) %>% 
+  mutate(feat_govt = fct_relabel(feat_govt, ~paste("Relationship with government:", .x))) %>% 
+  group_by(feat_govt) %>% 
+  gt() %>% 
+  sub_missing(columns = everything(), missing_text = "—") %>% 
+  fmt_markdown(columns = c(nice, diff_nice, contrast)) %>%
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = c(feat_issue, contrast)) %>% 
+  cols_label(
+    feat_issue = "Issue", 
+    nice = "Posterior EMM",
+    contrast = "Contrast",
+    diff_nice = "Posterior ∆",
+    p_neq_0 = "*p*~direction~",
+    .fn = md
+  ) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  tab_style(
+    style = cell_fill(color = "grey90"),
+    locations = cells_row_groups()
+  ) %>% 
+  tab_footnote(
+    footnote = "Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.",
+    locations = cells_column_labels(columns = c(nice, diff_nice))
+  ) %>% 
+  tab_footnote(
+    footnote = md("The probability of direction (*p*~direction~) is the probability that the posterior difference in marginal means is strictly positive or negative—it is the proportion of the posterior difference in marginal means that is the sign of the median."),
+    locations = cells_column_labels(columns = p_neq_0)
+  ) %>% 
+  gt_add_divider(columns = nice, style = "dashed", weight = px(1)) %>% 
+  opt_footnote_marks(marks = "standard") %>% 
+  opt_horizontal_padding(3) %>% 
+  opts_theme()
+```
