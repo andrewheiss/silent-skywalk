@@ -45,8 +45,8 @@ theme_set(theme_ngo())
 
 # H~2a~: Relationship with host government
 
-::: {.callout-tip}
-## H~2a~: Relationship with host government
+::: {.callout-tip icon=false}
+## {{< iconify fa6-solid flask-vial >}} Hypothesis 2~a~: Relationship with host government
 
 **Donors will show increased willingness to donate to NGOs that are facing government crackdown or criticism.**
 
@@ -173,8 +173,8 @@ bind_cols(
 
 # H~2b~: Organization and relationship with host government
 
-::: {.callout-tip}
-## H~2b~: Organization and relationship with host government
+::: {.callout-tip icon=false}
+## {{< iconify fa6-solid flask-vial >}} Hypothesis 2~b~: Organization and relationship with host government
 
 **Donors will show increased willingness to donate to Oxfam and Red Cross when they are facing government crackdown or criticism compared to when Amnesty or Greenpeace is facing crackdown.**
 :::

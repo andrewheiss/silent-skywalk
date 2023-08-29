@@ -45,8 +45,8 @@ theme_set(theme_ngo())
 
 # H~1~: Branding
 
-::: {.callout-tip}
-## H~1~: Branding
+::: {.callout-tip icon=false}
+## {{< iconify fa6-solid flask-vial >}} Hypothesis 1: Branding
 
 **Donors will be more likely to donate to Oxfam and Red Cross compared to Amnesty International and Greenpeace.**
 
