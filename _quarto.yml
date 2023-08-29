@@ -45,7 +45,7 @@ website:
       - text: "Methods"
         file: methods.qmd
       - text: "Results"
-        file: results.qmd
+        file: notebook/results.qmd
       - text: "Hypotheses"
         file: hypotheses.qmd
       - text: "Basic AMCEs and MMs"
@@ -83,8 +83,8 @@ website:
 
     - title: "Results"
       contents:
-        - notebook/analysis.qmd
-        - section: "Hypotheses"
+        - notebook/results.qmd
+        - section: "Specific hypotheses"
           contents:
             - notebook/results-branding.qmd
             - notebook/results-crackdown.qmd

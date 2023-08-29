@@ -1,0 +1,197 @@
+---
+title: "All AMCEs"
+format:
+  html:
+    code-fold: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center", fig.retina = 3,
+  fig.width = 6, fig.height = (6 * 0.618),
+  out.width = "80%", collapse = TRUE,
+  dev = "ragg_png"
+)
+
+options(
+  digits = 3, width = 120,
+  dplyr.summarise.inform = FALSE,
+  knitr.kable.NA = ""
+)
+```
+
+```{r libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(targets)
+library(tidybayes)
+library(patchwork)
+library(ggforce)
+library(scales)
+library(glue)
+library(gt)
+library(gtExtras)
+library(here)
+
+# Targets stuff
+tar_config_set(store = here('_targets'),
+               script = here('_targets.R'))
+
+tar_load(c(means_features_only, ref_grid_features_only))
+
+invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
+invisible(list2env(tar_read(table_functions), .GlobalEnv))
+
+theme_set(theme_ngo())
+```
+
+```{r create-var-lookups}
+var_levels <- tibble(
+  variable = c("feat_org", "feat_issue", "feat_transp", "feat_acc", "feat_funding", "feat_govt")
+) %>% 
+  mutate(levels = map(variable, ~{
+    x <- ref_grid_features_only$all_combos[[.x]]
+    if (is.numeric(x)) {
+      ""
+    } else if (is.factor(x)) {
+      levels(x)
+    } else {
+      sort(unique(x))
+    }
+  })) %>% 
+  unnest(levels)
+
+# Make a little lookup table for nicer feature labels
+var_lookup <- tribble(
+  ~variable,      ~variable_nice,
+  "feat_org",     "Organizations",
+  "feat_issue",   "Issue areas",
+  "feat_transp",  "Transparency",
+  "feat_acc",     "Accountability",
+  "feat_funding", "Funding sources",
+  "feat_govt",    "Relationship with host government"
+) %>% 
+  mutate(amce_var = str_replace(variable, "feat_", "amces_")) %>% 
+  mutate(variable_nice = fct_inorder(variable_nice))
+```
+
+```{r calc-mms}
+mms_org <- means_features_only %>% 
+  group_by(feat_org, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+mms_issue <- means_features_only %>% 
+  group_by(feat_issue, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+mms_transp <- means_features_only %>% 
+  group_by(feat_transp, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+mms_acc <- means_features_only %>% 
+  group_by(feat_acc, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+mms_funding <- means_features_only %>% 
+  group_by(feat_funding, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+mms_govt <- means_features_only %>% 
+  group_by(feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred))
+```
+
+```{r calc-amces}
+amces_org <- mms_org %>% 
+  group_by(feat_org) %>% 
+  compare_levels(variable = avg, by = feat_org, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feat_org,
+    delim = " - ", 
+    names = c("value", "reference_level")
+  ) %>% 
+  add_row(avg = 0, value = "Amnesty International")
+
+amces_issue <- mms_issue %>% 
+  group_by(feat_issue) %>% 
+  compare_levels(variable = avg, by = feat_issue, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feat_issue,
+    delim = " - ", 
+    names = c("value", "reference_level")
+  ) %>% 
+  add_row(avg = 0, value = "Emergency response")
+
+amces_transp <- mms_transp %>% 
+  group_by(feat_transp) %>% 
+  compare_levels(variable = avg, by = feat_transp, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feat_transp,
+    delim = " - ", 
+    names = c("value", "reference_level")
+  ) %>% 
+  add_row(avg = 0, value = "No")
+
+amces_acc <- mms_acc %>% 
+  group_by(feat_acc) %>% 
+  compare_levels(variable = avg, by = feat_acc, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feat_acc,
+    delim = " - ", 
+    names = c("value", "reference_level")
+  ) %>% 
+  add_row(avg = 0, value = "No")
+
+amces_funding <- mms_funding %>% 
+  group_by(feat_funding) %>% 
+  compare_levels(variable = avg, by = feat_funding, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feat_funding,
+    delim = " - ", 
+    names = c("value", "reference_level")
+  ) %>% 
+  add_row(avg = 0, value = "Many small donors")
+
+amces_govt <- mms_govt %>% 
+  group_by(feat_govt) %>% 
+  compare_levels(variable = avg, by = feat_govt, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feat_govt,
+    delim = " - ", 
+    names = c("value", "reference_level")
+  ) %>% 
+  add_row(avg = 0, value = "Friendly")
+
+amces_all <- bind_rows(
+  lst(amces_org, amces_issue, amces_transp, amces_acc, amces_funding, amces_govt),
+  .id = "amce_var"
+) %>%
+  left_join(var_lookup, by = join_by(amce_var)) %>%
+  mutate(value = factor(value, levels = unique(var_levels$levels)))
+```
+
+
+```{r plot-amces-all, fig.width=7, fig.height=6, out.width="100%"}
+ggplot(
+  amces_all,
+  aes(x = avg, y = value, fill = variable_nice)
+) +
+  geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  stat_halfeye(normalize = "groups") +  # Make the heights of the distributions equal within each facet
+  guides(fill = "none") +
+  facet_col(facets = "variable_nice", scales = "free_y", space = "free") +
+  scale_x_continuous(labels = label_pp) +
+  scale_fill_manual(values = clrs$prism[1:6]) +
+  labs(
+    x = "Percentage point change in probability of choice selection",
+    y = NULL,
+    title = "Posterior AMCEs"
+  )
+```
+
+
