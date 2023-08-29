@@ -46,7 +46,8 @@ list(
   
   ## Graphics and tables ----
   tar_target(graphic_functions, lst(
-    theme_ngo, set_annotation_fonts, clrs, build_ci
+    theme_ngo, set_annotation_fonts, clrs, 
+    build_ci, fmt_decimal, label_pp
   )),
   tar_target(table_functions, lst(opts_int, opts_theme)),
   

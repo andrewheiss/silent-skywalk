@@ -28,3 +28,12 @@ set_annotation_fonts <- function() {
 build_ci <- function(lower, upper) {
   glue::glue("[{fmt_decimal(lower)}, {fmt_decimal(upper)}]")
 }
+
+# Put these scales things in functions so that they work like regular functions,
+# otherwise {targets} complains that "... may be used in an incorrect context"
+fmt_decimal <- \(x) scales::label_number(accuracy = 0.001, style_negative = "minus")(x)
+
+label_pp <- function(x) {
+  scales::label_number(accuracy = 1, scale = 100, 
+    suffix = " pp.", style_negative = "minus")(x)
+}

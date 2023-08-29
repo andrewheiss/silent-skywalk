@@ -31,12 +31,6 @@ library(gt)
 library(gtExtras)
 library(here)
 
-# Helpful functions
-label_pp <- label_number(accuracy = 1, scale = 100, 
-  suffix = " pp.", style_negative = "minus")
-
-fmt_decimal <- label_number(accuracy = 0.001, style_negative = "minus")
-
 # Targets stuff
 tar_config_set(store = here('_targets'),
                script = here('_targets.R'))
