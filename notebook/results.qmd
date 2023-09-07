@@ -71,6 +71,7 @@ var_lookup <- tribble(
   "feat_govt",    "Relationship with host government"
 ) %>% 
   mutate(amce_var = str_replace(variable, "feat_", "amces_")) %>% 
+  mutate(mm_var = str_replace(variable, "feat_", "mms_")) %>% 
   mutate(variable_nice = fct_inorder(variable_nice))
 ```
 
@@ -173,6 +174,39 @@ amces_all <- bind_rows(
 ) %>%
   left_join(var_lookup, by = join_by(amce_var)) %>%
   mutate(value = factor(value, levels = unique(var_levels$levels)))
+```
+
+
+```{r plot-mms-all, fig.width=7, fig.height=6, out.width="100%"}
+mms_all <- bind_rows(
+  lst(
+    mms_org = rename(mms_org, value = feat_org), 
+    mms_issue = rename(mms_issue, value = feat_issue), 
+    mms_transp = rename(mms_transp, value = feat_transp), 
+    mms_acc = rename(mms_acc, value = feat_acc), 
+    mms_funding = rename(mms_funding, value = feat_funding), 
+    mms_govt = rename(mms_govt, value = feat_govt)
+  ),
+  .id = "mm_var"
+) %>%
+  left_join(var_lookup, by = join_by(mm_var)) %>%
+  mutate(value = factor(value, levels = unique(var_levels$levels)))
+
+ggplot(
+  mms_all,
+  aes(x = avg, y = value, fill = variable_nice)
+) +
+  geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  stat_halfeye(normalize = "groups") +
+  guides(fill = "none") +
+  facet_col(facets = "variable_nice", scales = "free_y", space = "free") +
+  scale_x_continuous(labels = label_percent()) +
+  scale_fill_manual(values = clrs$prism[1:6]) +
+  labs(
+    x = "Marginal means of probabilities",
+    y = NULL,
+    title = "Posterior marginal means"
+  )
 ```
 
 
