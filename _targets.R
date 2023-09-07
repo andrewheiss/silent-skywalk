@@ -18,6 +18,14 @@ options(
   dplyr.summarise.inform = FALSE
 )
 
+# Bayes stuff
+suppressPackageStartupMessages(library(brms))
+options(
+  mc.cores = 4,
+  brms.backend = "cmdstanr",
+  brms.threads = 2
+)
+
 set.seed(265927) # From random.org
 
 tar_option_set(
@@ -61,6 +69,9 @@ list(
   )),
   tar_target(table_functions, lst(opts_int, opts_theme)),
   
+  
+  ## Models ----
+  tar_target(m_treatment_only, f_treatment_only(data_full)),
   
   ## Create reference grid(s) ----
   tar_target(ref_grid_features_only, create_ref_grid_features_only()),
