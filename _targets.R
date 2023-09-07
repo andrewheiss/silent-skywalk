@@ -74,11 +74,17 @@ list(
   tar_target(m_treatment_only, f_treatment_only(data_full)),
   
   ## Create reference grid(s) ----
-  tar_target(ref_grid_features_only, create_ref_grid_features_only()),
+  tar_target(grid_treatment_only, create_grid_treatment_only(data_full)),
   
   ## Calculate predicted values for reference grids ----
-  tar_target(means_features_only, calculate_grid_means(gammas_intercept_only, ref_grid_features_only))#,
+  tar_target(preds_conditional_treatment_only, 
+    create_preds_conditional_treatment_only(m_treatment_only, grid_treatment_only)
+  ),
+  tar_target(preds_new_treatment_only, 
+    create_preds_new_treatment_only(m_treatment_only, grid_treatment_only)
+  ),
 
+  
   ## Analysis ----
   # tar_target(summary_activities, make_activities_summary(survey_orgs)),
   # tar_target(models_activities, make_activities_models(summary_activities))#,
