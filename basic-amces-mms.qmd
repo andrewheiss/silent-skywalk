@@ -25,7 +25,8 @@ library(tidyverse)
 library(cregg)
 
 results_long <- readRDS("original_data.rds") %>% 
-  mutate(choice_binary = ifelse(choice == alt, 1, 0)) %>% 
+  mutate(choice_binary = ifelse(choice == alt, 1, 0)) %>%
+  mutate(choice_alt = factor(alt * choice_binary)) %>% 
   mutate(
     feat_transp = fct_relabel(feat_transp, ~paste("Transparency: ", .x)),
     feat_acc = fct_relabel(feat_acc, ~paste("Accountability: ", .x)),
