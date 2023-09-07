@@ -38,6 +38,16 @@ lapply(list.files("R", full.names = TRUE, recursive = TRUE), source)
 # Actual pipeline ---------------------------------------------------------
 list(
   ## Data and draws ----
+  tar_target(
+    qualtrics_anonymized_file,
+    here_rel("data", "raw_data", "conjointqsf_final.csv"),
+    format = "file"
+  ),
+  
+  tar_target(data_processed, make_clean_data(qualtrics_anonymized_file)),
+  tar_target(data_sans_conjoint, data_processed[["data_clean"]]),
+  tar_target(data_full, data_processed[["data_final"]]),
+  
   tar_target(gammas_intercept_only,
     here_rel("data", "raw_data", "posterior_draws", "intercept.rds"),
     format = "file"
