@@ -13,7 +13,7 @@ calculate_grid_means <- function(draws, ref_grid) {
         mutate(
           .linpred = preds, 
           # fake bc it's not actually mean(posterior_predict(.))
-          .epred = plogis(preds)
+          .epred = plogis(.linpred)
         )
     })) %>% 
     select(-data) %>% 
