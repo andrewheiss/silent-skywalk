@@ -699,12 +699,8 @@ make_clean_data <- function(path) {
       feat_issue = factor(feat_issue,
         levels = c("Emergency response", "Environment", "Human rights", "Refugee relief")
       ),
-      feat_transp = factor(feat_transp,
-        levels = c("Transparency: No", "Transparency: Yes")
-      ),
-      feat_acc = factor(feat_acc,
-        levels = c("Accountability: No", "Accountability: Yes")
-      ),
+      feat_transp = factor(feat_transp, levels = c("No", "Yes")),
+      feat_acc = factor(feat_acc, levels = c("No", "Yes")),
       feat_funding = factor(feat_funding,
         levels = c(
           "Funded primarily by many small private donations",
@@ -718,6 +714,15 @@ make_clean_data <- function(path) {
           "Criticized by government",
           "Under government crackdown"
         )
+      ),
+      # Make the levels for transparency and accountability unique
+      feat_transp = fct_recode(feat_transp,
+        "Transparency: No" = "No",
+        "Transparency: Yes" = "Yes"
+      ),
+      feat_acc = fct_recode(feat_acc,
+        "Accountability: No" = "No",
+        "Accountability: Yes" = "Yes"
       )
     ) %>% 
     
