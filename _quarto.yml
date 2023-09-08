@@ -41,15 +41,15 @@ website:
     search: true
     left:
       - text: "Experiment"
-        file: experiment.qmd
+        file: notebook/experiment.qmd
       - text: "Methods"
-        file: methods.qmd
+        file: notebook/methods.qmd
       - text: "Results"
         file: notebook/results.qmd
       - text: "Hypotheses"
-        file: hypotheses.qmd
+        file: notebook/hypotheses.qmd
       - text: "Basic AMCEs and MMs"
-        file: basic-amces-mms.qmd
+        file: notebook/basic-amces-mms.qmd
     
     right:
       - icon: github

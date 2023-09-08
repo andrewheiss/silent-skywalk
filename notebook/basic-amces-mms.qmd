@@ -23,10 +23,13 @@ options(
 ```{r libraries-data, warning=FALSE, message=FALSE}
 library(tidyverse)
 library(cregg)
+library(targets)
 
-results_long <- readRDS("original_data.rds") %>% 
-  mutate(choice_binary = ifelse(choice == alt, 1, 0)) %>%
-  mutate(choice_alt = factor(alt * choice_binary)) %>% 
+# Targets stuff
+tar_config_set(store = here::here('_targets'),
+               script = here::here('_targets.R'))
+
+results_long <- tar_read(data_full) %>% 
   mutate(
     feat_transp = fct_relabel(feat_transp, ~paste("Transparency: ", .x)),
     feat_acc = fct_relabel(feat_acc, ~paste("Accountability: ", .x)),
