@@ -48,8 +48,6 @@ website:
         file: notebook/results.qmd
       - text: "Hypotheses"
         file: notebook/hypotheses.qmd
-      - text: "Basic AMCEs and MMs"
-        file: notebook/basic-amces-mms.qmd
     
     right:
       - icon: github
