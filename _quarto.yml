@@ -46,8 +46,8 @@ website:
         file: notebook/methods.qmd
       - text: "Results"
         file: notebook/results.qmd
-      - text: "Hypotheses"
-        file: notebook/hypotheses.qmd
+      - text: "Manuscript"
+        file: notebook/manuscript.qmd
     
     right:
       - icon: github
