@@ -56,12 +56,6 @@ list(
   tar_target(data_sans_conjoint, data_processed[["data_clean"]]),
   tar_target(data_full, data_processed[["data_final"]]),
   
-  tar_target(gammas_intercept_only,
-    here_rel("data", "raw_data", "posterior_draws", "intercept.rds"),
-    format = "file"
-  ),
-  
-  
   ## Graphics and tables ----
   tar_target(graphic_functions, lst(
     theme_ngo, set_annotation_fonts, clrs, 
