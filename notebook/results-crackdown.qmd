@@ -29,13 +29,13 @@ library(scales)
 library(glue)
 library(gt)
 library(gtExtras)
-library(here)
 
-# Targets stuff
-tar_config_set(store = here('_targets'),
-               script = here('_targets.R'))
+tar_config_set(
+  store = here::here("_targets"),
+  script = here::here("_targets.R")
+)
 
-tar_load(c(means_features_only))
+preds_all <- tar_read(preds_new_treatment_only)
 
 invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
 invisible(list2env(tar_read(table_functions), .GlobalEnv))
@@ -64,7 +64,7 @@ $$
 $$
 
 ```{r h2a-calc-estimands}
-h2a_mms <- means_features_only %>% 
+h2a_mms <- preds_all %>% 
   group_by(feat_govt, .draw) %>% 
   summarize(avg = mean(.epred))
 
@@ -95,7 +95,7 @@ p_h2a_amces <- h2a_amces %>%
     delim = " - ", 
     names = c("feat_govt", "reference_level")
   ) %>% 
-  add_row(avg = 0, feat_govt = "Friendly") %>%
+  add_row(avg = 0, feat_govt = unique(.$reference_level)) %>%
   mutate(feat_govt = factor(feat_govt, levels = levels(h2a_mms$feat_govt))) %>% 
   ggplot(aes(x = avg, y = feat_govt, fill = feat_govt)) +
   stat_halfeye() +
@@ -189,7 +189,7 @@ $$
 $$
 
 ```{r h2b-calc-estimands}
-h2b_mms <- means_features_only %>% 
+h2b_mms <- preds_all %>% 
   mutate(org_collapsed = fct_collapse(feat_org, 
     `Oxfam & Red Cross` = c("Oxfam", "Red Cross"),
     `Amnesty International & Greenpeace` = c("Amnesty International", "Greenpeace"))) %>% 

@@ -29,13 +29,14 @@ library(scales)
 library(glue)
 library(gt)
 library(gtExtras)
-library(here)
 
 # Targets stuff
-tar_config_set(store = here('_targets'),
-               script = here('_targets.R'))
+tar_config_set(
+  store = here::here("_targets"),
+  script = here::here("_targets.R")
+)
 
-tar_load(c(means_features_only))
+preds_all <- tar_read(preds_conditional_treatment_only)
 
 invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
 invisible(list2env(tar_read(table_functions), .GlobalEnv))
@@ -63,7 +64,7 @@ $$
 $$
 
 ```{r h1-calc-estimands}
-h1_mms <- means_features_only %>% 
+h1_mms <- preds_all %>% 
   group_by(feat_org, .draw) %>% 
   summarize(avg = mean(.epred))
 
@@ -94,7 +95,7 @@ p_h1_amces <- h1_amces %>%
     delim = " - ", 
     names = c("feat_org", "reference_level")
   ) %>% 
-  add_row(avg = 0, feat_org = "Amnesty International") %>% 
+  add_row(avg = 0, feat_org = unique(.$reference_level)) %>% 
   ggplot(aes(x = avg, y = feat_org, fill = feat_org)) +
   stat_halfeye() +
   geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +

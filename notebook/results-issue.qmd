@@ -29,13 +29,13 @@ library(scales)
 library(glue)
 library(gt)
 library(gtExtras)
-library(here)
 
-# Targets stuff
-tar_config_set(store = here('_targets'),
-               script = here('_targets.R'))
+tar_config_set(
+  store = here::here("_targets"),
+  script = here::here("_targets.R")
+)
 
-tar_load(c(means_features_only))
+preds_all <- tar_read(preds_conditional_treatment_only)
 
 invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
 invisible(list2env(tar_read(table_functions), .GlobalEnv))
@@ -61,7 +61,7 @@ $$
 $$
 
 ```{r h3a-calc-estimands}
-h3a_mms <- means_features_only %>% 
+h3a_mms <- preds_all %>% 
   group_by(feat_issue, .draw) %>% 
   summarize(avg = mean(.epred))
 
@@ -92,7 +92,7 @@ p_h3a_amces <- h3a_amces %>%
     delim = " - ", 
     names = c("feat_issue", "reference_level")
   ) %>% 
-  add_row(avg = 0, feat_issue = "Emergency response") %>%
+  add_row(avg = 0, feat_issue = unique(.$reference_level)) %>%
   mutate(feat_issue = factor(feat_issue, levels = levels(h3a_mms$feat_issue))) %>% 
   ggplot(aes(x = avg, y = feat_issue, fill = feat_issue)) +
   stat_halfeye() +
@@ -188,7 +188,7 @@ $$
 $$
 
 ```{r h3b-calc-estimands}
-h3b_mms <- means_features_only %>% 
+h3b_mms <- preds_all %>% 
   group_by(feat_issue, feat_govt, .draw) %>% 
   summarize(avg = mean(.epred))
 
@@ -225,9 +225,9 @@ p_h3b_amces <- h3b_amces %>%
     delim = " - ", 
     names = c("feat_issue", "reference_level")
   ) %>% 
-  add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Friendly") %>%
-  add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Criticized") %>%
-  add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Under crackdown") %>%
+  add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Friendly relationship with government") %>%
+  add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Criticized by government") %>%
+  add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Under government crackdown") %>%
   mutate(feat_issue = factor(feat_issue, levels = levels(h3b_mms$feat_issue))) %>% 
   ggplot(aes(x = avg, y = feat_issue, fill = feat_issue)) +
   stat_halfeye() +
