@@ -36,8 +36,8 @@ library(here)
 tar_config_set(store = here('_targets'),
                script = here('_targets.R'))
 
-tar_load(c(preds_conditional_treatment_only, grid_treatment_only))
-tar_load(c(level_lookup, feature_lookup))
+tar_load(c(grid_treatment_only, level_lookup, feature_lookup))
+preds_all <- tar_read(preds_conditional_treatment_only)
 
 invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
 invisible(list2env(tar_read(table_functions), .GlobalEnv))
@@ -46,10 +46,6 @@ theme_set(theme_ngo())
 ```
 
 ```{r calc-mms}
-preds_all <- preds_conditional_treatment_only %>% 
-  filter(.category == 0) %>% 
-  mutate(.epred = 1 - .epred)
-
 mms_org <- preds_all %>% 
   group_by(feat_org, .draw) %>% 
   summarize(avg = mean(.epred))

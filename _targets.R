@@ -70,11 +70,17 @@ list(
   tar_target(grid_treatment_only, create_grid_treatment_only(data_full)),
   
   ## Calculate predicted values for reference grids ----
-  tar_target(preds_conditional_treatment_only, 
+  tar_target(preds_conditional_treatment_only_full, 
     create_preds_conditional_treatment_only(m_treatment_only, grid_treatment_only)
   ),
-  tar_target(preds_new_treatment_only, 
+  tar_target(preds_conditional_treatment_only,
+    filter_responses_only(preds_conditional_treatment_only_full)
+  ),
+  tar_target(preds_new_treatment_only_full, 
     create_preds_new_treatment_only(m_treatment_only, grid_treatment_only)
+  ),
+  tar_target(preds_new_treatment_only,
+    filter_responses_only(preds_new_treatment_only_full)
   ),
 
   ## Helper objects like lookup tables

@@ -50,6 +50,18 @@ make_feature_lookup <- function() {
   return(feature_lookup)
 }
 
+filter_responses_only <- function(preds) {
+  preds %>% 
+    # Get rid of all category 0 rows
+    filter(.category != 0) %>% 
+    # Stop grouping by category so we can add the three categories together
+    ungroup(.category) %>% 
+    # Add .draw as a group so that we collapse the epreds within each draw
+    group_by(.draw, .add = TRUE) %>% 
+    # Combine the three epreds
+    summarize(.epred = sum(.epred))
+}
+
 # Average respondent
 create_preds_conditional_treatment_only <- function(model, grid) {
   preds <- model %>% 
