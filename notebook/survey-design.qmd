@@ -1,0 +1,109 @@
+---
+title: "Experimental design"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center", fig.retina = 3,
+  fig.width = 6, fig.height = (6 * 0.618),
+  out.width = "80%", collapse = TRUE,
+  dev = "ragg_png",
+  echo = FALSE
+)
+
+options(
+  digits = 3, width = 120,
+  dplyr.summarise.inform = FALSE,
+  knitr.kable.NA = ""
+)
+```
+
+```{r libraries-functions, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(gt)
+library(targets)
+
+set.seed(12345)
+
+# Targets stuff
+tar_config_set(
+  store = here::here("_targets"),
+  script = here::here("_targets.R")
+)
+
+tar_load(data_sans_conjoint)
+
+invisible(list2env(tar_read(table_functions), .GlobalEnv))
+```
+
+We use a partial fractional factorial design using the following organizational attributes:
+
+```{css, echo=FALSE}
+/* Remove padding on lists in tables */
+.gt_table ul, .gt_table ol {
+  padding-left: 1rem;
+}
+```
+
+```{r design-table}
+orgs <- c("Amnesty International", "Greenpeace", "Oxfam", "Red Cross")
+issues <- c("Emergency response", "Environment", "Human rights", "Refugee relief")
+transparency <- c("Doesn't engage in transparency", "Engages in transparency")
+accountability <- c("Doesn't engage in accountability", "Engages in accountability")
+funding <- c("Funded primarily by many small private donations", "Funded primarily by a handful of wealthy private donors", "Funded primarily by government grants")
+govt <- c("Friendly relationship with government", "Criticized by government", "Under government crackdown")
+
+tribble(
+  ~feature, ~levels,
+  "Organization", paste0(paste0("- ", orgs), collapse = "\n"),
+  "Issue area", paste0(paste0("- ", issues), collapse = "\n"),
+  "Financial transparency", paste0(paste0("- ", transparency), collapse = "\n"),
+  "Accountability", paste0(paste0("- ", accountability), collapse = "\n"),
+  "Funding source", paste0(paste0("- ", funding), collapse = "\n"),
+  "Relationship with host government", paste0(paste0("- ", govt), collapse = "\n")
+) %>% 
+  gt() %>% 
+  cols_label(feature = "Feature/Attribute", levels = "Levels") %>% 
+  fmt_markdown(columns = levels) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  opts_theme()
+```
+
+Participants were then presented with random combinations of these attributes and asked to select which hypothetical organization they'd be willing to donate to. Participants see 12 iterations of a question that looks like this:
+
+::: {.callout-tip icon=false}
+### {{< iconify fa6-solid check-to-slot >}}&emsp; Example conjoint survey question
+
+***Q4.x*: For each of the next 12 questions, imagine you are selecting an organization you will donate to and that each of the listed organizations exists. Which of the following organizations would you donate to?**
+
+```{r conjoint-table, echo=FALSE, warning=FALSE, message=FALSE}
+tribble(
+  ~Attribute, ~`Option 1`, ~`Option 2`, ~`Option 3`, ~None,
+  "Organization", sample(orgs, 1), sample(orgs, 1), sample(orgs, 1), "—",
+  "Issue area", sample(issues, 1), sample(issues, 1), sample(issues, 1), "—",
+  "Transparency", sample(transparency, 1), sample(transparency, 1), sample(transparency, 1), "—",
+  "Accountability", sample(accountability, 1), sample(accountability, 1), sample(accountability, 1), "—",
+  "Funding sources", sample(funding, 1), sample(funding, 1), sample(funding, 1), "—",
+  "Relationship with host government", sample(govt, 1), sample(govt, 1), sample(govt, 1), "—"
+) %>% 
+  gt() %>% 
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = Attribute) %>% 
+  cols_width(everything() ~ pct(20)) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  tab_style(
+    style = cell_text(weight = "bold"),
+    location = cells_body(columns = Attribute)
+  ) %>% 
+  opts_theme()
+```
+
+:::
+
+Our target sample size was 1,000 (and we ended up with `r scales::label_comma()(nrow(data_sans_conjoint))` valid responses), which constitutes a sufficient size for model estimation. A sample size of at least 500 respondents is typical for estimating a hierarchical Bayesian model based on conjoint data. We double this amount because we are interested in analyzing subpopulations of respondents, which requires a larger sample. We present respondents with 4 hypothetical organizations that have 4 randomly assigned features. Respondents will be shown 12 sets of hypothetical organizations. This partial fractional factorial design results in 288 (4 × 4 × 2 × 3 × 3) possible combinations of organization features, and no single respondent will be offered every combination. To provide better coverage and arrive at better individual-level estimates, we use a larger sample size.

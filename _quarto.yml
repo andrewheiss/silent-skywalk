@@ -41,7 +41,7 @@ website:
     search: true
     left:
       - text: "Experiment"
-        file: notebook/experiment.qmd
+        file: notebook/survey-experiment.qmd
       - text: "Methods"
         file: notebook/methods.qmd
       - text: "Results"
@@ -64,7 +64,7 @@ website:
     
     - title: "Experiment"
       contents:
-        - section: "Preregistration"
+        - section: "Background details"
           contents:
             - notebook/survey-prereg.qmd
             - notebook/survey-irb.qmd

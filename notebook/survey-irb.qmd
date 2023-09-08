@@ -1,0 +1,24 @@
+---
+title: "Human subjects and IRB approval"
+---
+
+This project has received IRB approval from the human subjects research committees at BYU, Christopher Newport, and Georgia State. We have included a generic version of our protocol below.
+
+<p class="text-center">
+<a href="files/byu-irb-approval.pdf" class="btn btn-success btn-md" target="_blank" role="button">
+{{< iconify fa6-solid circle-check >}} &nbsp; BYU IRB approval
+</a> 
+&nbsp;
+<a href="files/cnu-irb-approval.pdf" class="btn btn-md btn-success" target="_blank" role="button">
+{{< iconify fa6-solid circle-check >}} &nbsp; Christopher Newport IRB approval
+</a>
+&nbsp;
+<a href="files/gsu-irb-approval.pdf" class="btn btn-success btn-md" target="_blank" role="button">
+{{< iconify fa6-solid circle-check >}} &nbsp; Georgia State IRB approval
+</a>
+</p>
+
+
+---
+
+{{< include survey/irb.md >}}

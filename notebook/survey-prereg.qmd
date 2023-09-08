@@ -1,0 +1,15 @@
+---
+title: "Preregistration"
+---
+
+We preregistered this study with the [Center for Open Science's](https://cos.io/) [Open Science Framework](https://osf.io/).
+
+<p class="text-center">
+<a href="https://osf.io/hsbyd" class="btn btn-success btn-md" target="_blank" role="button">
+{{< iconify fa6-solid compass-drafting >}} &nbsp; OSF preregistered pre-analysis plan &raquo;
+</a> 
+</p>
+
+---
+
+{{< include survey/preregistration.md >}}
