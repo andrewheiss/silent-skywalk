@@ -103,39 +103,6 @@ all_combos_means <- gammas_raw %>%
 ```
 
 
-# Model
-
-TODO: Intercept only because (1) LOO is best, and (2) it makes most sense causally since all confounding arrows are deleted due to randomization
-
-
-# Method: Marginal means
-
-To find the causal effects defined in each of our estimands, we calculate estimated marginal means (EMMs) by finding the fitted values for each cell in a balanced reference grid of all 576 possible combinations of feature levels (4 organizations × 4 issues × 2 transparency × 2 accountability × 3 funding × 3 government relationship = 576 rows). We transform these estimates to the probability scale in order to work directly with predicted probabilities rather than the link (logit) scale. We then calculate group averages and contrasts in group averages for each of the features of interest, marginalizing over all other features.
-
-TODO: Simple example here to just to illustrate the process—show literal marginal means in the margins of a balanced reference grid, then subtract them for the difference in marginal means, or AMCEs
-
-Here's what the full grid of 576 options looks like, with posterior median predictions for each combination:
-
-```{r}
-#| column: screen-inset
-all_combos_means %>% 
-  group_by(feat_org, feat_issue, feat_transp, feat_acc, feat_funding, feat_govt) %>% 
-  summarize(avg = mean(.epred)) %>% 
-  ungroup() %>% 
-  gt() %>% 
-  cols_align(align = "left") %>% 
-  cols_label(
-    feat_org = "Organization",
-    feat_issue = "Issue",
-    feat_transp = "Transparency",
-    feat_acc = "Accountability",
-    feat_funding = "Funding",
-    feat_govt = "Relationship",
-    avg = "Median probability"
-  ) %>% 
-  opts_theme() %>% 
-  opt_interactive(use_compact_mode = TRUE, use_highlight = TRUE, use_filters = TRUE)
-```
 
 
 # H~1~: Branding
