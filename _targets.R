@@ -69,7 +69,6 @@ list(
   )),
   tar_target(table_functions, lst(opts_int, opts_theme)),
   
-  
   ## Models ----
   tar_target(m_treatment_only, f_treatment_only(data_full)),
   
@@ -84,6 +83,9 @@ list(
     create_preds_new_treatment_only(m_treatment_only, grid_treatment_only)
   ),
 
+  ## Helper objects like lookup tables
+  tar_target(level_lookup, make_level_lookup(grid_treatment_only)),
+  tar_target(feature_lookup, make_feature_lookup())
   
   ## Analysis ----
   # tar_target(summary_activities, make_activities_summary(survey_orgs)),
