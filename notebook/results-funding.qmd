@@ -359,7 +359,7 @@ p_h4c_mms <- h4c_mms %>%
     ncol = 4,
     strip = strip_nested(
       text_x = list(element_text(
-        family = "Clear Sans",
+        family = "Libre Franklin",
         face = "bold"
       ), NULL),
       background_x = list(element_rect(fill = "grey96"), NULL),
@@ -407,7 +407,7 @@ p_h4c_amces <- h4c_amces %>%
     ncol = 4,
     strip = strip_nested(
       text_x = list(element_text(
-        family = "Clear Sans",
+        family = "Libre Franklin",
         face = "bold"
       ), NULL),
       background_x = list(element_rect(fill = "grey96"), NULL),

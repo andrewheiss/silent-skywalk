@@ -350,7 +350,7 @@ p_h5c_mms <- h5c_mms %>%
     ncol = 3,
     strip = strip_nested(
       text_x = list(element_text(
-        family = "Clear Sans",
+        family = "Libre Franklin",
         face = "bold"
       ), NULL),
       background_x = list(element_rect(fill = "grey96"), NULL),
@@ -398,7 +398,7 @@ p_h5c_amces <- h5c_amces %>%
     ncol = 3,
     strip = strip_nested(
       text_x = list(element_text(
-        family = "Clear Sans",
+        family = "Libre Franklin",
         face = "bold"
       ), NULL),
       background_x = list(element_rect(fill = "grey96"), NULL),
@@ -452,7 +452,7 @@ p_h5d_mms <- h5d_mms %>%
     ncol = 4,
     strip = strip_nested(
       text_x = list(element_text(
-        family = "Clear Sans",
+        family = "Libre Franklin",
         face = "bold"
       ), NULL),
       background_x = list(element_rect(fill = "grey96"), NULL),
@@ -500,7 +500,7 @@ p_h5d_amces <- h5d_amces %>%
     ncol = 4,
     strip = strip_nested(
       text_x = list(element_text(
-        family = "Clear Sans",
+        family = "Libre Franklin",
         face = "bold"
       ), NULL),
       background_x = list(element_rect(fill = "grey96"), NULL),
@@ -553,7 +553,7 @@ p_h5e_mms <- h5e_mms %>%
     ncol = 12,
     strip = strip_nested(
       text_x = list(element_text(
-        family = "Clear Sans",
+        family = "Libre Franklin",
         face = "bold"
       ), NULL),
       background_x = list(element_rect(fill = "grey96"), NULL),
@@ -602,7 +602,7 @@ p_h5e_amces <- h5e_amces %>%
     ncol = 12,
     strip = strip_nested(
       text_x = list(element_text(
-        family = "Clear Sans",
+        family = "Libre Franklin",
         face = "bold"
       ), NULL),
       background_x = list(element_rect(fill = "grey96"), NULL),

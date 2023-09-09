@@ -47,7 +47,7 @@ show_nice_pal <- function(pal, nrow = 1, show_text = TRUE) {
 # Fonts
 
 ```{scss echo=FALSE}
-@import url('https://fonts.googleapis.com/css2?family=Inter&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Libre+Franklin&display=swap');
 
 @font-face {
   font-family: 'Linux Libertine O';
@@ -88,8 +88,8 @@ show_nice_pal <- function(pal, nrow = 1, show_text = TRUE) {
   font-size: 1.1em;
 }
 
-.inter {
-  font-family: "Inter";
+.libre-franklin {
+  font-family: "Libre Franklin";
 }
 
 .libertine {
@@ -98,10 +98,10 @@ show_nice_pal <- function(pal, nrow = 1, show_text = TRUE) {
 }
 ```
 
-We use [Inter](https://rsms.me/inter/) (accessible for free from [Google Fonts](https://fonts.google.com/specimen/Inter)) as the main font in all our plots. 
+We use [Libre Franklin](https://github.com/impallari/Libre-Franklin) (accessible for free from [Google Fonts](https://fonts.google.com/specimen/Libre+Franklin)) as the main font in all our plots. 
 
-::: {.font-example .inter}
-**Inter**
+::: {.font-example .libre-franklin}
+**Libre Franklin**
 
 Whereas recognition of the *inherent dignity* and of the ***equal and inalienable*** rights of all members of the human family is the foundation of freedom, justice and peace in the world…
 :::
