@@ -58,6 +58,10 @@ thead th {
   padding-bottom: 0.2rem;
 }
 
+div.sidebar-item-container .active {
+  color: $red;
+}
+
 // Footer stuff
 .nav-footer-left {
   text-align: left;
