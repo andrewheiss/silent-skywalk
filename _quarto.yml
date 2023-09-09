@@ -100,6 +100,15 @@ website:
             - notebook/results-funding.qmd
             - notebook/results-practices.qmd
     
+    - title: "Manuscript"
+      contents:
+        - section: "Manuscript"
+          contents:
+            - notebook/manuscript.qmd
+        - section: "Miscellaneous"
+          contents:
+            - notebook/style-guide.qmd
+    
     - title: "Empty space lol"
     
   page-footer:
