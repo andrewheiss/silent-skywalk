@@ -1,0 +1,204 @@
+---
+title: "Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy"
+short-title: "Why Donors Donate"
+date: "2023-09-09"
+author:
+- name: Suparna Chaudhry
+  affiliation: Lewis and Clark College
+  url: http://www.suparnachaudhry.com/
+  email: schaudhry@lclark.edu
+  orcid: 0000-0003-3506-7590
+- name: Marc Dotson
+  affiliation: Brigham Young University
+  url: https://marriottschool.byu.edu/directory/details?id=50683
+  email: marc_dotson@byu.edu
+- name: Andrew Heiss
+  affiliation: Georgia State University
+  url: https://www.andrewheiss.com/
+  email: aheiss@gsu.edu
+  orcid: 0000-0002-3948-3914
+abstract: |
+  As space for civil society has closed around the world, transnational NGOs have faced a crisis of funding. We explore how NGOs have shifted from traditionally Northern funding sources toward grassroots private philanthropic money. How do individual donors in the US feel about donating to legally besieged NGOs abroad? Do legal restrictions on NGOs influence donors’ decision to donate? We use a conjoint survey experiment to argue that domestic political environments of NGO host countries influence preferences of private donors and that legal crackdowns on NGOs serve as a heuristic of organizational deservingness.
+keywords:
+  - philanthropy
+  - civil society
+  - conjoint experiments
+  - donor heuristics
+code-repo: "Access the code, data, and analysis at <https://github.com/andrewheiss/silent-skywalk>"
+bibliography: references.bib
+link-citations: true
+---
+
+```{r setup, include=FALSE}
+if (is.null(knitr::pandoc_to())) {
+  fmt_out <- "interactive"
+} else {
+  fmt_out <- knitr::pandoc_to()
+}
+
+knitr::opts_chunk$set(echo = FALSE, include = FALSE, 
+                      warning = FALSE, message = FALSE)
+
+knitr::opts_chunk$set(fig.align = "center", fig.retina = 3,
+                      fig.width = 6, fig.height = (6 * 0.618),
+                      out.width = "100%", collapse = TRUE)
+
+options(digits = 3, width = 120,
+        dplyr.summarise.inform = FALSE,
+        knitr.kable.NA = "")
+```
+
+Over the last three decades, states have increasingly sought to crack down on civil society organizations. In Human Rights Watch's 2016 Annual Report, Executive Director Kenneth Roth argued that civil society was under more aggressive attack than at any time in recent memory. Policymakers have referred to this phenomenon as the "closing of civic space" and data from the CIVICUS Civil Society Monitor shows that civil society groups face serious restrictions in nearly 60% of countries—111 in total [@CIVICUS:2017]. These attacks—most of which have occurred through restrictive legislation targeted against nongovernmental organizations (NGOs)—have adversely affected the ability of both domestic and international NGOs to operate and raise funds. Official aid funds have decreased substantially in countries that have imposed restrictive anti-NGO legislation [@ChaudhryHeiss:2018; @DupuyPrakash:2018] and official aid donors channel fewer funds to contentious issues and instead choose to fund "tame" causes [@ChaudhryHeiss:2018; @Bush:2015].
+
+In response to this dramatic shift in the NGO funding landscape, international NGOs (INGOs) have increasingly turned to foreign individual donors to offset the loss of funding from government and foundation sources [@BanksHulmeEdwards:2015]. The amount of this private foreign aid is not insignificant—from 2000–2010, private giving by U.S. entities towards international causes doubled in real terms [@desaikharas, 505]. In 2016, U.S. private philanthropy towards international NGOs amounted to \$22.06 billion [@givingusa:2017].
+
+This turn to private donors opens INGOs up to new dynamics in seeking out aid. Many organizations that had previously relied on governments and foundations had optimized their fundraising strategies for those kinds of organizations, but now need to tailor their fundraising attempts to private individuals, who behave differently from governments and foundations. Individuals have different preferences and rely on signals of effectiveness that differ from the benchmarks that large donor agencies rely on, including ratios of administrative overhead spending, financial transparency, accountability, and efficiency. These signals are are organizational characteristics that INGOs have direct control over. However, the political environment in the countries INGOs work in—including the global crackdown on civil society that is causing many organizations to seek out private funding in the first place—is a structural factor that INGOs can rarely influence on their own. How do organizational elements of private donor decision-making interact with broader structural limits on INGO fundraising?
+
+Given the growing crackdown on INGOs across the world, how do individual donors in the U.S. feel about donating to legally besieged NGOs abroad? How do organizational-level factors such as financial transparency and accountability; funding sources, including private donations and government grants; and various different issue areas compare with more structural-level factors such as host country politics when deciding to donate?
+
+While recent research on private foreign aid has examined funding decisions of donor NGOs themselves, we know less about the funding choices of the individuals responsible for much of these private aid flows [@desaikharas]. We argue that NGO-level organizational factors and domestic political environments of NGO host countries can influence preferences of foreign private donors by serving as heuristics to potential donors. Using a conjoint survey experiment, we find that private donors favor NGOs that voluntarily engage in transparency and accountability, prefer organizations that receive funding from many private individuals, rather than government or foundation grants, and that work on issues related to humanitarian and disaster relief rather than human rights and environmental advocacy. Importantly, we also find that structural factors play an important role in the private decision to donate—donors are significantly less likely to donate to INGOs that face government criticism or crackdown. Our results have important implications for international NGOs facing increased antagonism by government abroad and point to possible methods of adapting to these new regulations alienating their newfound donor base.
+
+
+# Private foreign aid
+
+Substantial research on nonprofit studies has looked at the motivation of individual donors, including altruism, reputational benefits and alignments with personal values [@BilodeauSlivinski:1997; @Wiepking:2010; @BekkersWiepking:2011]. However, this research has overwhelmingly looked at individual donor behavior and motivation for giving to local—rather than international—causes. On the other hand, the systematic study of private foreign aid is still in its infancy—there is an absence of expansive and high quality data [@greenhill2013], and most research has been restricted to elite, high net-worth donors [@USTrust2014].
+
+We argue that understanding funding decisions of private citizens is important for two main reasons. Examining the organizational-level factors in a group that make the average donor increase their charitable-giving towards these groups can help NGOs better target their programming towards these donors. It can also help organizations market their activities more saliently. More broadly, understanding motivations of private citizens can help organizations and governments better assess claims about the benefits of privatizing foreign aid. Previous research has argued that private foreign aid does not have to deal with the same strategic and political considerations as official aid and therefore, may be in a better position to respond to recipients' needs on the grounds [@easterlywilliamson].
+
+While recent research on private foreign aid has examined funding decisions of donor NGOs and foundations[^1], we know less about the funding choices of the individuals responsible for much of these private aid flows [@desaikharas]. While we do investigate the impact of individual-level factors on such private philanthropy targeted towards international causes in our larger project, in this paper we seek to understand the impact of organizational features of nongovernmental organizations and the structural factors in target countries in which they operate on donors’ decisions to engage in philanthropy.
+
+[^1]: On aid from world's largest NGOs, see @koch2009, on private aid flows from NGOs based in the US, see @buthe2012.
+
+## Organizational heuristics: The impact of NGO organizational decisions on individual philanthropy
+
+Existing research has found that donors respond to a host of heuristics and signals when deciding whether to donate to an NGO, since seeking out complete information about an organization's deservingness and efficiency is costly and time-consuming. One common signal for donors is organizational efficacy or the belief that an individual's donation will make a real difference. This can manifest itself through multiple mechanisms such as the amount an organization spends on overhead costs, whether an organization makes its finances public, or whether an organization participates in voluntary accountability practices, such as listing organizational details on websites like GuideStar and Charity Navigator.
+
+Financial transparency, defined as the degree of completeness of information, provided by organizations to the public concerning its business activities is one such important organizational practice that can enhance donor trust and confidence in organizations [@Vacarro:2006; @vaccaromadsen]. Previous research has found that media exposés about charity mismanagement can generate negative reputational spillovers for the charitable sector [@gibelmangelman]. Therefore, being financially transparent and engaging in activities that further transparency can reduce actual or perceived information asymmetries between donors and charities, and increase donor perception of organizational efficacy.
+
+> **H~1a~**:  If NGOs are financially transparent, then individual private donors will be more likely to donate to them.
+
+In addition to financial transparency, researchers and organizations, especially those auditing accountability practices, argue that accountability is another factor that can impact donor willingness to donate. While transparency is an organization's willingness to make critical data about the organization public, accountability is the willingness of the organization to explain its action to shareholders.
+
+Explaining actions to stakeholders can be important because many NGOs, even when well-intentioned, can devote excessive resources towards marketing and overheads [@bowman:2006]. Private donors, subsequently, may be more likely to dislike NGOs that spend a large share of their revenues for unproductive purposes [@rose1982], or rather, a large share of resources on administration, management and fundraising. As @Tremblay-BoirePrakash:2017 point out, while individuals would like to have some assurance that their resources will be used appropriately and organizations are not spending too much on overhead, donors do not necessarily have the time to research charities thoroughly. Based on a survey experiment, they find that membership in a voluntary program ultimately does not influence people's willingness to donate. Thus, while seeking out explanations about NGO actions can be important to individual donors, they do not necessarily seek assurance through third-party programs/audits and charity watchdogs, but rather through word of mouth, personal scrutiny and local networks.
+
+> **H~1b~**: If NGOs are accountable and hold regular third-party audits, then individual private donors will be more likely to donate to them.
+
+Another heuristic for deservingness is the *issue area* an NGO engages in. Donors can have very different preferences regarding the nature of NGO activities that they would like to support [@AndreoniPayne:2003]. Organizations that address humanitarian issues such as relief and development have broader appeal to donors who might shy away from NGOs dealing with more political causes like human rights. Organizations focusing on the former may also be able to frame their activities as in need of greater support.
+
+Perception of need, whether from personal experiences or acquired through media framing, can strongly influence the decisions of individuals to donate to relief efforts [@BekkersWiepking:2010, 6-8; @wiepkingleeuwen, 227-29]. This is especially the case when donors are faced with beneficiaries that fit the commonly accepted stereotypes of "victims" [@breezedean, 134]. Indeed, previous research has found that emergency funding, at least in the form of bilateral aid NGO, is more likely to be directed towards the senders of asylum-seekers and refugees [@czaikamayer; @bermeoleblang]. Therefore, donors may be more willing to donate to NGOs working on emergency response or relief focusing on victimized groups such as refugees or women and children in war.
+
+On the other hand, donors may be less willing to support NGOs focusing on contentious issue areas or programs that are not compatible with host government preferences. While NGOs working on issues like health, education and humanitarian relief rarely challenge the government [@Bush:2015; @Kiai:2017], those working on more contentious areas such as human rights, environmental advocacy, or election monitoring can pose political and economic challenges to regimes [@Chaudhry:2016]. These organizations are often viewed as politically motivated outsiders and run a higher risk of getting expelled [@DPR2015], increasing the possibility of wasting donor resources. Further, unlike the former causes, their programmatic output is harder to measure and quantify, which is another factor that is important to donors [@Bush:2015].
+
+>**H~2~**: If NGOs work in less contentious issue areas (emergency response and refugee relief), then individual private donors will be more likely to donate to them over more contentious issue areas (environment and human rights).
+
+The *source of NGO funding* can also influence donor behavior. Government grants to NGOs can often crowd out private funding [@AndreoniPayne:2003]. Donors are less likely to contribute to NGOs that rely heavily on government grants since their donation might feel more impersonal and less needed, while donors are more likely to give to organizations that rely primarily on private donations given that they may feel personally invested in the organization and perceive their contribution mattering. Government grants may also imply lack of independence from government which can reduce the efficiency of an organization [@Stroup:2012].
+
+>**H~3~**: If NGOs are funded primarily by numerous small private donors, then individual private donors will be more likely to donate to them compared to NGOs that are funded by a handful of wealthy private donors and government grants.
+
+Each of these signals is *organizational*. NGOs typically have direct control over their organizational practices, mission and issue area, and funding sources. We theorize that organizational characteristics like managerial practices, issue area, and funding sources all influence the decision to donate to an NGO (see @fig:big-dag). At the same time, however, we propose that structural characteristics like an NGO's host-country political and legal environment can also serve as donor heuristics.
+
+## Structural heuristics: The impact of anti-NGO crackdowns on individual philanthropy
+
+NGOs have less control over *structural* issues, and the role of political and legal institutions in donor decision making has been understudied. However, over the past decade international NGOs have become increasingly politicized and legally restricted around the world. NGO registration is not inherently restrictive, as governments frequently use regulations to streamline NGO-state relationships. Restrictive NGO laws, on the other hand, are designed to limit organizational programming by imposing barriers to entry, funding, and advocacy. These anti-NGO laws may signal to donors that NGOs undertake crucial work abroad, which is why governments perceive them as threatening and crack down on them. Therefore, we expect that government restrictions abroad will increase respondents' likelihood of donating to the organization.
+
+>**H~4~**: If NGOs face legal crackdowns abroad, then individual donors will be more likely to donate to them.
+
+
+## Examining the joint impact of organizational and structural factors
+
+```
+![Causal diagram showing causes of donor behavior. D = donation to NGO (outcome); G = NGO-government relationship, I = NGO issue area, F = NGO funding source, O = NGO organizational and managerial practices.](output/figures/causal-path.pdf){#fig:big-dag}
+```
+
+Identifying the causal link between structural factors and donor behavior is more difficult than measuring the link between organizational factors and donor behavior, however, because (1) NGOs have less direct control over their political environments, and (2) organizational characteristics like issue area and funding can sour the NGO-government relationship (as we explain in further detail below, governments are more likely to crack down on NGOs that address human rights and that receive government funding). @fig:big-dag helps disentangle this complex relationship. Organizational factors (**O**, or organizational practices like financial disclosure and accountability practices; **I**, or issue area; and **F**, or funding) all influence the decision to donate (**D**). Structural factors like an NGO's relationship with its host government (**G**) also influence donation behavior, but the relationship itself is shaped by both funding and issue area. As such, legal crackdowns do not occur in isolation. Countries are more likely to repress NGOs when organizational missions are in tension with government preferences and when organizations receive substantial funding from abroad [@DPR2015]. Therefore, the same organizational characteristic that can increase the likelihood of crackdown can also simultaneously serve as a donor heuristic and influence perceptions of NGO deservingness.
+
+Donors therefore may show increased willingness to donate to NGOs facing government crackdown/criticism working in less contentious issue areas (emergency response and refugee relief) over more contentious issue areas (environment and human rights). Those working on contentious issues may be expelled or shut down, which would waste donor resources and make it less likely that they donate to these organizations. Similarly, the combination of legal crackdown and funding may reshape donor perceptions of deservingness. Private donors may be more likely to punish government-funded NGOs that face restrictions. This is because legal trouble with the group's main funder could fuel private donor mistrust.
+
+Finally, the combination of financial transparency and government crackdown may increase donor willingness to support besieged NGOs. While concerns about NGO mismanagement and lack of financial transparency may signal concerns about an NGO's operations and its ability to abide by the host country's regulatory environment, the presence of such transparency may instead convince donors that government targeting of NGOs may be ill-intentioned rather than simply a manifestation of financial oversight. Donors may view NGO legislation as a sign of governments looking to crack down on groups that seek to keep governments accountable, rather than merely auditing and punishing groups that violate routine regulations.
+
+> **H~5a~**: Donors will show increased willingness to donate to NGOs facing government crackdown/criticism working in less contentious issue areas (emergency response and refugee relief) over more contentious issue areas (environment and human rights).
+>
+> **H~5b~**: Donors will show increased willingness to donate to NGOs that are facing government crackdown and are funded primarily by numerous small private donors.
+>
+>**H~5c~**: Donors will show increased willingness to donate to NGOs that are facing government crackdown and are funded primarily by numerous small private donors and work in less contentious areas (emergency response and refugee relief).
+>
+>**H~5d~**: Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are also financially transparent and work in less contentious areas (emergency response and refugee relief) and are funded by numerous small donors.
+
+
+# Methods
+
+## Conjoint analysis
+
+It is possible to study the effects of both organizational and structural heuristics on donor decision making individually, but disentangling the interaction of the two heuristics from individual donor characteristics adds complex dimensionality and makes more standard experimental work difficult, costly, and statistically fraught. To address this, we use conjoint analysis to simultaneously test individual donor preferences in the face of both organizational and structural heuristics. Conjoint analysis is a staple in marketing research for evaluating which product attributes are most important to consumers. It has been extensively used in new product development and product line optimization. Conjoint analysis is generally applicable whenever individuals face complex, multi-dimensional tradeoffs that make it difficult (or even impossible) to explicitly elicit preferences. In the context of this project, we use conjoint techniques to evaluate donor rather than consumer preferences as they choose NGOs which to donate to based on both organizational and structural heuristics.
+
+Conjoint analysis has been widely used within social sciences to explain causality and has recently begun to be used in political and public policy fields. @Helfer:2016 and @Mummolo:2016 both used conjoint analysis to assess perceptions of political communications. @KnudsenJohannesson:2019 argue that political communication research requires conjoint analysis because it accounts for the masking effects of factors as well as the complexity of a respondent's judgment of credibility. Because we also want to capture the complexity of a respondent's judgment of which NGO they should donate to, if any, we saw potential to expand the application of conjoint analysis within public policy.
+
+## Sample
+
+After collecting baseline information on respondent demographics and attitudes toward charity and voluntarism, we presented respondents with four randomly selected international nonprofit organizations with four randomly assigned features.^[See the appendix for a copy of the survey.] We included organizations that are associated with a range of contentious and noncontentious issues: Amnesty International, Greenpeace, Oxfam, and the International Committee of the Red Cross. We then displayed various combinations of features, including one of four issue areas (emergency response, environmental advocacy, human rights advocacy, and refugee relief), one of two organizational practices (financial transparency and third-party accountability audits), one of three funding sources (many small private donations, a handful of wealthy private donors, and government grants), and one of three relationships with host governments (friendly, criticized by the government, and under government crackdown). We presented twelve sets of four hypothetical combinations of organizational features, and because our partial fractional factorial design resulted in 288 (4 × 4 × 2 × 3 × 3) possible combinations of organizations and features, no single respondent was offered every combination.
+
+Survey participants were recruited through Centiment, a commercial online provider of high quality non-probability opt-in survey panels. Centiment ensures panel quality by actively recruiting representative samples of the US population and provides monetary incentives and rewards to participants. To see how varying NGO characteristics influence the decision to donate, our sample was representative of the population of people who are likely to donate to charity. We asked potential participants a screening question early in the survey ("Q2.5: How often do you donate to charity?"). If a participant responded that they give once every few years or never, they were disqualified from the study. We received 1,016 viable responses, which is a sufficient size for model estimation. A sample size of at least 500 respondents is typical for estimating a hierarchical Bayesian model based on conjoint data. We doubled this amount because we are interested in analyzing subpopulations of respondents, which requires a larger sample.
+
+```
+output/tables/tbl-sample-details.md
+```
+
+@tbl:sample-details provides a detailed breakdown of the individual characteristics of our sample. In general, respondents were well balanced across genders and tended to be older than the national median age of 36—less than 20% of respondents were under 36 years old. The majority of respondents (45%) had never been married, while nearly 40% were married, with 10% divorced. A quarter of the sample had a high school degree, with the remainder attending some level of college or university. The majority (58%) earned less than the national median income (\$61,372).
+
+Since we limited the sample to people who frequently donate to charities, most respondents have a favorable opinion of nonprofits and charities, with more than half reporting a 5 or greater (on a 7-point scale) of trust in charities. Nearly 90% of respondents indicated that it is important to trust charities, rating importance of trust at least a 3 on a 7-point scale. The majority of respondents volunteer at least once a year, donate to charity at least once a year, and give between \$1–\$999 annually. Most rarely attend church, but feel that religion is important. Respondents are also engaged civically (three quarters voted in the last election) and follow national news closely (70% follow the news daily). Respondents are fairly balanced ideologically, with the majority reporting a 3, 4, or 5 on a 7-point scale of liberal–conservative political ideology.
+
+## Modeling
+
+We analyze the effect of the various combinations of organizational features and donor characteristics with the following hierarchical Bayesian multinomial logit model:
+
+$$
+\begin{aligned}
+\beta &\sim \operatorname{Multivariate} \mathcal{N}(Z \Gamma, \xi) \\
+y &\sim \operatorname{Multinomial\ logit}(X \beta, \varepsilon)
+\end{aligned}
+$$
+
+where $y$ = which alternative the respondent chooses to donate to, $X$ = design matrix of attribute levels (i.e. organizations, issue areas, organizational practices, funding sources, and government relations), $\beta$ = latent individual preferences for the attribute levels, $Z$ = matrix of individual-level covariates (i.e. demographics, political knowledge, attitudes towards charity, etc.), $\Gamma$ = matrix of coefficients mapping individual-level covariates onto the latent individual-level preferences, and $\varepsilon$ and $\xi$ = errors. Simply put, the first level of the model predicts individual donor preferences for various combinations of features (e.g. the combination of human rights issues, financial transparency, government funding, and government crackdown), while the second level of the model uses these fitted preferences to predict the ultimate choice of donation.
+
+We use median values from the posterior distributions of the model as point estimates and calculate credible intervals using the 95% highest posterior density. We report the results primarily through density plots that show both the posterior distributions and 95% credible intervals. Inference based on Bayesian analysis differs from more common frequentist null hypothesis testing—as such, we declare an effect statistically significant if the posterior probability of being different from zero (or from other comparison values) exceeds 0.95.
+
+
+# Results
+
+## Effect of organizational and structural features on the likelihood of selection
+
+We hypothesized that the interaction of structural, organizational, and individual donor characteristics would have varying significant effects on donor behavior, and our results bear this out. @fig:probs-org shows the baseline probabilities of selecting an organization to donate to based on organization. Even without varying issue area, organizational practices, funding sources, and government relationships, respondents were most likely to donate to the Red Cross, with an 86% probability of being selected when given the choice. Oxfam had the lowest probability of being selected (65%), likely because it has less name recognition in the United States. Amnesty International and Greenpeace were slightly more probable (69% and 72%, respectively).
+
+```
+![Baseline probability of selecting an organization for donation](output/figures/probs-org.pdf){#fig:probs-org}
+```
+
+@fig:first-hypotheses presents the results for our first four hypotheses, which deal with the effect of organizational and structural factors on individual decisions to donate. The main coefficient parameter $\theta$ is shown as an odds ratio ($e^\theta$) to demonstrate changes in likelihood. Each conjoint feature omits one level as the base case.
+
+```
+![Changes in the likelihood of selecting an organization for donation across different levels within conjoint features. Values shown as odds ratios; red line at 1 shows point of no change in likelihood](output/figures/results-h1-4.pdf){#fig:first-hypotheses}
+```
+
+In our first set of hypotheses, we predicted that donors would be more likely to donate to organizations that engage in organizational practices that highlight transparency and accountability. As seen in the top left panel of @fig:first-hypotheses, donors were roughly three times more likely to select an organization that either voluntarily undergoes external audits for the sake of accountability or voluntarily discloses financial details. There is no significant difference between these two practices. Based on this evidence, donors rely heavily on heuristics of managerial best practices and reward INGOs for being transparent and accountable.
+
+According to our second hypothesis, donors should be more likely to donate to organizations working on less contentious issues like emergency response and refugee relief. A heuristic of deservingness should drive donor decisions, with donors leaning more towards causes that alleviate human suffering. The results from the experiment provide mixed results for this hypothesis. As seen in the top right panel of @fig:first-hypotheses, an emergency response frame has the most positive influence on donor decisions—since it is the reference group, all other issues decrease the likelihood of donation. Interestingly, human rights advocacy is the next most influential issue—respondents were 15% less likely to donate (compared to emergency response) when presented with human rights issues. Respondents are 36% less likely to donate when presented with an organization working on environmental issues, and a surprising 44% less likely when shown an organization working on refugee relief. There is no significant difference between refugee relief and environmental issues; both are significantly different from human rights, and human rights is significantly different from 1. While the preeminence of refugee relief follows our hypothesis, the other issues diverge markedly from our expectations. Human rights and environmental issues do decrease the likelihood of donation compared to emergency relief, as expected, but refugee issues see the most negative change in likelihood, contrary to the idea that tamer NGOs working on issues of human suffering will receive more attention from donors.
+
+The bottom left panel of @fig:first-hypotheses shows the results for our third hypothesis that an NGO's funding sources matter for donors. We posited that donors use the fact that an INGO receives many small donations as a heuristic of deservingness, providing individual donors with a greater chance that their money will have a positive impact on an NGO's programs. Our results confirm this: compared to the reference level of an INGO that receives many small donations, donors are 22% less likely to donate to an organization that receives its funding primarily from government donors, and 31% less likely to donate to one that receives the bulk of its funding from a handful of wealthy donors. There is no significant difference between the change in likelihood across government grants and wealthy donors, but both are significantly different from 1.
+
+These first three hypotheses all deal with organizational heuristics, or practices and attributes that an NGO has more direct control over. INGOs have less control over structural factors, such as the political environments of their host countries, but donors will likely still use these factors as signals of deservingness. The bottom right panel of @fig:first-hypotheses demonstrates that donors likely punish organizations that fall afoul of their host countries. Compared to an INGO with a friendly relationship with its host government, donors are 49% less likely to choose to donate to an organization that is criticized by its host government, and a sizable 64% less likely if the organization is under government crackdown (there is a significant difference between criticized by government and under government crackdown, and both are significantly different from 1). Contrary to expectations, donors appear to punish INGOs that face legal difficulties abroad.
+
+## Interaction between organizational and structural features and individual characteristics
+
+In our final set of hypotheses, we are interested in how individual-level donor characteristics interact with structural and organizational heuristics. In particular, we are interested in finding which kinds of donors are more or less likely to consider an INGO's managerial practices, issue area, funding sources, and host country politics when deciding to donate.
+
+**NOTE**: This section is still in progress—disentangling all the effects here is complex, which is good! Looking at the different interactions between conjoint features and attributes and individual-level covariates is one of the most powerful contributions of conjoint analysis, but isolating the most important effects (given that there are nearly 300 different combinations of just the organizational attributes, which then combine with dozens of possible covariate combinations), is difficult. We're still working on finding the best way to communicate this complexity graphically.
+
+In the meantime, @fig:second-level shows one attempt at this, displaying a heatmap of the significance of individual-level characteristics in the second level of a model that uses covariates related to attitudes toward charity and voluntarism. We find that personal experiences with and attitudes toward charity influence have heterogenous effects on the salience of different organizational and structural characteristics. For instance, believing that it is important to trust charities makes individuals less likely that government grants and rich donors play a role in the decision to donate, perhaps due to the perception that an organization receiving many small donations (the reference level) is more trustworthy. Similarly, the importance of trusting charities makes it more likely that accountability and transparency will influence the decision to donate. Notably, few of the covariates related to charity and voluntarism interact with structural attributes in any consistent way, other than personal involvement in activism—those with a history of activism are more likely to select an organization that is either facing government criticism or government crackdown.
+
+```
+![Heatmap showing significance of various covariates across conjoint attributes and levels](output/figures/q2-heatmap.pdf){#fig:second-level}
+```
+
+# Discussion and conclusion
+
+In general we find support for our hypotheses. With the turn towards private philanthropy in the face of the global crackdown on civil society, INGOs need to be aware of the dynamics of individual donor preferences and how those preferences interact with their managerial and organizational decision. Additionally, structural factors like political trends in INGO host countries influence donor decision-making. In aggregate, donors are less likely to give to organizations that face government criticism and crackdown, which could be a worrying sign for INGOs working on contentious issues that are more likely to elicit negative government responses. However, for the subgroup of respondents with personal involvement in advocacy, government crackdown serves as a positive heuristic instead, likely because those involved in advocacy understand how the relationship between governments and charities can be fraught.
