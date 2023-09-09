@@ -1,0 +1,93 @@
+---
+title: "Model details"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  fig.align = "center", fig.retina = 3,
+  fig.width = 6, fig.height = (6 * 0.618),
+  out.width = "80%", collapse = TRUE,
+  dev = "ragg_png"
+)
+
+options(
+  digits = 3, width = 120,
+  dplyr.summarise.inform = FALSE,
+  knitr.kable.NA = ""
+)
+```
+
+```{r libraries-data, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(targets)
+library(tidybayes)
+library(glue)
+library(gt)
+library(gtExtras)
+
+tar_config_set(
+  store = here::here("_targets"),
+  script = here::here("_targets.R")
+)
+
+tar_load(m_treatment_only)
+
+invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
+invisible(list2env(tar_read(table_functions), .GlobalEnv))
+
+theme_set(theme_ngo())
+```
+
+
+```{r calculate-model-times}
+models <- tribble(
+  ~model_name, ~nesting, ~model,
+  "Treatment variables only", "Respondent-specific intercepts", m_treatment_only#,
+  # "Treatment variables only", "Respondent-specific intercepts and slopes", NA
+) %>% 
+  mutate(duration = map(model, ~{
+    .$fit %>% 
+      rstan::get_elapsed_time() %>% 
+      as_tibble() %>% 
+      summarize(total = as.duration(max(warmup + sample)))
+  })) %>% 
+  select(-model) %>% 
+  unnest(duration)
+
+dur <- as.period(as.duration(sum(models$total)))
+
+total_run_time <- glue(
+  "{hours} hours, {minutes} minutes, and {seconds} seconds",
+  hours = hour(dur), minutes = minute(dur), seconds = round(second(dur), 0)
+)
+```
+
+We ran these models on a 2021 M1 MacBook Pro with 32 GB of RAM, with 4 MCMC chains spread across 8 cores, with two CPU threads per chain, using Stan through brms through cmdstanr. 
+
+In total, it took `r total_run_time` to run everything.
+
+```{r mcmc-duration-table}
+models %>% 
+  gt() %>% 
+  tab_footnote(
+    footnote = "Duration of the longest-running MCMC chain",
+    locations = cells_column_labels(columns = total)
+  ) %>% 
+  cols_label(
+    model_name = "Model variation",
+    nesting =  "Nesting structure",
+    total = "Total time"
+  ) %>% 
+  cols_align(
+    align = "left",
+    columns = everything()
+  ) %>%
+  grand_summary_rows(
+    columns = c(total),
+    fns = list(`Overall total` = ~as.duration(sum(.)))
+  ) %>% 
+  opt_footnote_marks(marks = "standard") %>% 
+  opt_horizontal_padding(3) %>% 
+  opts_theme()
+```
+

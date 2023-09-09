@@ -62,6 +62,7 @@ list(
     build_ci, fmt_decimal, label_pp
   )),
   tar_target(table_functions, lst(opts_int, opts_theme)),
+  tar_target(diagnostic_functions, lst(plot_trace, plot_trank, plot_pp)),
   
   ## Models ----
   tar_target(m_treatment_only, f_treatment_only(data_full)),

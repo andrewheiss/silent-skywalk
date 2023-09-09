@@ -75,9 +75,19 @@ website:
             - text: "Actual survey"
               file: notebook/survey-experiment.qmd
     
-    - title: "Methods"
+    - title: "Methods & Models"
       contents:
-        - notebook/marginal-means.qmd
+        - section: "Methods"
+          contents:
+            - notebook/methods.qmd
+        - section: "Model details"
+          contents:
+            - text: "Model definitions"
+              file: notebook/model-definitions.qmd
+            - text: "Model details"
+              file: notebook/model-details.qmd
+            - text: "Model diagnostics"
+              file: notebook/model-diagnostics.qmd
 
     - title: "Results"
       contents:
