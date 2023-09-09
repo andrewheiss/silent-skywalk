@@ -35,7 +35,7 @@ tar_config_set(
   script = here::here("_targets.R")
 )
 
-preds_all <- tar_read(preds_new_treatment_only)
+preds_all <- tar_read(preds_conditional_treatment_only)
 
 invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
 invisible(list2env(tar_read(table_functions), .GlobalEnv))
