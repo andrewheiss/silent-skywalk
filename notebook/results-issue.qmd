@@ -75,6 +75,7 @@ h3a_amces <- h3a_mms %>%
 p_h3a_mms <- h3a_mms %>% 
   ggplot(aes(x = avg, y = feat_issue, fill = feat_issue)) +
   stat_halfeye() +
+  geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
   scale_x_continuous(labels = label_percent()) +
   scale_y_discrete(labels = label_wrap(10)) +
   scale_fill_manual(values = clrs$prism[c(2, 6, 8, 10)], guide = "none") +
@@ -202,6 +203,7 @@ h3b_amces <- h3b_mms %>%
 p_h3b_mms <- h3b_mms %>% 
   ggplot(aes(x = avg, y = feat_issue, fill = feat_issue)) +
   stat_halfeye() +
+  geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
   scale_x_continuous(labels = label_percent()) +
   scale_y_discrete(labels = label_wrap(10)) +
   scale_fill_manual(values = clrs$prism[c(2, 6, 8, 10)], guide = "none") +
@@ -229,6 +231,7 @@ p_h3b_amces <- h3b_amces %>%
   add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Criticized by government") %>%
   add_row(avg = 0, feat_issue = "Emergency response", feat_govt = "Under government crackdown") %>%
   mutate(feat_issue = factor(feat_issue, levels = levels(h3b_mms$feat_issue))) %>% 
+  mutate(feat_govt = factor(feat_govt, levels = levels(h3b_mms$feat_govt))) %>% 
   ggplot(aes(x = avg, y = feat_issue, fill = feat_issue)) +
   stat_halfeye() +
   geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +

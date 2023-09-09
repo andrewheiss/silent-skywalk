@@ -78,6 +78,7 @@ h1_amces <- h1_mms %>%
 p_h1_mms <- h1_mms %>% 
   ggplot(aes(x = avg, y = feat_org, fill = feat_org)) +
   stat_halfeye() +
+  geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
   scale_x_continuous(labels = label_percent()) +
   scale_y_discrete(labels = label_wrap(10)) +
   scale_fill_manual(values = clrs$prism[c(1, 3, 5, 7)], guide = "none") +

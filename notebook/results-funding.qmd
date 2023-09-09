@@ -232,6 +232,7 @@ p_h4b_amces <- h4b_amces %>%
   add_row(avg = 0, feat_funding_short = "Many small donors", feat_govt = "Criticized by government") %>%
   add_row(avg = 0, feat_funding_short = "Many small donors", feat_govt = "Under government crackdown") %>%
   mutate(feat_funding_short = factor(feat_funding_short, levels = levels(h4b_mms$feat_funding_short))) %>% 
+  mutate(feat_govt = factor(feat_govt, levels = levels(h4b_mms$feat_govt))) %>% 
   ggplot(aes(x = avg, y = feat_funding_short, fill = feat_funding_short)) +
   stat_halfeye() +
   geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
@@ -376,6 +377,7 @@ p_h4c_mms <- h4c_mms %>%
     legend.justification = "left",
     legend.margin = margin(l = -7, t = 0)
   )
+p_h4c_mms
 
 baselines <- expand_grid(
   avg = 0,
@@ -383,7 +385,6 @@ baselines <- expand_grid(
   feat_govt = levels(h4c_mms$feat_govt),
   feat_issue = levels(h4c_mms$feat_issue)
 )
-p_h4c_mms
 
 p_h4c_amces <- h4c_amces %>% 
   ungroup() %>% 
@@ -394,6 +395,7 @@ p_h4c_amces <- h4c_amces %>%
   ) %>% 
   bind_rows(baselines) %>% 
   mutate(feat_funding_short = factor(feat_funding_short, levels = levels(h4c_mms$feat_funding_short))) %>% 
+  mutate(feat_govt = factor(feat_govt, levels = levels(h4c_mms$feat_govt))) %>% 
   ggplot(aes(x = avg, y = feat_funding_short, fill = feat_funding_short)) +
   stat_halfeye() +
   geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
