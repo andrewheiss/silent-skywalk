@@ -49,7 +49,7 @@ TODO: Simple example here to just to illustrate the process—show literal margi
 
 Here's what the full grid of 576 options looks like, with posterior median predictions for each combination:
 
-```{r}
+```{r show-full-grid-preds}
 #| column: screen-inset
 preds_all %>% 
   group_by(feat_org, feat_issue, feat_transp, feat_acc, feat_funding, feat_govt) %>% 
