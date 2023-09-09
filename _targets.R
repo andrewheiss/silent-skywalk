@@ -29,7 +29,7 @@ options(
 set.seed(265927) # From random.org
 
 tar_option_set(
-  packages = c("tidyverse", "Matrix"),
+  packages = c("tidyverse"),
   format = "qs"
 )
 
