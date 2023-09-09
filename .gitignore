@@ -10,10 +10,12 @@
 _site/
 _freeze/
 manuscript/output/
+manuscript/output-ms/
 
 *.pdf
 *.html
 *.docx
+
 
 # Data stuff
 data/raw_data/
