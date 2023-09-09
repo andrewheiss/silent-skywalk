@@ -48,6 +48,17 @@ options(digits = 3, width = 120,
         knitr.kable.NA = "")
 ```
 
+```{r libraries-data}
+library(tidyverse)
+library(targets)
+
+# Targets stuff
+tar_config_set(store = here::here('_targets'),
+               script = here::here('_targets.R'))
+
+invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
+```
+
 Over the last three decades, states have increasingly sought to crack down on civil society organizations. In Human Rights Watch's 2016 Annual Report, Executive Director Kenneth Roth argued that civil society was under more aggressive attack than at any time in recent memory. Policymakers have referred to this phenomenon as the "closing of civic space" and data from the CIVICUS Civil Society Monitor shows that civil society groups face serious restrictions in nearly 60% of countries—111 in total [@CIVICUS:2017]. These attacks—most of which have occurred through restrictive legislation targeted against nongovernmental organizations (NGOs)—have adversely affected the ability of both domestic and international NGOs to operate and raise funds. Official aid funds have decreased substantially in countries that have imposed restrictive anti-NGO legislation [@ChaudhryHeiss:2018; @DupuyPrakash:2018] and official aid donors channel fewer funds to contentious issues and instead choose to fund "tame" causes [@ChaudhryHeiss:2018; @Bush:2015].
 
 In response to this dramatic shift in the NGO funding landscape, international NGOs (INGOs) have increasingly turned to foreign individual donors to offset the loss of funding from government and foundation sources [@BanksHulmeEdwards:2015]. The amount of this private foreign aid is not insignificant—from 2000–2010, private giving by U.S. entities towards international causes doubled in real terms [@desaikharas, 505]. In 2016, U.S. private philanthropy towards international NGOs amounted to \$22.06 billion [@givingusa:2017].

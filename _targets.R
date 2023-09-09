@@ -86,21 +86,20 @@ list(
 
   ## Helper objects like lookup tables
   tar_target(level_lookup, make_level_lookup(grid_treatment_only)),
-  tar_target(feature_lookup, make_feature_lookup())
+  tar_target(feature_lookup, make_feature_lookup()),
   
-  ## Analysis ----
-  # tar_target(summary_activities, make_activities_summary(survey_orgs)),
-  # tar_target(models_activities, make_activities_models(summary_activities))#,
-  # 
-  # Manuscript and analysis notebook ----
-  # tar_quarto(output_nice, path = "manuscript", quiet = FALSE, profile = "nice"),
-  # tar_quarto(output_ms, path = "manuscript", quiet = FALSE, profile = "ms"),
-  # tar_quarto(website, path = ".", quiet = FALSE),
-  # tar_target(deploy_script, here_rel("deploy.sh"), format = "file"),
-  # tar_target(deploy, {
-  #   # Force a dependency
-  #   website
-  #   # Run the deploy script
-  #   if (Sys.getenv("UPLOAD_WEBSITES") == "TRUE") processx::run(paste0("./", deploy_script))
-  # })
+  ## Manuscript and notebook ----
+  tar_quarto(output_nice, path = "manuscript", quiet = FALSE, profile = "nice"),
+  tar_quarto(output_ms, path = "manuscript", quiet = FALSE, profile = "ms"),
+  tar_quarto(website, path = ".", quiet = FALSE),
+  tar_target(deploy_script, here_rel("deploy.sh"), format = "file"),
+  tar_target(deploy, {
+    # Force a dependency
+    website
+    # Run the deploy script
+    if (Sys.getenv("UPLOAD_WEBSITES") == "TRUE") processx::run(paste0("./", deploy_script))
+  }),
+  
+  ## Render the README ----
+  tar_quarto(readme, here_rel("README.qmd"))
 )
