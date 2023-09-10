@@ -3,10 +3,6 @@
     "Version": "4.3.1",
     "Repositories": [
       {
-        "Name": "Stan",
-        "URL": "https://mc-stan.org/r-packages"
-      },
-      {
         "Name": "CRAN",
         "URL": "https://packagemanager.posit.co/cran/latest"
       }
@@ -531,8 +527,7 @@
     "cmdstanr": {
       "Package": "cmdstanr",
       "Version": "0.6.1",
-      "Source": "Repository",
-      "Repository": "Stan",
+      "Source": "unknown",
       "Requirements": [
         "R",
         "R6",
@@ -2172,13 +2167,18 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "1.0.2",
-      "Source": "Repository",
-      "Repository": "CRAN",
+      "Version": "1.0.2.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "renv",
+      "RemoteUsername": "rstudio",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "dba0079085ee3edec3b17c011f6d0a62e91635db",
       "Requirements": [
         "utils"
       ],
-      "Hash": "4b22ac016fe54028b88d0c68badbd061"
+      "Hash": "f8d3fa18f5060bb2026b15d39873b9f1"
     },
     "reprex": {
       "Package": "reprex",
