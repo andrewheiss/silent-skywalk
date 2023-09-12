@@ -41,7 +41,7 @@ invisible(list2env(tar_read(table_functions), .GlobalEnv))
 theme_set(theme_ngo())
 ```
 
-To find the causal effects defined in each of our estimands, we calculate estimated marginal means (EMMs) by finding the fitted values for each cell in a balanced reference grid of all 576 possible combinations of feature levels (4 organizations × 4 issues × 2 transparency × 2 accountability × 3 funding × 3 government relationship = 576 rows). We transform these estimates to the probability scale in order to work directly with predicted probabilities rather than the link (logit) scale. We then calculate group averages and contrasts in group averages for each of the features of interest, marginalizing over all other features.
+To find the causal effects defined in each of our estimands, we calculate estimated marginal means (EMMs) by finding the fitted probability-scale values for each cell in a balanced reference grid of all 576 possible combinations of feature levels (4 organizations × 4 issues × 2 transparency × 2 accountability × 3 funding × 3 government relationship = 576 rows). We then calculate group averages and contrasts in group averages for each of the features of interest, marginalizing over all other features.
 
 This is a little more complicated than just looking at the model coefficients, but it is a valid way of thinking about marginal contrasts and it is a common approach in fields like epidemiology, and the complex multinomial models we're using require it.
 
