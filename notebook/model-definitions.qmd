@@ -3,3 +3,8 @@ title: "Model definitions"
 ---
 
 TODO: Formal math for the models
+
+# Model
+
+TODO: Intercept only because (1) LOO is best, and (2) it makes most sense causally since all confounding arrows are deleted due to randomization
+

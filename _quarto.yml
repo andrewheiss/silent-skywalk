@@ -42,8 +42,8 @@ website:
     left:
       - text: "Experiment"
         file: notebook/survey-experiment.qmd
-      - text: "Methods"
-        file: notebook/methods.qmd
+      - text: "Methods & Models"
+        file: notebook/marginal-means.qmd
       - text: "Results"
         file: notebook/results.qmd
       - text: "Manuscript"
@@ -79,7 +79,7 @@ website:
       contents:
         - section: "Methods"
           contents:
-            - notebook/methods.qmd
+            - notebook/marginal-means.qmd
         - section: "Model details"
           contents:
             - text: "Model definitions"
