@@ -11,8 +11,14 @@ theme_ngo <- function() {
   theme_minimal(base_family = "Libre Franklin") +
     theme(panel.grid.minor = element_blank(),
       plot.title = element_text(family = "Libre Franklin", face = "bold"),
-      axis.title.x = element_text(hjust = 0),
-      axis.title.y = element_text(hjust = 1),
+      axis.title.x = element_text(
+        family = "Libre Franklin SemiBold", face = "plain",
+        hjust = 0, size = rel(0.9), 
+        margin = margin(t = 10)),
+      axis.title.y = element_text(
+        family = "Libre Franklin SemiBold", face = "plain",
+        hjust = 1, size = rel(0.9), 
+        margin = margin(r = 10)),
       strip.text = element_text(family = "Libre Franklin", face = "bold",
         size = rel(0.75), hjust = 0),
       strip.background = element_rect(fill = "grey90", color = NA))
