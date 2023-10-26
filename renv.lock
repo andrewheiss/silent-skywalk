@@ -3,6 +3,10 @@
     "Version": "4.3.1",
     "Repositories": [
       {
+        "Name": "Stan",
+        "URL": "https://mc-stan.org/r-packages"
+      },
+      {
         "Name": "CRAN",
         "URL": "https://packagemanager.posit.co/cran/latest"
       }
@@ -527,7 +531,8 @@
     "cmdstanr": {
       "Package": "cmdstanr",
       "Version": "0.6.1",
-      "Source": "unknown",
+      "Source": "Repository",
+      "Repository": "Stan",
       "Requirements": [
         "R",
         "R6",
@@ -1436,6 +1441,19 @@
       ],
       "Hash": "1deaf1de3eac7e1d3377954b3a283652"
     },
+    "insight": {
+      "Package": "insight",
+      "Version": "0.19.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "methods",
+        "stats",
+        "utils"
+      ],
+      "Hash": "e605299a4e3d10404ac7989b05c4a917"
+    },
     "isoband": {
       "Package": "isoband",
       "Version": "0.2.7",
@@ -1599,6 +1617,24 @@
         "R"
       ],
       "Hash": "7ce2733a9826b3aeb1775d56fd305472"
+    },
+    "marginaleffects": {
+      "Package": "marginaleffects",
+      "Version": "0.13.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R",
+        "Rcpp",
+        "RcppEigen",
+        "checkmate",
+        "data.table",
+        "generics",
+        "insight",
+        "methods",
+        "rlang"
+      ],
+      "Hash": "76ff31be3ad5592c280062b18851a125"
     },
     "markdown": {
       "Package": "markdown",
@@ -1794,6 +1830,16 @@
         "rstudioapi"
       ],
       "Hash": "2cc72e89c9f4dc12c38d848914aac313"
+    },
+    "palmerpenguins": {
+      "Package": "palmerpenguins",
+      "Version": "0.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Requirements": [
+        "R"
+      ],
+      "Hash": "6c6861efbc13c1d543749e9c7be4a592"
     },
     "parallelly": {
       "Package": "parallelly",
@@ -2167,18 +2213,13 @@
     },
     "renv": {
       "Package": "renv",
-      "Version": "1.0.2.9000",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "renv",
-      "RemoteUsername": "rstudio",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "dba0079085ee3edec3b17c011f6d0a62e91635db",
+      "Version": "1.0.3",
+      "Source": "Repository",
+      "Repository": "RSPM",
       "Requirements": [
         "utils"
       ],
-      "Hash": "f8d3fa18f5060bb2026b15d39873b9f1"
+      "Hash": "41b847654f567341725473431dd0d5ab"
     },
     "reprex": {
       "Package": "reprex",
