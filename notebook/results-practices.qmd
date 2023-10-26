@@ -63,18 +63,18 @@ $$
 $$
 ```{r h5a-calc-estimands}
 h5a_mms <- preds_all %>% 
-  group_by(feat_transp_short, .draw) %>% 
+  group_by(feat_acc, .draw) %>% 
   summarize(avg = mean(.epred))
 
 h5a_amces <- h5a_mms %>% 
-  group_by(feat_transp_short) %>% 
-  compare_levels(variable = avg, by = feat_transp_short, comparison = "control")
+  group_by(feat_transp) %>% 
+  compare_levels(variable = avg, by = feat_transp, comparison = "control")
 ```
 
 ```{r plot-h5a-mm-amce, fig.width=10, fig.height=4, out.width="100%"}
 #| column: body-outset-right
 p_h5a_mms <- h5a_mms %>% 
-  ggplot(aes(x = avg, y = feat_transp_short, fill = feat_transp_short)) +
+  ggplot(aes(x = avg, y = feat_acc, fill = feat_acc)) +
   stat_halfeye() +
   geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
   scale_x_continuous(labels = label_percent()) +
@@ -170,10 +170,12 @@ bind_cols(
 ```
 
 
-# H~5b~: Relationship with host government, organizational practices
+# H~5b~: Relationship with host government and organizational practices
+
+## Transparency
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 5~b~: Relationship with host government, organizational practices
+### {{< iconify fa6-solid flask-vial >}} Hypothesis 5~b~: Relationship with host government, organizational practices
 
 **Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are also financially transparent**
 :::
@@ -285,6 +287,149 @@ bind_cols(
   cols_align(align = "left", columns = c(feat_transp_short, contrast)) %>% 
   cols_label(
     feat_transp_short = "Transparency", 
+    nice = "Posterior EMM",
+    contrast = "Contrast",
+    diff_nice = "Posterior ∆",
+    p_neq_0 = "*p*~direction~",
+    .fn = md
+  ) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  tab_style(
+    style = cell_fill(color = "grey90"),
+    locations = cells_row_groups()
+  ) %>% 
+  tab_footnote(
+    footnote = "Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.",
+    locations = cells_column_labels(columns = c(nice, diff_nice))
+  ) %>% 
+  tab_footnote(
+    footnote = md("The probability of direction (*p*~direction~) is the probability that the posterior difference in marginal means is strictly positive or negative—it is the proportion of the posterior difference in marginal means that is the sign of the median."),
+    locations = cells_column_labels(columns = p_neq_0)
+  ) %>% 
+  gt_add_divider(columns = nice, style = "dashed", weight = px(1)) %>% 
+  opt_footnote_marks(marks = "standard") %>% 
+  opt_horizontal_padding(3) %>% 
+  opts_theme()
+```
+
+## Accountability
+
+::: {.callout-tip icon=false}
+### {{< iconify fa6-solid flask-vial >}} Hypothesis 5~b2~: Relationship with host government, organizational practices
+
+**Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are accountable and hold regular third party audits**
+:::
+
+$$
+\begin{aligned}
+\theta =&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Accountability} = \text{Yes} \mid \text{Relationship = Under crackdown or Criticized} \right) \bigr] - \\
+&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Accountability} = \text{Yes} \mid \text{Relationship = Friendly} \right) \bigr]
+\end{aligned}
+$$
+
+```{r h5b2-calc-estimands}
+h5b2_mms <- preds_all %>% 
+  group_by(feat_acc_short, feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+h5b2_amces <- h5b2_mms %>% 
+  group_by(feat_govt) %>% 
+  compare_levels(variable = avg, by = feat_acc_short, comparison = "control")
+```
+
+```{r plot-h5b2-mm-amce, fig.width=10, fig.height=6.5, out.width="100%"}
+#| column: body-outset-right
+p_h5b2_mms <- h5b2_mms %>% 
+  ggplot(aes(x = avg, y = feat_acc_short, fill = feat_acc_short)) +
+  stat_halfeye() +
+  geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  scale_x_continuous(labels = label_percent()) +
+  scale_y_discrete(labels = label_wrap(11)) +
+  scale_fill_manual(values = clrs$prism[c(9, 4)], guide = "none") +
+  facet_wrap(vars(feat_govt), ncol = 1) +
+  labs(
+    x = "Overall average predicted probability",
+    y = NULL,
+    fill = NULL,
+    title = "Estimated marginal means"
+  ) +
+  theme(
+    legend.position = "top",
+    legend.justification = "left",
+    legend.margin = margin(l = -7, t = 0)
+  )
+
+p_h5b2_amces <- h5b2_amces %>% 
+  ungroup() %>% 
+  separate_wider_delim(
+    feat_acc_short,
+    delim = " - ", 
+    names = c("feat_acc_short", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feat_acc_short = "No", feat_govt = "Friendly relationship with government") %>%
+  add_row(avg = 0, feat_acc_short = "No", feat_govt = "Criticized by government") %>%
+  add_row(avg = 0, feat_acc_short = "No", feat_govt = "Under government crackdown") %>%
+  mutate(feat_acc_short = factor(feat_acc_short, levels = levels(h5b2_mms$feat_acc_short))) %>% 
+  mutate(feat_govt = factor(feat_govt, levels = levels(h5b2_mms$feat_govt))) %>% 
+  ggplot(aes(x = avg, y = feat_acc_short, fill = feat_acc_short)) +
+  stat_halfeye() +
+  geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  scale_x_continuous(labels = label_pp) +
+  scale_y_discrete(labels = label_wrap(11)) +
+  scale_fill_manual(values = clrs$prism[c(9, 4)], guide = "none") +
+  facet_wrap(vars(feat_govt), ncol = 1) +
+  labs(
+    x = "Percentage point change in probability of choice selection",
+    y = NULL,
+    fill = NULL,
+    title = "Difference in estimated marginal means"
+  )
+
+p_h5b2_mms | p_h5b2_amces
+```
+
+```{r table-h5b2-mm-amce}
+#| column: body-outset-right
+h5b2_tbl_mm <- h5b2_mms %>% 
+  group_by(feat_govt, feat_acc_short) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  arrange(desc(feat_govt), desc(feat_acc_short)) %>% 
+  select(feat_acc_short, feat_govt, nice)
+
+h5b2_tbl_amces <- h5b2_amces %>% 
+  group_by(feat_govt, feat_acc_short) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>%
+  ungroup() %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0)) %>% 
+  mutate(nice = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_acc_short = str_replace(feat_acc_short, " - ", "−<br>")) %>% 
+  mutate(across(starts_with("p_"), ~fmt_decimal(.))) %>% 
+  arrange(desc(feat_govt)) %>% 
+  select(contrast = feat_acc_short, diff_nice = nice, p_neq_0)
+
+bind_cols(
+  h5b2_tbl_mm, 
+  h5b2_tbl_amces %>% 
+    add_row(contrast = NA, .after = 1) %>% 
+    add_row(contrast = NA, .after = 3) %>% 
+    add_row(contrast = NA, .after = 5)
+) %>% 
+  mutate(feat_govt = fct_relabel(feat_govt, ~paste("Relationship with government:", .x))) %>% 
+  group_by(feat_govt) %>% 
+  gt() %>% 
+  sub_missing(columns = everything(), missing_text = "—") %>% 
+  fmt_markdown(columns = c(nice, diff_nice, contrast)) %>%
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = c(feat_acc_short, contrast)) %>% 
+  cols_label(
+    feat_acc_short = "Accountability", 
     nice = "Posterior EMM",
     contrast = "Contrast",
     diff_nice = "Posterior ∆",
@@ -745,3 +890,4 @@ bind_cols(
   opt_horizontal_padding(3) %>% 
   opts_theme()
 ```
+
