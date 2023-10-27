@@ -125,13 +125,23 @@ Donors therefore may show increased willingness to donate to NGOs facing governm
 
 Since we are running a conjoint experiment, the interactions between the main treatment variables described above is simply an exploratory analysis. Importantly, when testing these hypotheses, we do not assume that individual donors have perfect knowledge about an NGO or the country an NGO operates in. Moreover, the average donor will not know exactly what “crackdown” entails for any given organization (i.e., does it mean an NGO was expelled, or that its assets were frozen, or that it received a fine?). For the sake of this experiment, this ambiguity is not a central concern as the heuristics we explore here are explicitly simplified short- cuts to donor information-gathering. Knowing that an organization is financially transparent (even if donors are not familiar with specific kinds of requirements regarding transparency) or knowing that an NGO faces legal trouble abroad should be enough to trigger the effect of these frames on donor preferences. Moreover, although many NGOs make information about their operations accessible through annual reports, it is time-consuming to track down that information. In each of these hypotheses, we assume that donors will not spend additional effort to research the exact details concerning crackdown, transparency and accountability. Instead, donors rely on signals and heuristics about the organization to shape their preferences and behavior [@SzperPrakash:2011].
 
-# Methods
+# Research design
 
-## Conjoint analysis
+TODO: Cite @ChaudhryHeiss:2022
+
+
+We use an experiment...
+
+## Conjoint research design
 
 It is possible to study the effects of both organizational and structural heuristics on donor decision making individually, but disentangling the interaction of the two heuristics from individual donor characteristics adds complex dimensionality and makes more standard experimental work difficult, costly, and statistically fraught. To address this, we use conjoint analysis to simultaneously test individual donor preferences in the face of both organizational and structural heuristics. Conjoint analysis is a staple in marketing research for evaluating which product attributes are most important to consumers. It has been extensively used in new product development and product line optimization. Conjoint analysis is generally applicable whenever individuals face complex, multi-dimensional tradeoffs that make it difficult (or even impossible) to explicitly elicit preferences. In the context of this project, we use conjoint techniques to evaluate donor rather than consumer preferences as they choose NGOs which to donate to based on both organizational and structural heuristics.
 
 Conjoint analysis has been widely used within social sciences to explain causality and has recently begun to be used in political and public policy fields. @Helfer:2016 and @Mummolo:2016 both used conjoint analysis to assess perceptions of political communications. @KnudsenJohannesson:2019 argue that political communication research requires conjoint analysis because it accounts for the masking effects of factors as well as the complexity of a respondent's judgment of credibility. Because we also want to capture the complexity of a respondent's judgment of which NGO they should donate to, if any, we saw potential to expand the application of conjoint analysis within public policy.
+
+TODO: More on conjoint stuff
+
+Before launching the survey experiment, in an effort to avoid issues with p-hacking and cherry-picking results, we preregistered a series of confirmatory hypotehses at the Open Science Framework, and our preregistration protocol is available at URL. Appendix contains blah. Analysis fully reproducible using code and data available at BLAH
+
 
 ## Sample
 
@@ -147,7 +157,7 @@ output/tables/tbl-sample-details.md
 
 Since we limited the sample to people who frequently donate to charities, most respondents have a favorable opinion of nonprofits and charities, with more than half reporting a 5 or greater (on a 7-point scale) of trust in charities. Nearly 90% of respondents indicated that it is important to trust charities, rating importance of trust at least a 3 on a 7-point scale. The majority of respondents volunteer at least once a year, donate to charity at least once a year, and give between \$1–\$999 annually. Most rarely attend church, but feel that religion is important. Respondents are also engaged civically (three quarters voted in the last election) and follow national news closely (70% follow the news daily). Respondents are fairly balanced ideologically, with the majority reporting a 3, 4, or 5 on a 7-point scale of liberal–conservative political ideology.
 
-## Modeling
+## Modeling and estimation
 
 We analyze the effect of the various combinations of organizational features and donor characteristics with the following hierarchical Bayesian multinomial logit model:
 
@@ -159,6 +169,8 @@ y &\sim \operatorname{Multinomial\ logit}(X \beta, \varepsilon)
 $$
 
 where $y$ = which alternative the respondent chooses to donate to, $X$ = design matrix of attribute levels (i.e. organizations, issue areas, organizational practices, funding sources, and government relations), $\beta$ = latent individual preferences for the attribute levels, $Z$ = matrix of individual-level covariates (i.e. demographics, political knowledge, attitudes towards charity, etc.), $\Gamma$ = matrix of coefficients mapping individual-level covariates onto the latent individual-level preferences, and $\varepsilon$ and $\xi$ = errors. Simply put, the first level of the model predicts individual donor preferences for various combinations of features (e.g. the combination of human rights issues, financial transparency, government funding, and government crackdown), while the second level of the model uses these fitted preferences to predict the ultimate choice of donation.
+
+Marginal means and marginalization across a balanced reference grid
 
 We use median values from the posterior distributions of the model as point estimates and calculate credible intervals using the 95% highest posterior density. We report the results primarily through density plots that show both the posterior distributions and 95% credible intervals. Inference based on Bayesian analysis differs from more common frequentist null hypothesis testing—as such, we declare an effect statistically significant if the posterior probability of being different from zero (or from other comparison values) exceeds 0.95.
 
@@ -200,6 +212,7 @@ In the meantime, @fig:second-level shows one attempt at this, displaying a heatm
 ```
 
 # Conclusion
+
 Over the last two decades, governments globally have systematically controlled and repressed NGOs using both violent tactics and administrative means over the last three decades -- a phenomenon known as `closing' or `shrinking' civic space. This trend of closing civic space has important implications for local and international NGOs as well as donors. Recent research has analyzed the impact of this crackdown on public or official aid donors. However, we know relatively little about how state repression of NGOs affects the preferences of foreign private donors. The responses of elite donors and foundations to government crackdown on civil society organizations remains a ripe area for research. Unlike state donors, individual and elite donors may not necessarily withdraw or reduce support for NGOs facing harassment abroad. This is important because private philanthropy towards organizations working in international affairs continues to grow despite inflation -- from 2021 to 2022, individual giving to nonprofits in international affairs grew by over 10.9% in the US [@GivingUSA:2023]. 
 
 Given the increasing hurdles faced by these nonprofits, how do individual donors in the U.S. feel about donating to legally besieged NGOs abroad? How do organizational-level factors such as financial transparency and accountability compare with more structural-level factors such as host country politics when deciding to donate? Using a conjoint experiment with a nationally representative sample of the U.S. population, we find COMPLETE. 
