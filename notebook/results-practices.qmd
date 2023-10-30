@@ -63,18 +63,18 @@ $$
 $$
 ```{r h5a-calc-estimands}
 h5a_mms <- preds_all %>% 
-  group_by(feat_acc, .draw) %>% 
+  group_by(feat_transp_short, .draw) %>% 
   summarize(avg = mean(.epred))
 
 h5a_amces <- h5a_mms %>% 
-  group_by(feat_transp) %>% 
-  compare_levels(variable = avg, by = feat_transp, comparison = "control")
+  group_by(feat_transp_short) %>% 
+  compare_levels(variable = avg, by = feat_transp_short, comparison = "control")
 ```
 
 ```{r plot-h5a-mm-amce, fig.width=10, fig.height=4, out.width="100%"}
 #| column: body-outset-right
 p_h5a_mms <- h5a_mms %>% 
-  ggplot(aes(x = avg, y = feat_acc, fill = feat_acc)) +
+  ggplot(aes(x = avg, y = feat_transp_short, fill = feat_transp_short)) +
   stat_halfeye() +
   geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
   scale_x_continuous(labels = label_percent()) +
