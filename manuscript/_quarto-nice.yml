@@ -23,25 +23,25 @@ format:
         dpi: 300
 
 
-  # Nice PDF output
-  hikmah-pdf: 
-    cite-method: citeproc
-    
-    # Custom fonts
-    mainfont: "Linux Libertine O"
-    mainfontoptions: 
-      - "Numbers=Proportional"
-      - "Numbers=OldStyle"
-    sansfont: "IBM Plex Sans"
-    mathfont: "Libertinus Math"
-    # linestretch: 1.05
-    
-    include-in-header: 
-      # The \everydisplay thing makes all math blocks use \small font
-      text: |
-        \usepackage{mathtools}
-        \everydisplay\expandafter{\the\everydisplay\small }
-    
-    knitr:
-      opts_chunk:
-        dev: "cairo_pdf"
+  # # Nice PDF output
+  # hikmah-pdf: 
+  #   cite-method: citeproc
+  #   
+  #   # Custom fonts
+  #   mainfont: "Linux Libertine O"
+  #   mainfontoptions: 
+  #     - "Numbers=Proportional"
+  #     - "Numbers=OldStyle"
+  #   sansfont: "IBM Plex Sans"
+  #   mathfont: "Libertinus Math"
+  #   # linestretch: 1.05
+  #   
+  #   include-in-header: 
+  #     # The \everydisplay thing makes all math blocks use \small font
+  #     text: |
+  #       \usepackage{mathtools}
+  #       \everydisplay\expandafter{\the\everydisplay\small }
+  #   
+  #   knitr:
+  #     opts_chunk:
+  #       dev: "cairo_pdf"
