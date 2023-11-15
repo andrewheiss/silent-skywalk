@@ -46,6 +46,12 @@ lapply(list.files("R", full.names = TRUE, recursive = TRUE), source)
 # Actual pipeline ---------------------------------------------------------
 list(
   ## Data and draws ----
+  tar_target(survey_results_file,
+    get_from_osf(osf_url = "https://osf.io/n2hwm/",
+      out_dir = here_rel("data", "raw_data")),
+    format = "file"),
+  tar_target(survey_results, read_rds(survey_results_file)),
+  
   tar_target(
     qualtrics_anonymized_file,
     here_rel("data", "raw_data", "conjointqsf_final.csv"),
@@ -59,9 +65,9 @@ list(
   ## Graphics and tables ----
   tar_target(graphic_functions, lst(
     theme_ngo, set_annotation_fonts, clrs, 
-    build_ci, fmt_decimal, label_pp
+    build_ci, fmt_decimal, fmt_decimal2, fmt_pp_int, label_pp
   )),
-  tar_target(table_functions, lst(opts_int, opts_theme)),
+  tar_target(table_functions, lst(opts_int, opts_theme, inline_listify)),
   tar_target(diagnostic_functions, lst(plot_trace, plot_trank, plot_pp)),
   
   ## Models ----
@@ -87,6 +93,10 @@ list(
   ## Helper objects like lookup tables
   tar_target(level_lookup, make_level_lookup(grid_treatment_only)),
   tar_target(feature_lookup, make_feature_lookup()),
+  
+  ## Miscellaneous analysis stuff
+  tar_target(participant_summary, create_sample_summary(survey_results)),
+  tar_target(model_summary_table, build_modelsummary(m_treatment_only)),
   
   ## Manuscript and notebook ----
   tar_quarto(output_nice, path = "manuscript", quiet = FALSE, profile = "nice"),

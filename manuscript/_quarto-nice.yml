@@ -5,6 +5,13 @@ format:
   # Nice HTML output
   html:
     toc: true
+    include-in-header:
+      - text: |
+          <style type="text/css">
+          h2.hide {
+            display: none;
+          }
+          </style>
     language: 
       title-block-published: "Latest version"
     shift-heading-level-by: 1
@@ -13,8 +20,10 @@ format:
       - html/custom.scss
     citeproc: false
     filters: 
-      - "_extensions/andrewheiss/wordcount/citeproc.lua"
-      - "_extensions/andrewheiss/wordcount/wordcount.lua"
+      - at: pre-render
+        path: "_extensions/andrewheiss/wordcount/citeproc.lua"
+      - at: pre-render
+        path: "_extensions/andrewheiss/wordcount/wordcount.lua"
     knitr:
       opts_chunk:
         dev: "ragg_png"

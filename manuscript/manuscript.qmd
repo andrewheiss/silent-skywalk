@@ -1,7 +1,7 @@
 ---
 title: "Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy"
 short-title: "Why Donors Donate"
-date: "2023-10-29"
+date: "2023-11-14"
 author:
 - name: Suparna Chaudhry
   affiliation: Lewis and Clark College
@@ -28,6 +28,19 @@ code-repo: "Access the code, data, and analysis at <https://github.com/andrewhei
 bibliography: references.bib
 csl: csl/british-journal-of-political-science.csl
 link-citations: true
+word-count: 9324
+
+crossref:
+  custom:
+    - kind: float
+      prefix: Table A
+      space-before-numbering: false
+      name: Table A
+      ref-type: apptbl
+      latex-env: apptbl
+      latex-list-of-file-extension: lost
+      latex-list-of-description: Appendix Table
+apptbl-cap-location: top
 ---
 
 ```{r setup, include=FALSE}
@@ -55,10 +68,13 @@ library(targets)
 library(tidybayes)
 library(patchwork)
 library(ggforce)
+library(ggh4x)
 library(scales)
 library(glue)
 library(gt)
 library(gtExtras)
+library(kableExtra)
+library(modelsummary)
 library(here)
 
 # Targets stuff
@@ -67,7 +83,11 @@ tar_config_set(
   script = here("_targets.R")
 )
 
-tar_load(c(grid_treatment_only, level_lookup, feature_lookup))
+tar_load(c(
+  grid_treatment_only, level_lookup, feature_lookup,
+  participant_summary, model_summary_table
+))
+
 preds_all <- tar_read(preds_conditional_treatment_only)
 
 invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
@@ -76,15 +96,253 @@ invisible(list2env(tar_read(table_functions), .GlobalEnv))
 theme_set(theme_ngo())
 ```
 
-Over the last three decades, governments globally have increasingly sought to crack down on NGOs [@ChristensenWeinstein:2013; @DupuyRonPrakash:2016, @Heiss:2017; @GlasiusSchalkDeLange:2020; @BakkeMitchellSmidt:2020; @Chaudhry:2022]. Repressive governments have cracked down on these organizations using both violence, as well as administrative crackdown, which create barriers to funding and advocacy for a variety of NGOs [@DupuyRonPrakash:2016; Chaudhry 2022]. Policymakers have referred to this phenomenon as the "closing of civic space" or "shrinking civic space" [@CarothersBrechenmacher:2014; @Rutzen:2015] and data from the CIVICUS Civil Society Monitor shows that civil society groups face serious restrictions in more than 60% of countries---117 in total (https://monitor.civicus.org/globalfindings/). These attacks---most of which have been implemented through anti-NGO laws---have adversely affected the ability of both domestic and international NGOs to operate and raise funds. Official aid funds have decreased substantially in countries that have imposed restrictive anti-NGO legislation [@ChaudhryHeiss:2018; @DupuyPrakash:2018] and official aid donors channel fewer funds to contentious issues and instead choose to fund "tame" causes [@ChaudhryHeiss:2018; @Bush:2015; @Herrold:2020; @RightSpringmanWibbels:2022]. In response to this dramatic shift in the NGO funding landscape, international NGOs (INGOs) have increasingly turned to foreign individual donors to offset the loss of funding from government and foundation sources [@BanksHulmeEdwards:2015].
+```{r calc-mms}
+mms_org <- preds_all %>% 
+  group_by(feature_level = feat_org, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
 
-The amount of private foreign aid is not insignificant---from 2000--2010, private giving by U.S. entities towards international causes doubled in real terms [@DesaiKharas:2018, 505]. In 2016, U.S. private philanthropy towards international NGOs amounted to \$22.06 billion [@GivingUSA:2017]. Most notably, a large portion of this growth was driven by individuals making small-scale donations. In 2017, individuals gave US\$286.7 billion or approximately 70% of total giving to international affairs. This further increased to US\$427.71 billion in 2018, 85.7% of which was through individuals [@GivingUSA:2019]. This turn to private donors opens INGOs up to new dynamics in seeking out aid. Many organizations that had previously relied on governments and foundations had optimized their fundraising strategies for those donors, but now need to tailor their fundraising strategies to private individuals, who behave differently from governments and foundations.
+mms_issue <- preds_all %>% 
+  group_by(feature_level = feat_issue, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_transp <- preds_all %>% 
+  group_by(feature_level = feat_transp, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_acc <- preds_all %>% 
+  group_by(feature_level = feat_acc, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_funding <- preds_all %>% 
+  group_by(feature_level = feat_funding, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_govt <- preds_all %>% 
+  group_by(feature_level = feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_all <- bind_rows(
+  lst(mms_org, mms_issue, mms_transp, mms_acc, mms_funding, mms_govt),
+  .id = "mm_var"
+) %>%
+  left_join(select(feature_lookup, mm_var, feature_nice_paper), by = join_by(mm_var))
+
+mms_all_medians <- mms_all %>% 
+  group_by(feature_nice_paper, feature_level) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_25 = sum(avg > 0.25) / n()
+  ) %>% 
+  mutate(p_neq_25 = ifelse(y >= 0.25, p_gt_25, 1 - p_gt_25))
+
+# Make a bunch of differently-formatted numbers
+mms <- mms_all_medians %>% 
+  mutate(level = janitor::make_clean_names(feature_level)) %>% 
+  mutate(
+    pd = fmt_decimal2(p_neq_25),
+    pct = label_percent(accuracy = 0.1)(y),
+    nice_full = glue("{fmt_decimal(y)}; {build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_simple = glue("{fmt_decimal(y)}; {build_ci(ymin, ymax)}"),
+    nice_ci = glue("{build_ci(ymin, ymax)}"),
+    nice_ci_pd = glue("{build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_ci_pd_prefix = glue("95% cred. int. = {build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_full_prefix = glue("{fmt_decimal(y)}; 95% cred. int. = {build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_br = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")
+  ) %>% 
+  split(~level)
+
+# Marginal means for transparency and accountability together
+mms_transp_acc <- preds_all %>% 
+  group_by(feat_transp, feat_acc, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_ta <- mms_transp_acc %>% 
+  group_by(feat_transp, feat_acc) %>% 
+  median_qi(avg) %>% 
+  mutate(combined = janitor::make_clean_names(paste0(feat_transp, feat_acc))) %>% 
+  mutate(
+    pct = label_percent(accuracy = 0.1)(avg),
+    nice_ci = glue("{build_ci(.lower, .upper)}")
+  ) %>% 
+  split(~combined)
+
+# Marginal means for transparency/accountability and crackdown together
+mms_transp_crackdown <- preds_all %>% 
+  group_by(feat_transp_short, feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+mms_acc_crackdown <- preds_all %>% 
+  group_by(feat_acc_short, feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+mms_tc <- mms_transp_crackdown %>% 
+  group_by(feat_transp_short, feat_govt) %>% 
+  median_qi(avg) %>% 
+  mutate(combined = janitor::make_clean_names(paste0(feat_transp_short, feat_govt))) %>% 
+  mutate(
+    pct = label_percent(accuracy = 0.1)(avg),
+    nice_ci = glue("{build_ci(.lower, .upper)}")
+  ) %>% 
+  split(~combined)
+```
+
+```{r calc-amces}
+amces_org <- mms_org %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_issue <- mms_issue %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_transp <- mms_transp %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_acc <- mms_acc %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_funding <- mms_funding %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_govt <- mms_govt %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_all <- bind_rows(
+  lst(amces_org, amces_issue, amces_transp, amces_acc, amces_funding, amces_govt),
+  .id = "amce_var"
+) %>%
+  left_join(select(feature_lookup, amce_var, feature_nice_paper), by = join_by(amce_var)) %>%
+  left_join(
+    select(level_lookup, contains("_level")), 
+    by = join_by(feature_level)
+  )
+
+amces_all_medians <- amces_all %>% 
+  group_by(feature_nice_paper, feature_level) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0))
+
+# Make a bunch of differently-formatted numbers
+amce <- amces_all_medians %>% 
+  mutate(level = janitor::make_clean_names(feature_level)) %>% 
+  mutate(
+    pd = fmt_decimal2(p_neq_0),
+    pp = fmt_pp_int(y),
+    pp_abs = fmt_pp_int(abs(y)),
+    nice_full = glue("{fmt_decimal(y)}; {build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_ci_pd = glue("{build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_ci_pd_prefix = glue("95% cred. int. = {build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_full_prefix = glue("{fmt_decimal(y)}; 95% cred. int. = {build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_br = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")
+  ) %>% 
+  split(~level)
+
+amces_transp_crackdown <- mms_transp_crackdown %>% 
+  group_by(feat_govt) %>% 
+  compare_levels(variable = avg, by = feat_transp_short, comparison = "control")
+
+amces_transp_crackdown_medians <- amces_transp_crackdown %>% 
+  group_by(feat_govt, feat_transp_short) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0))
+
+amce_tc <- amces_transp_crackdown_medians %>% 
+  mutate(level = janitor::make_clean_names(feat_govt)) %>% 
+  mutate(
+    pd = fmt_decimal2(p_neq_0),
+    pp = fmt_pp_int(y),
+    pp_abs = fmt_pp_int(abs(y)),
+    nice_full = glue("{fmt_decimal(y)}; {build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_ci_pd = glue("{build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_ci_pd_prefix = glue("95% cred. int. = {build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_full_prefix = glue("{fmt_decimal(y)}; 95% cred. int. = {build_ci(ymin, ymax)}; $p_d$ = {pd}"),
+    nice_br = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")
+  ) %>% 
+  split(~level)
+
+amces_acc_crackdown_medians <- mms_acc_crackdown %>% 
+  group_by(feat_govt) %>% 
+  compare_levels(variable = avg, by = feat_acc_short, comparison = "control") %>% 
+  group_by(feat_govt, feat_acc_short) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0))
+```
+
+::: {.content-visible when-format="html"}
+# Introduction {.hide}
+:::
+
+Over the last three decades, governments globally have increasingly sought to crack down on NGOs [@ChristensenWeinstein:2013; @DupuyRonPrakash:2016, @Heiss:2017; @GlasiusSchalkDeLange:2020; @BakkeMitchellSmidt:2020; @Chaudhry:2022]. Repressive governments have cracked down on these organizations using both violence, as well as administrative crackdown, which create barriers to funding and advocacy for a variety of NGOs [@DupuyRonPrakash:2016; @Chaudhry:2022]. Policymakers have referred to this phenomenon as the "closing of civic space" or "shrinking civic space" [@CarothersBrechenmacher:2014; @Rutzen:2015] and data from the CIVICUS Civil Society Monitor shows that civil society groups face serious restrictions in more than 60% of countries---117 in total [@CIVICUSMonitor]. These attacks---most of which have been implemented through anti-NGO laws---have adversely affected the ability of both domestic and international NGOs to operate and raise funds. Official aid funds have decreased substantially in countries that have imposed restrictive anti-NGO legislation [@ChaudhryHeiss:2018; @DupuyPrakash:2018] and official aid donors channel fewer funds to contentious issues and instead choose to fund "tame" causes [@ChaudhryHeiss:2018; @Bush:2015; @Herrold:2020; @RightSpringmanWibbels:2022]. In response to this dramatic shift in the NGO funding landscape, international NGOs (INGOs) have increasingly turned to foreign individual donors to offset the loss of funding from government and foundation sources [@BanksHulmeEdwards:2015].
+
+The amount of private foreign aid is not insignificant---from 2000--2010, private giving by U.S. entities towards international causes doubled in real terms [@DesaiKharas:2018, 505]. In 2016, U.S. private philanthropy towards international NGOs amounted to \$22.06 billion [@GivingUSA:2017]. Most notably, a large portion of this growth was driven by individuals making small-scale donations. In 2017, individuals gave \$286.7 billion or approximately 70% of total giving to international affairs. This further increased to \$427.71 billion in 2018, 85.7% of which was through individuals [@GivingUSA:2019]. This turn to private donors opens INGOs up to new dynamics in seeking out aid. Many organizations that had previously relied on governments and foundations had optimized their fundraising strategies for those donors, but now need to tailor their fundraising strategies to private individuals, who behave differently from governments and foundations.
 
 Individuals have different preferences and rely on signals of effectiveness that differ from the benchmarks that large donor agencies rely on, including financial transparency and accountability. While INGOs have control over these organizational-level factors that motivate donations, the political environment in the host countries INGOs work in---including the global crackdown on civil society that is causing many organizations to seek out private funding in the first place---is a structural factor that INGOs can rarely influence on their own. How do organizational elements of private donor decision-making interact with broader structural limits on INGO fundraising? How do individual donors in the U.S. feel about donating to legally besieged NGOs abroad? How do organizational-level factors such as financial transparency and accountability compare with more structural-level factors such as host country politics when deciding to donate?
 
-Existing research shows that organizational accountability and financial transparency play an important role in motivating individual donors to donate to NGOs [@HarrisNeely:2021; @SaxtonKuoHo:2012; @Vaccaro:2006; @VaccaroMadsen:2006; @Tremblay-BoirePrakash:2017; @Becker:2018]. In this article, we extend this literature by evaluating how these organization-level characteristics influence private donor behavior in an era of shrinking civic space. In considering this question, we engage with a growing body of research on the consequences of closing civic space on NGOs and donors [@DupuyPrakash:2018; @RightSpringmanWibbels:2022; @FransenDupuyHinfelaar:2021; @SundstromHenrySperling:2022; @Herrold:2020; @ChaudhryHeiss:2021]. We argue that NGO-level organizational factors and domestic political environments of NGO host countries serve as heuristics and can influence foreign private donors' preferences. We fielded a conjoint experiment to a nationally representative sample of X [HOW MANY] adults in the US. A conjoint design allows us to directly compare the relative impact of host government repression of NGOs vis-a-vis an organization's financial transparency and accountability on individual donor preferences. The result of these experiments show both financial transparency and accountability increases individuals' willingness to donate NGOs. Learning about host government criticism and crackdown against NGOs decreases the likelihood of donation by itself; however, organizational features such as financial transparency and accountability protect against this dampening effect. INSERT LINE ABOUT EFFECT SIZE.
+Existing research shows that organizational accountability and financial transparency play an important role in motivating individual donors to donate to NGOs [@HarrisNeely:2021; @SaxtonKuoHo:2012; @Vaccaro:2006; @VaccaroMadsen:2006; @Tremblay-BoirePrakash:2017; @Becker:2018]. In this article, we extend this literature by evaluating how these organization-level characteristics influence private donor behavior in an era of shrinking civic space. In considering this question, we engage with a growing body of research on the consequences of closing civic space on NGOs and donors [@DupuyPrakash:2018; @RightSpringmanWibbels:2022; @FransenDupuyHinfelaar:2021; @SundstromHenrySperling:2022; @Herrold:2020; @ChaudhryHeiss:2021]. We argue that NGO-level organizational factors and domestic political environments of NGO host countries serve as heuristics and can influence foreign private donors' preferences. We fielded a conjoint experiment to a nationally representative sample of 1,016 adults in the US, which allows us to directly compare the relative impact of host government repression of NGOs and organizational financial transparency and accountability on individual donor preferences. The result of this experiment shows that both financial transparency and accountability increase individuals' willingness to donate to NGOs. Conversely, learning about host government criticism and crackdown against NGOs decreases the likelihood of donation by itself; however, organizational features such as financial transparency and accountability can protect against this dampening effect. These effect sizes are substantial: ten percentage point increases and decreases in the predicted probability of choosing to donate to an NGO.
 
-These findings make two main contributions. While recent research on private foreign aid has examined funding decisions of donor NGOs and foundations[^1], we know less about the funding choices of the individuals responsible for much of these private aid flows [@DesaiKharas:2018]. The systematic study of private foreign aid is still in its infancy---there is an absence of expansive and high quality data [@GreenhillPrizzonRogerson:2013], and most research has been restricted to elite, high net-worth donors [@USTrust2014]. Our research makes a significant contribution to research on individual giving and indicates the promise and limits of different framing appeals on individual donor preferences.
+Our findings make two main contributions. While recent research on private foreign aid has examined funding decisions of donor NGOs and foundations[^1], we know less about the funding choices of the individuals responsible for much of these private aid flows [@DesaiKharas:2018]. The systematic study of private foreign aid is still in its infancy---there is an absence of expansive and high quality data [@GreenhillPrizzonRogerson:2013], and most research has been restricted to elite, high net-worth donors [@USTrust2014]. Our research makes a significant contribution to research on individual giving and indicates the promise and limits of different framing appeals on individual donor preferences.
 
 [^1]: On aid from world's largest NGOs, see @Koch:2009, on private aid flows from NGOs based in the US, see @ButheMajorMello-e-Souza:2012.
 
@@ -105,9 +363,7 @@ Private donors, however, do not necessarily seek out complete information about 
 
 ## Organizational heuristics: The impact of NGO organizational practices on individual philanthropy
 
-In theory, donors should scrutinize each aspect of an NGO's organizational structure and programmatic performance prior to donation, but this rarely happens in practice [@Tremblay-BoirePrakash:2017]. Instead, individuals rely on heuristics to simplify their decision-making.
-
-One common signal for donors is organizational efficacy or the belief that an individual's donation will make a real difference. This can manifest itself through multiple mechanisms such as the amount an organization spends on overhead costs, whether an organization makes its finances public, or whether an organization participates in voluntary accountability practices, such as listing organizational details on websites like GuideStar and Charity Navigator. 
+In theory, donors should scrutinize each aspect of an NGO's organizational structure and programmatic performance prior to donation, but this rarely happens in practice [@Tremblay-BoirePrakash:2017]. Instead, individuals rely on heuristics to simplify their decision-making. One common signal for donors is organizational efficacy or the belief that an individual's donation will make a real difference [@ChaudhryHeiss:2021]. This can manifest itself through multiple mechanisms such as the amount an organization spends on overhead costs, whether an organization makes its finances public, or whether an organization participates in voluntary accountability practices, such as listing organizational details on websites like GuideStar and Charity Navigator. 
 
 An NGO's financial transparency, defined as the degree of completeness of information, provided by organizations to the public concerning its business activities, is one tangible heuristics that donors use to make their decisions. NGOs can engage in financial transparency in a variety of ways such as distribution of audited financial statements, third party intermediaries. Research shows that transparency is associated with greater donations, lower debt and better governance [@HarrisNeely:2021; @SaxtonKuoHo:2012]. It can also enhance donor trust and confidence in organizations [@Vaccaro:2006; @VaccaroMadsen:2006].
 
@@ -125,7 +381,7 @@ To judge organizational accountability, donors may use ratings by watchdog organ
 
 ## Structural heuristics: Host country conditions
 
-While NGOs have control over organizational factors such as transparency and accountability, and can work to improve these characteristics and public perception of them, these NGOs may have little to no control over structural factors that can also influence philanthropy. These structural factors include political contexts in NGO host countries, especially their environments for civil society organizations. A global cascade of anti-NGO laws in recent decades has created barriers to entry, funding, and advocacy for civic organizations [@GlasiusSchalkDeLange:2020; @BakkeMitchellSmidt:2020; @Chaudhry:2022; @Heiss:2017; @DupuyRonPrakash:2016]. As a result, NGOs must spend more time, effort, and resources to ensure their survival—at the expense of pursuing their missions. 
+While NGOs have control over organizational factors such as transparency and accountability, and can work to improve these characteristics and public perception of them, these NGOs may have little to no control over structural factors that can also influence philanthropy. These structural factors include political contexts in NGO host countries, especially their environments for civil society organizations. A global cascade of anti-NGO laws in recent decades has created barriers to entry, funding, and advocacy for civic organizations [@GlasiusSchalkDeLange:2020; @BakkeMitchellSmidt:2020; @Chaudhry:2022; @Heiss:2017; @DupuyRonPrakash:2016]. As a result, NGOs must spend more time, effort, and resources to ensure their survival---at the expense of pursuing their missions. 
 
 Some NGOs have adapted to their repressive environments by recreating their organizations and changing their mission to avoid directly confronting the government. Analyzing the impact of anti-NGO laws in Bangladesh and Zambia, scholars have similarly found that NGOs with a broad mission ended up restricting themselves to service work and giving up on their advocacy work. Those that continued to engage in transnational advocacy changed the targets of their advocacy, the issues they focused on, and the language they used. For instance, many NGOs stopped lobbying the central government and focused their advocacy efforts on lower levels of government [@FransenDupuyHinfelaar:2021]. Similarly, in Russia, many NGOs working with foreign partners and lobbying the central government no longer consider it an effective strategy [@SundstromHenrySperling:2022]. Overall, fewer groups may end up focusing on contentious causes, instead focusing on regime-compatible causes.
 
@@ -147,29 +403,26 @@ Importantly, when testing these hypotheses, we do not assume that individual don
 
 It is possible to study the effects of both organizational and structural heuristics on donor decision making individually, but disentangling the interaction of the two heuristics from individual donor characteristics adds complex dimensionality and makes more standard experimental work difficult, costly, and statistically fraught. To address this, we use conjoint analysis to simultaneously test individual donor preferences in the face of both organizational and structural heuristics. Conjoint analysis is generally applicable whenever individuals face complex, multi-dimensional tradeoffs that make it difficult (or even impossible) to explicitly elicit preferences. Conjoint designs have been used extensively in political science to study complex preferences for elections, laws, public policy, and public opinion [@HainmuellerHopkinsYamamoto:2014; @Mummolo:2016; @KertzerRenshonYarhi-Milo:2021; @BansakHainmuellerHopkins:2021]. @KnudsenJohannesson:2019 argue that research related to respondent opinions requires conjoint analysis because it accounts for the masking effects of factors as well as the complexity of a respondent's judgment of credibility. Because we also want to capture the complexity of a respondent's judgment of philanthropic preferences, we use a conjoint design to evaluate the effect of organizational and structural heuristics on philanthropic preferences.
 
-A conjoint research design also allows us to calculate treatment effects even if respondents do not see every combination of organization attributes, and correspondingly provides a substantial increase in statistical power. In standard factorial experimental designs, every combination of treatment attributes would need to be shown to some number of participants would ordinarily need to be shown all possible combinations of experimental attributes. In our experiment, we presented respondents with six possible treatments with varying counts of attributes for each treatment, yielding 576 possible unique combinations of features [EXPLAIN HERE THAT WE HAVE ALL THE IVS BUT WE LOOK AT JUST THESE]. Even with respondents answering twelve iterations of the experiment, not every combination was seen. However, as long as all the possible organizational attributes are well randomized and there are no systematic biases toward specific options (i.e. more respondents select the first option because it is the first) or toward earlier iterations of attribute choices (i.e. respondents are more careful and attentive for the first hypothetical organization than the last), we can pool all observations together for specific attributes of interest while marginalizing across all other attributes [@KertzerRenshonYarhi-Milo:2021]. This allows us to (1) estimate the effect of each experimental treatment even if some unique combinations of attributes were unseen, and (2) use a much smaller sample size than would be required in a more traditional factorial design.
+A conjoint research design also allows us to calculate treatment effects even if respondents do not see every combination of organization attributes, and correspondingly provides a substantial increase in statistical power. In standard factorial experimental designs, every combination of treatment attributes would need to be shown to some number of participants would ordinarily need to be shown all possible combinations of experimental attributes. In our experiment, we presented respondents with six possible treatments with varying counts of attributes for each treatment, yielding 576 possible unique combinations of features. Even with respondents answering twelve iterations of the experiment, not every combination was seen. However, as long as all the possible organizational attributes are well randomized and there are no systematic biases toward specific options (i.e. more respondents select the first option because it is the first) or toward earlier iterations of attribute choices (i.e. respondents are more careful and attentive for the first hypothetical organization than the last), we can pool all observations together for specific attributes of interest while marginalizing across all other attributes [@KertzerRenshonYarhi-Milo:2021]. This allows us to (1) estimate the effect of each experimental treatment even if some unique combinations of attributes were unseen, and (2) use a much smaller sample size than would be required in a more traditional factorial design.
 
-While the ability to select key attributes and marginalize over others provides us with analytic flexibility, it also raises possible issues with multiple comparisons, *p*-hacking, and selective cherry-picking [@BansakHainmuellerHopkins:2021]. As such, before launching the survey experiment, we preregistered a set of confirmatory and exploratory hypotheses at the Open Science Framework. Our preregistration protocol is available at `ANONYMIZED_URL` and in Appendix TODO, and our data and reproducible code is available at `ANONYMIZED_URL`.
+While the ability to select key attributes and marginalize over others provides us with analytic flexibility, it also raises possible issues with multiple comparisons, *p*-hacking, and selective cherry-picking [@BansakHainmuellerHopkins:2021], especially given the fact that we have 576 possible combinations of independent variables to explore. As such, before launching the survey experiment, we preregistered a subset of confirmatory and exploratory hypotheses at the Open Science Framework. These hypotheses deal specifically with our key research questions about the effect of transparency, accountability, and crackdown on the propensity to donate, along with comparison treatment effects for organization brand name, issue area, and funding sources. We also examine the interaction between transparency, accountability, and host-country relationships. Our preregistration protocol is available at `ANONYMIZED_URL` and in the appendix, and our data and reproducible code is available at `ANONYMIZED_URL`.[^prereg]
+
+[^prereg]: For narrative purposes, we do not explore all our preregistered hypotheses in this study—many of them are nested inside each other (e.g., the effect of branding and issue area and transparency and crackdown simultaneously). We instead focus here on the simplest, non-nested hypotheses. H~1a~ and H~1b~ correspond to preregistration question #5; H~2~ corresponds to preregistration question #2; our comparison treatments correspond to preregistration questions #1, #3, and #4. Our exploration of the interaction between transparency, accountability, and crackdown corresponds to part 2 of preregistration question #5.
 
 ## Sample
 
-We recruited survey participants through Centiment, a commercial online provider of high quality non-probability opt-in survey panels. Centiment ensures panel quality by actively recruiting representative samples of the US population and provides monetary incentives and rewards to participants. To see how varying NGO characteristics influence the decision to donate, our sample was representative of the population of people who are likely to donate to charity. We asked potential participants a screening question early in the survey ("Q2.5: How often do you donate to charity?"). If a participant responded that they give once every few years or never, they were disqualified from the study. We also included an attention check question early in the survey and removed respondents who failed the question. Importantly, these screening questions were presented *prior to* the experimental manipulation to avoid post-treatment bias [@MontgomeryNyhanTorres:2018].
+We recruited survey participants through Centiment, a commercial online provider of high quality non-probability opt-in survey panels. Centiment ensures panel quality by actively recruiting representative samples of the US population and provides monetary incentives and rewards to participants. To see how varying NGO characteristics influence the decision to donate, our sample was representative of the population of people who are likely to donate to charity. We asked potential participants a screening question about their philanthropic behavior early in the survey---if a participant responded that they give once every few years or never, they were disqualified from the study. Our reported causal effects are therefore not representative of the entire population and instead are only valid for people interested in charitable giving. We also included an attention check question early in the survey and removed respondents who failed the question. Importantly, these screening questions were presented *prior to* the experimental manipulation to avoid post-treatment bias [@MontgomeryNyhanTorres:2018].
 
-Following screening, we received 1,016 viable responses. @tbl:sample-details provides a detailed breakdown of the individual characteristics of our sample. In general, respondents were well balanced across genders and tended to be older than the national median age of 36---less than 20% of respondents were under 36 years old. The majority of respondents (45%) had never been married, while nearly 40% were married, with 10% divorced. A quarter of the sample had a high school degree, with the remainder attending some level of college or university. The majority (58%) earned less than the national median income (\$61,372). Since we limited the sample to people who frequently donate to charities, most respondents have a favorable opinion of nonprofits and charities, with more than half reporting a 5 or greater (on a 7-point scale) of trust in charities. Nearly 90% of respondents indicated that it is important to trust charities, rating importance of trust at least a 3 on a 7-point scale. The majority of respondents volunteer at least once a year, donate to charity at least once a year, and give between \$1--\$999 annually. Most rarely attend church, but feel that religion is important. Respondents are also engaged civically (three quarters voted in the last election) and follow national news closely (70% follow the news daily). Respondents are fairly balanced ideologically, with the majority reporting a 3, 4, or 5 on a 7-point scale of liberal--conservative political ideology.
+Following screening, we received 1,016 viable responses. @apptbl-sample-details provides a detailed breakdown of the individual characteristics of our sample. In general, respondents were well balanced across genders and tended to be older than the national median age of 36---less than 20% of respondents were under 36 years old. The majority of respondents (45%) had never been married, while nearly 40% were married, with 10% divorced. A quarter of the sample had a high school degree, with the remainder attending some level of college or university. The majority (58%) earned less than the national median income (\$61,372). Since we limited the sample to people who frequently donate to charities, most respondents have a favorable opinion of nonprofits and charities, with more than half reporting a 5 or greater (on a 7-point scale) of trust in charities. Nearly 90% of respondents indicated that it is important to trust charities, rating importance of trust at least a 3 on a 7-point scale. The majority of respondents volunteer at least once a year, donate to charity at least once a year, and give between \$1--\$999 annually. Most rarely attend church, but feel that religion is important. Respondents are also engaged civically (three quarters voted in the last election) and follow national news closely (70% follow the news daily). Respondents are fairly balanced ideologically, with the majority reporting a 3, 4, or 5 on a 7-point scale of liberal--conservative political ideology.
 
 ## Experimental design
 
 After collecting baseline information on respondent demographics and attitudes toward charity and voluntarism, we presented respondents with three randomly generated hypothetical international nonprofit organizations with six randomly assigned features. In this paper, we hypothesize and empirically test the effect of financial transparency, accountability, and host country relationship on the likelihood of donations. In our experiment, we included a few additional treatments to aid with the interpretation and comparison of effect sizes for our treatments of interest. In total, we varied six different organizational and structural attributes that might have an effect on donor behavior: (1) organization name and branding, (2) organization issue area, (3) financial transparency practices, (4) accountability practices, (5) funding sources, and (6) relationship with host government (see @tbl-design).
 
-```{css, echo=FALSE}
-/* Remove padding on lists in tables */
-.gt_table ul, .gt_table ol {
-  padding-left: 1rem;
-}
-```
-
-```{r tbl-design, include=TRUE}
+```{r}
+#| label: tbl-design
 #| tbl-cap: "All experimental features and levels included in the conjoint experiment"
+#| include: true
 transparency <- c("Doesn't engage in transparency", "Engages in transparency")
 accountability <- c("Doesn't engage in accountability", "Engages in accountability")
 govt <- c("Friendly relationship with government", "Criticized by government", "Under government crackdown")
@@ -179,29 +432,34 @@ funding <- c("Funded primarily by many small private donations", "Funded primari
 
 tribble(
   ~type, ~feature, ~levels,
-  "H~1a~", "Financial transparency", paste0(paste0("- ", transparency), collapse = "\n"),
-  "H~1b~", "Accountability", paste0(paste0("- ", accountability), collapse = "\n"),
-  "H~2~", "Relationship with host government", paste0(paste0("- ", govt), collapse = "\n"),
-  "Comparison", "Organization", paste0(paste0("- ", orgs), collapse = "\n"),
-  "Comparison", "Issue area", paste0(paste0("- ", issues), collapse = "\n"),
-  "Comparison", "Funding source", paste0(paste0("- ", funding), collapse = "\n")
+  "H~1a~", "Financial transparency", inline_listify(transparency),
+  "H~1b~", "Accountability", inline_listify(accountability),
+  "H~2~", "Relationship with host government", inline_listify(govt),
+  "Comparison", "Organization", inline_listify(orgs),
+  "Comparison", "Issue area", inline_listify(issues),
+  "Comparison", "Funding source", inline_listify(funding)
 ) %>% 
   gt() %>% 
   cols_label(feature = "Feature/Attribute", levels = "Levels", type = "Purpose") %>% 
-  fmt_markdown(columns = c(type, levels)) %>% 
+  fmt_markdown(columns = c(type)) %>% 
   tab_style(
     style = cell_text(v_align = "top"),
     locations = cells_body()
   ) %>% 
-  opts_theme()
+  opts_theme() |>
+  tab_options(
+    quarto.disable_processing = TRUE
+  )
 ```
 
-Charity Navigator—a large database of U.S. nonprofit financial information—categorizes its nonprofit organizations into four core sectors: humanitarian relief, human rights, development, and the environment. Accordingly, we used four nonprofits that are stereotypical for each issue: the International Committee of the Red Cross (humanitarian relief), Amnesty International (human rights), Oxfam (development), and Greenpeace (environment). We also varied several other features, including four issue areas (emergency response, environmental advocacy, human rights advocacy, and refugee relief), two organizational practices (financial transparency and third-party accountability audits), three funding sources (many small private donations, a handful of wealthy private donors, and government grants), and three relationships with host governments (friendly, criticized by the government, and under government crackdown).
+Charity Navigator---a large database of U.S. nonprofit financial information---categorizes its nonprofit organizations into four core sectors: humanitarian relief, human rights, development, and the environment. Accordingly, we used four nonprofits that are stereotypical for each issue: the International Committee of the Red Cross (humanitarian relief), Amnesty International (human rights), Oxfam (development), and Greenpeace (environment). We also varied several other features, including four issue areas (emergency response, environmental advocacy, human rights advocacy, and refugee relief), two organizational practices (financial transparency and third-party accountability audits), three funding sources (many small private donations, a handful of wealthy private donors, and government grants), and three relationships with host governments (friendly, criticized by the government, and under government crackdown).
 
 After presenting respondents with three organizations, we asked them which of the three they would be willing to donate to, along with an option for no selection (see @tbl-example for an example). We then repeated the process eleven more times for a total of twelve randomized iterations of hypothetical combinations of attributes, resulting in 12,192 completed experimental tasks (12 iterations × 1,016 respondents).
 
-```{r tbl-example, include=TRUE}
+```{r}
+#| label: tbl-example
 #| tbl-cap: "Example possible experimental task, with three randomized combinations of organizational attributes"
+#| include: true
 withr::with_seed(12345, {
   tribble(
     ~Attribute, ~`Option 1`, ~`Option 2`, ~`Option 3`, ~None,
@@ -230,9 +488,9 @@ withr::with_seed(12345, {
 
 ## Modeling and estimands
 
-We analyze the results using a multilevel Bayesian multinomial model. Our experimental data has a natural hierarchical structure, with 3 questions nested inside 12 separate experimental tasks, nested inside each of the 1,016 respondents, which lends itself to multilevel modeling. Relying on standard OLS regression can discard useful information about (1) the relationships and covariance between the different combinations of feature levels offered to respondents, and (2) individual-specific differences in how respondents react to different feature levels [@JensenMarbleScheve:2021]. Since it was impossible for every respondent to see every possible all 12,000 experimental tasks, multilevel modeling allows us to pool together information about respondents with similar characteristics facing similar sets of choices. Moreover, using random respondent effects provides natural regularization and shrinkage for our estimates—experimental tasks that happened to appear more often due to chance will be accounted for and not influence the overall causal effect.
+We analyze the results using a multilevel Bayesian multinomial model. Our experimental data has a natural hierarchical structure, with 3 questions nested inside 12 separate experimental tasks, nested inside each of the 1,016 respondents, which lends itself to multilevel modeling. Relying on standard OLS regression can discard valuable information about (1) the relationships and covariance between the different combinations of feature levels offered to respondents, and (2) individual-specific differences in how respondents react to different feature levels [@JensenMarbleScheve:2021]. Since it was impossible for every respondent to see every possible all 12,000 experimental tasks, multilevel modeling allows us to pool together information about respondents with similar characteristics facing similar sets of choices. Moreover, using random respondent effects provides natural regularization and shrinkage for our estimates---experimental tasks that happened to appear more often due to chance will be accounted for and their frequency will not bias the overall causal effect.
 
-We analyze the effect of the various combinations of organizational features and donor characteristics with the following hierarchical Bayesian multinomial logit model:
+We analyze the effect of the various combinations of organizational features and donor characteristics with the following Bayesian multinomial logit model and priors:
 
 $$
 \begin{aligned}
@@ -252,131 +510,22 @@ b_{0_j} \sim&\ \mathcal{N}(0, \sigma_0) && \text{Respondent-specific offsets fro
 \end{aligned}
 $$
 
-Importantly, we do not include any respondent-level covariates beyond the treatment variables. Because this is an experimental design, any statistical confounding is accounted for during the process of randomization and covariates should have no systematic effect on treatment effects. We do not work with the raw results of the model directly (though a complete table of results is included in Appendix TODO). Given the conjoint design, we instead create a complete balanced grid of all 576 combinations of feature levels (4 organizations × 4 issues × 2 transparency × 2 accountability × 3 funding × 3 government relationships) and use the model to calculate predicted probabilities of choice selection for each row of possible treatment values. We then collapse this set of predicted probabilities into estimated marginal means (EMMs) for specific features of interested while marginalizing or averaging over all other predicted variables. To calculate the causal effect of a treatment, we find the average marginal component effect (AMCE), which is equivalent to the difference in estimated marginal means for specific feature levels. For example, when estimating the marginal means of the transparency treatment, we find the average predicted probability across the 288 rows of the reference grid where transparency is true and across the 288 rows where transparency is false—the difference between these two estimated marginal means is the AMCE, or the causal effect of the treatment, on the probability scale.
+We do not include any respondent-level covariates beyond the treatment variables. Because this is an experimental design, any statistical confounding is accounted for during the process of randomization and covariates should have no systematic effect on treatment effects. We do not work with the raw results of the model directly (though a complete table of results is included in @apptbl-coefs-orig). Given the conjoint design, we instead create a complete balanced grid of all 576 combinations of feature levels (4 organizations × 4 issues × 2 transparency × 2 accountability × 3 funding × 3 government relationships) and use the model to calculate predicted probabilities of choice selection for each row of possible treatment values. We then collapse this set of predicted probabilities into estimated marginal means (EMMs) for specific features of interested while marginalizing or averaging over all other predicted variables. To calculate the causal effect of a treatment, we find the average marginal component effect (AMCE), which is equivalent to the difference in estimated marginal means for specific feature levels. For example, when estimating the marginal means of the transparency treatment, we find the average predicted probability across the 288 rows of the reference grid where transparency is true and across the 288 rows where transparency is false---the difference between these two estimated marginal means is the AMCE, or the causal effect of the treatment holding all other values constant, on the probability scale.
 
 # Results
 
-We present the posterior distributions of the marginal means and AMCEs for each of our experimental conditions in @fig-all-results and provide posterior medians and credible intervals in @tbl-all-results in the appendix. Because AMCEs are relative statements (i.e. contrasts between one feature level and a reference level), we try to use logical reference levels: for binary treatments like transparency and accountability, we calculate the difference between false and true levels; for ordered treatments like host country relationship, we calculate the differences between different levels of crackdown compared to no crackdown. To avoid imposing an artificial order on other unordered treatment variables, we report both marginal means and AMCEs [@LeeperHoboltTilley:2020].
+We present the posterior distributions of the marginal means and AMCEs for each of our experimental conditions in @fig-all-results and provide posterior medians, credible intervals, and other model diagnostics in @apptbl-all-results and @apptbl-coefs-orig. Because AMCEs are relative statements (i.e. contrasts between one feature level and a reference level), we try to use logical reference levels: for binary treatments like transparency and accountability, we calculate the difference between false and true levels; for ordered treatments like host country relationship, we calculate the differences between different levels of crackdown compared to no crackdown. To avoid imposing an artificial order on other unordered treatment variables, we report both marginal means and AMCEs [@LeeperHoboltTilley:2020].
 
-```{r calc-mms}
-mms_org <- preds_all %>% 
-  group_by(feat_org, .draw) %>% 
-  summarize(avg = mean(.epred))
-
-mms_issue <- preds_all %>% 
-  group_by(feat_issue, .draw) %>% 
-  summarize(avg = mean(.epred))
-
-mms_transp <- preds_all %>% 
-  group_by(feat_transp, .draw) %>% 
-  summarize(avg = mean(.epred))
-
-mms_acc <- preds_all %>% 
-  group_by(feat_acc, .draw) %>% 
-  summarize(avg = mean(.epred))
-
-mms_funding <- preds_all %>% 
-  group_by(feat_funding, .draw) %>% 
-  summarize(avg = mean(.epred))
-
-mms_govt <- preds_all %>% 
-  group_by(feat_govt, .draw) %>% 
-  summarize(avg = mean(.epred))
-```
-
-```{r calc-amces}
-amces_org <- mms_org %>% 
-  group_by(feat_org) %>% 
-  compare_levels(variable = avg, by = feat_org, comparison = "control") %>% 
-  ungroup() %>% 
-    separate_wider_delim(
-    feat_org,
-    delim = " - ", 
-    names = c("feature_level", "reference_level")
-  ) %>% 
-  add_row(avg = 0, feature_level = unique(.$reference_level))
-
-amces_issue <- mms_issue %>% 
-  group_by(feat_issue) %>% 
-  compare_levels(variable = avg, by = feat_issue, comparison = "control") %>% 
-  ungroup() %>% 
-    separate_wider_delim(
-    feat_issue,
-    delim = " - ", 
-    names = c("feature_level", "reference_level")
-  ) %>% 
-  add_row(avg = 0, feature_level = unique(.$reference_level))
-
-amces_transp <- mms_transp %>% 
-  group_by(feat_transp) %>% 
-  compare_levels(variable = avg, by = feat_transp, comparison = "control") %>% 
-  ungroup() %>% 
-    separate_wider_delim(
-    feat_transp,
-    delim = " - ", 
-    names = c("feature_level", "reference_level")
-  ) %>% 
-  add_row(avg = 0, feature_level = unique(.$reference_level))
-
-amces_acc <- mms_acc %>% 
-  group_by(feat_acc) %>% 
-  compare_levels(variable = avg, by = feat_acc, comparison = "control") %>% 
-  ungroup() %>% 
-    separate_wider_delim(
-    feat_acc,
-    delim = " - ", 
-    names = c("feature_level", "reference_level")
-  ) %>% 
-  add_row(avg = 0, feature_level = unique(.$reference_level))
-
-amces_funding <- mms_funding %>% 
-  group_by(feat_funding) %>% 
-  compare_levels(variable = avg, by = feat_funding, comparison = "control") %>% 
-  ungroup() %>% 
-    separate_wider_delim(
-    feat_funding,
-    delim = " - ", 
-    names = c("feature_level", "reference_level")
-  ) %>% 
-  add_row(avg = 0, feature_level = unique(.$reference_level))
-
-amces_govt <- mms_govt %>% 
-  group_by(feat_govt) %>% 
-  compare_levels(variable = avg, by = feat_govt, comparison = "control") %>% 
-  ungroup() %>% 
-    separate_wider_delim(
-    feat_govt,
-    delim = " - ", 
-    names = c("feature_level", "reference_level")
-  ) %>% 
-  add_row(avg = 0, feature_level = unique(.$reference_level))
-
-amces_all <- bind_rows(
-  lst(amces_org, amces_issue, amces_transp, amces_acc, amces_funding, amces_govt),
-  .id = "amce_var"
-) %>%
-  left_join(select(feature_lookup, amce_var, feature_nice_paper), by = join_by(amce_var)) %>%
-  left_join(
-    select(level_lookup, contains("_level")), 
-    by = join_by(feature_level)
-  )
-```
-
-```{r fig-all-results, include=TRUE}
+```{r}
+#| label: fig-all-results
 #| fig-width: 12
 #| fig-height: 6
 #| out-width: "100%"
 #| fig-cap: "Estimated marginal means and average marginal component effects for conjoint experiment results"
 #| column: page
+#| include: true
 mms_all <- bind_rows(
-  lst(
-    mms_org = rename(mms_org, feature_level = feat_org), 
-    mms_issue = rename(mms_issue, feature_level = feat_issue), 
-    mms_transp = rename(mms_transp, feature_level = feat_transp), 
-    mms_acc = rename(mms_acc, feature_level = feat_acc), 
-    mms_funding = rename(mms_funding, feature_level = feat_funding), 
-    mms_govt = rename(mms_govt, feature_level = feat_govt)
-  ),
+  lst(mms_org, mms_issue, mms_transp, mms_acc, mms_funding, mms_govt),
   .id = "mm_var"
 ) %>%
   left_join(select(feature_lookup, mm_var, feature_nice_paper), by = join_by(mm_var)) %>%
@@ -389,8 +538,8 @@ p1 <- ggplot(
   mms_all,
   aes(x = avg, y = feature_short_level, fill = feature_nice_paper)
 ) +
-  geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
   stat_halfeye(normalize = "groups") +
+  geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
   guides(fill = "none") +
   facet_col(facets = "feature_nice_paper", scales = "free_y", space = "free") +
   scale_x_continuous(labels = label_percent()) +
@@ -405,8 +554,8 @@ p2 <- ggplot(
   amces_all,
   aes(x = avg, y = feature_short_level, fill = feature_nice_paper)
 ) +
-  geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
   stat_halfeye(normalize = "groups") +  # Make the heights of the distributions equal within each facet
+  geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
   guides(fill = "none") +
   facet_col(facets = "feature_nice_paper", scales = "free_y", space = "free") +
   scale_x_continuous(labels = label_pp) +
@@ -420,46 +569,490 @@ p2 <- ggplot(
 p1 | p2
 ```
 
-We use median values of the posterior marginal means and AMCEs as point estimates and calculate credible intervals using a 95% equal-tailed quantile interval. However, we are generally less concerned with the exact point estimates of our causal effects and instead focus on the direction and relative magnitude of their posterior distributions. For inference, we calculate the probability of direction ($p_d$), or the probability that the posterior AMCE is strictly positive or negative—it is the proportion of the posterior AMCE that is the sign of the median.
+We use median values of the posterior marginal means and AMCEs as point estimates and calculate credible intervals using a 95% equal-tailed quantile interval. However, we are generally less concerned with the exact point estimates of our causal effects and instead focus on the direction and relative magnitude of their posterior distributions. For inference, we calculate the probability of direction ($p_d$), or the probability that the posterior AMCE is strictly positive or negative---it is the proportion of the posterior AMCE that is the sign of the median.
 
-## Discussion
+## Effect of comparison treatments
 
-To contextualize the magnitude of the causal effects for our hypotheses of interest, we begin our analysis with a brief overview of the effects of organizational characteristics that nonprofits have less direct control over: their brand name, their issue area, and their funding sources. Name brand recognition appears to be a powerful heuristic for donor decision making. Respondents were substantially more likely to prefer an organization when it was identified as the Red Cross, with an average marginal mean of 35%—ten percentage points higher than the 25% probability that would be expected if respondents selected an organization at random. When using Amnesty International as the reference category, the AMCE for the Red Cross is 12 percentage points ($p_d$ = 1). Other organizations see much smaller marginal means and AMCEs. Compared to Amnesty International, Greenpeace causes a small 2.x percentage point increase ($p_d$ = X) and Oxfam causes a small 3.x percentage point decrease ($p_d$ = X) in the probability of selecting an organization. The Red Cross brand name heuristic is actually the strongest of all the experimental treatments and features, signifying the organization's brand power and goodwill among potential donors.
+To contextualize the magnitude of the causal effects for our hypotheses of interest, we begin our analysis with a brief overview of the effects of organizational characteristics that nonprofits have less direct control over: their brand name, their issue area, and their funding sources. Brand recognition appears to be a powerful heuristic for donor decision making. Respondents were substantially more likely to prefer an organization when it was identified as the Red Cross, with an median posterior marginal mean of `r mms$red_cross$pct` (95% cred. int. = `r mms$red_cross$nice_ci`)---ten percentage points higher than the 25% probability that would be expected if respondents selected an organization at random. When using Amnesty International as the reference category, the AMCE for the Red Cross is `r amce$red_cross$pp` percentage points (`r amce$red_cross$nice_ci_pd_prefix`). Other organizations see much smaller marginal means and AMCEs. Compared to Amnesty International, Greenpeace causes a small `r amce$greenpeace$pp` percentage point increase (`r amce$greenpeace$nice_ci_pd`) and Oxfam causes a small `r amce$oxfam$pp_abs` percentage point decrease (`r amce$oxfam$nice_ci_pd`) in the probability of selecting an organization. The Red Cross brand name heuristic is actually the strongest of all the experimental treatments and features, signifying the organization's brand power and goodwill among potential donors.
 
-The issue area an organization works on also serves as a heuristic for donors. As seen in the marginal means in @fig-all-results, organizations focused on human rights and emergency response are more popular than those working on issues related to the environment or refugee relief. When using emergency response (the most popular issue) as the reference category for AMCEs, working with human rights causes a 3 percentage point decrease ($p_d$ = X), while environmental and refugee relief issues see a 4 and 6 percentage point decrease, respectively ($p_d$). To put these effects in context, these effects are smaller than the the Red Cross effect and a little larger than the Oxfam and Greenpeace effects.
+The issue area an organization works on also serves as a heuristic for donors. As seen in the marginal means in @fig-all-results, organizations focused on human rights and emergency response are more popular than those working on issues related to the environment or refugee relief. When using emergency response (the most popular issue) as the reference category for AMCEs, working with human rights causes a `r amce$human_rights$pp_abs` percentage point decrease (`r amce$human_rights$nice_ci_pd`), while environmental and refugee relief issues see `r amce$environment$pp_abs` (`r amce$environment$nice_ci_pd`) and `r amce$refugee_relief$pp_abs` (`r amce$refugee_relief$nice_ci_pd`) percentage point decreases, respectively. To put these effects in context, these effects are smaller than the the Red Cross effect and a little larger than the Oxfam and Greenpeace effects.
 
-Finally, organization funding source also serves as a reliable donor heuristic. Organizations that are funded by many small donors are substantially more popular than those funded by government grants or a a small group of wealthy donors—when compared to many small donors, both government and wealthy individual funding cause a 4 percentage point decrease in the probability of selection ($p_d$ = X). TODO: SHORT SPECULATION ABOUT DONOR EFFICACY AND WHY THIS IS EXPECTED?
+Finally, organization funding source also serves as a reliable donor heuristic. Organizations that are funded by many small donors are substantially more popular than those funded by government grants or a a small group of wealthy donors---when compared to many small donors, both government and wealthy individual funding cause `r amce$funded_primarily_by_government_grants$pp_abs` and `r amce$funded_primarily_by_a_handful_of_wealthy_private_donors$pp_abs` percentage point decreases in the probability of selection (`r amce$funded_primarily_by_government_grants$nice_ci_pd` and `r amce$funded_primarily_by_a_handful_of_wealthy_private_donors$nice_ci_pd`). These effects follow existing research on donor efficacy [@ChaudhryHeiss:2021]---when donors know that an organization is funded by others like themselves and that the marginal benefit of their individual donation is important, they are more likely to donate. In contrast, when donors know that an organization's funding does not come from the public and instead comes from a few wealthy donors or large government grants, the marginal benefit they receive from donating decreases and they are less likely to donate. Donors therefore appear to be motivated by some degree of personal efficacy.
 
 ## Effect of transparency and accountability
 
-Having explored the effects of general organizational characteristics on the propensity to donate, we can test our first hypotheses and examine the effects of our treatments of interest. As seen in the marginal means in @fig-all-results, both transparency and accountability are surprisingly strong signals of organizational deservingness. Respondents strongly prefer organizations that engage in either transparency or accountability—both treatments have a marginal mean of 30% compared to a baseline equally-at-random probability of 25%. The AMCEs for each treatment show a roughly 10 percentage point increase in the probability of selection compared to organizations that do not engage in transparency or accountability ($p_d$ = X). This effect is nearly the same order of magnitude as the Red Cross effect—an NGO that chooses to be more transparent or that takes steps to demonstrate greater accountability can expect to see an increase in the probability of selection equivalent to the boost that the brand name boost associated with the Red Cross.
+Having explored the effects of general organizational characteristics on the propensity to donate, we can test our first hypotheses and examine the effects of our treatments of interest. As seen in the marginal means in @fig-all-results, both transparency and accountability are surprisingly strong signals of organizational deservingness. Respondents strongly prefer organizations that engage in either transparency or accountability---both treatments have a posterior marginal mean of roughly 30% compared to a baseline equally-at-random probability of 25% (transparency: `r mms$transparency_yes$nice_simple`; accountability: `r mms$accountability_yes$nice_simple`). The AMCEs for each treatment show a roughly 10 percentage point increase in the probability of selection compared to organizations that do not engage in transparency or accountability (transparency: `r amce$transparency_yes$nice_full`; accountability: `r amce$accountability_yes$nice_full`). This effect is nearly the same order of magnitude as the Red Cross effect---an NGO that chooses to be more transparent or that takes steps to demonstrate greater accountability can expect to see an increase in the probability of selection equivalent to the boost of the brand name effect associated with the Red Cross. As predicted, we thus find strong support for both H~1a~ and H~1b~: if NGOs are financially transparent or engage in accountability practices, then individual private donors are roughly 10 percentage points more likely to donate to them. Donors appear to reward NGOs for their efforts to disclose their funding and be more transparent.
 
-We thus find strong evidence for both H~1a~ and H~1b~: if NGOs are financially transparent or engage in accountability practices, then individual private donors are roughly 10 percentage points more likely to donate to them. TODO: MORE DISCUSSION ABOUT THAT HERE
+There is also some evidence that these two effects are equivalent and perhaps interchangeable. @fig-transp-acc (and @apptbl-mms-trans-acc) shows the posterior marginal means for all four combinations of possible levels of transparency and accountability. When respondents see both as "no" simultaneously, the estimated marginal mean is lower than any of the individual treatments in @fig-all-results, at `r mms_ta$transparency_no_accountability_no$pct` (`r mms_ta$transparency_no_accountability_no$nice_ci`), or 9 percentage points lower than the baseline probability of 25%. When either transparency or accountability is set to "yes", the estimated marginal mean is essentially identical at `r mms$transparency_yes$pct` and `r mms$accountability_yes$pct`, respectively. When both treatments are set to "yes", the estimated marginal mean is `r mms_ta$transparency_yes_accountability_yes$pct` (`r mms_ta$transparency_yes_accountability_yes$nice_ci`), which is roughly the same as the overall estimated marginal mean for the Red Cross. Holding all other treatments constant, the effect of transparency and accountability practices on their own are generally the same, and when combined, the overall favorability of the organization increases substantially. This could indicate that donors do not care about which specific type of organizational practice an NGO engages in and that instead they are looking for some sort of signal that the organization is following best practices in transparency or accountability. 
 
-MAYBE: Something about how the two effects are the same and maybe interchangeable? Or that donors don't care about which one specifically—they just want some sort of indication that the organization is trying to be a good citizen. TODO: This might need some different statistical test to see the differences in marginal means - like maybe 4 conditions (T/T, T/F, F/T, F/F for transparency and accountability)?
+```{r}
+#| label: fig-transp-acc
+#| fig-width: 6
+#| fig-height: 2.5
+#| out-width: "80%"
+#| fig-cap: "Estimated marginal means for the four combinations of transparency and accountability"
+#| include: true
+mms_trans_acc_all <- mms_transp_acc %>% 
+  filter(
+    (feat_transp == "Transparency: Yes" & feat_acc == "Accountability: Yes") | 
+      (feat_transp == "Transparency: No" & feat_acc == "Accountability: No")) %>% 
+  bind_rows(
+    mms_transp %>% 
+      filter(feature_level == "Transparency: Yes") %>% 
+      rename(feat_transp = feature_level) %>% 
+      mutate(feat_acc = "Accountability: No"),
+    mms_acc %>% 
+      filter(feature_level == "Accountability: Yes") %>% 
+      rename(feat_acc = feature_level) %>% 
+      mutate(feat_transp = "Transparency: No")
+  )
+
+mms_trans_acc_all %>% 
+  mutate(
+    across(c(feat_transp, feat_acc), 
+      list(
+        grp = ~str_remove(.x, ": .*"),
+        short = ~str_remove(.x, ".*: "))
+    )) %>% 
+  mutate(combined = paste(feat_transp, feat_acc)) %>% 
+  ggplot(aes(x = avg, y = feat_transp, fill = combined)) +
+  stat_halfeye(normalize = "panels") +
+  geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  facet_nested(
+    rows = vars(feat_transp_grp, feat_transp_short),
+    cols = vars(feat_acc_grp, feat_acc_short),
+    switch = "y", scales = "free_y",
+    strip = strip_nested(
+      background_x = list(element_rect(fill = "grey90"), element_blank()),
+      text_x = list(NULL, element_text(hjust = 0.5)),
+      by_layer_x = TRUE,
+      background_y = list(element_rect(fill = "grey90"), element_blank()),
+      text_y = list(NULL, element_text(hjust = 0.5)),
+      by_layer_y = TRUE
+    )
+  ) +
+  scale_x_continuous(labels = label_percent()) +
+  scale_fill_manual(values = clrs$prism[c(12, 2, 1, 7)], guide = "none") +
+  labs(
+    x = "Marginal means of probabilities",
+    y = NULL
+  ) +
+  theme_ngo() +
+  theme(
+    axis.text.y = element_blank(),
+    strip.text.y.left = element_text(hjust = 1)
+  )
+```
 
 ## Effect of crackdown
 
-To test our second hypothesis regarding structural heuristics, we explore the effect of an NGO's host country conditions on the propensity to donate. Contrary to our expectations, respondents appear to prefer donating to NGOs that have friendly relationships with their host governments, with a marginal mean of 32% (compared to a baseline of 25%). Respondents are less likely to donate when an organization is criticized by its host government, and far less likely when an organization is under legal crackdown. Compared to other treatments, an organization facing legal crackdown has roughly the same negative preference as an organization without transparency or accountability measures, while having a friendly relationship is generally equivalent to engaging in transparency or accountability.
+To test our second hypothesis regarding structural heuristics, we explore the effect of an NGO's host country conditions on the propensity to donate. Contrary to our expectations, respondents appear to prefer donating to NGOs that have friendly relationships with their host governments, with a marginal mean of `r mms$friendly_relationship_with_government$pct` (compared to a baseline of 25%; `r mms$friendly_relationship_with_government$nice_ci`). Respondents are less likely to donate when an organization is criticized by its host government, and far less likely when an organization is under legal crackdown. Compared to other treatments, an organization facing legal crackdown has roughly the same negative preference as an organization without transparency or accountability measures, while having a friendly relationship is generally equivalent to engaging in transparency or accountability.
 
-In addition to these overall trends in preferences, we can measure the causal effect of moving from friendly relations to something more restrictive. Using friendly relationship as the reference category, facing criticism by the host government is causes a 7 percentage point reduction in the probability of selection ($p_d$ = 1). Participants respond more strongly as the relationship becomes more conflictual and restricted—an NGO facing crackdown sees a 10 percentage point reduction ($p_d$ = 1) in support. We thus find strong evidence against H~2~: if NGOs face legal crackdown abroad, individual donors are *less* likely to donate to them. For context, the causal effect of facing crackdown is the same magnitude as the Red Cross branding effect, but in the opposite direction---donors appear to punish NGOs facing criticism to an inverse degree as they reward the Red Cross. TODO: Speculation about why this is the case?
+In addition to these overall trends in preferences, we can measure the causal effect of moving from friendly relations to something more restrictive. Using friendly relationship as the reference category, facing criticism by the host government causes a `r amce$criticized_by_government$pp_abs` percentage point reduction in the probability of selection (`r amce$criticized_by_government$nice_ci_pd`). Participants respond more strongly as the relationship becomes more conflictual and restricted---an NGO facing crackdown sees a `r amce$under_government_crackdown$pp_abs` percentage point reduction (`r amce$under_government_crackdown$nice_ci_pd`) in support. We thus find strong evidence against H~2~: if NGOs face legal crackdown abroad, individual donors are *less* likely to donate to them. For context, the causal effect of facing crackdown is the same magnitude as the Red Cross branding effect, but in the opposite direction---donors seem to penalize NGOs facing criticism to the same extent that they reward the Red Cross. This result is surprising, but clarifies findings in previous research. In a similar vignette-based experiment, @ChaudhryHeiss:2021 find no substantial effect of legal crackdown on the likelihood of donation, and any substantive crackdown-related effects are moderated by other treatments like NGO issue area or funding source. This negative effect might also be related to the notion of donor efficacy. When deciding how to maximize the impact or marginal benefit of their individual donation, donors look for signals that their money will make a difference. Transparency and accountability practices, in addition to knowing that other individuals regularly support the organization, all act as heuristics of efficacy. An NGO facing criticism or crackdown abroad, on the other hand, may signal that potential donations could be used for legal fees, or signal that the NGO had perhaps done something to deserve the legal limitations it faces. Legal crackdown thus serves as a negative heuristic, signaling that donations might not be used as effectively as donors might hope.
 
 ## The interaction between transparency, accountability, and crackdown
 
-TODO: I still need to finish this section, based on H~5b~ here: <https://stats.andrewheiss.com/silent-skywalk/notebook/results-practices.html#h5b-relationship-with-host-government-organizational-practices>. Main gist = the transparency and accountability effects decrease as relationship with host country gets worse—it's 12 pp when friendly, 8 pp when not.
+Financial transparency and accountability practices both have a positive (and likely interchangeable) effect on NGO favorability, while government criticism and crackdown have a negative effect and discourage potential donors from donating. As seen in @fig-transp-crackdown (and @apptbl-transp-crackdown), these heuristics also interact with each other.[^transp-only] The estimated posterior marginal means for different relationships with host governments move in the same direction regardless of whether an organization engages in transparency practices: organizations with friendly relationships with their host governments are most preferred, while organizations under government crackdown are least preferred. Transparency practices in the presence of crackdown seem to have two general effects. First, engaging in transparency offsets most of the negative effect of facing crackdown. The estimated marginal mean for an organization with friendly host government relationships and no transparency is `r mms_tc$no_friendly_relationship_with_government$pct`, which is equivalent to the estimated marginal mean for an organization under government crackdown that does engage in transparency. On average, donors are indifferent to both of these situations---again, a marginal mean of 25% represents the probability of selecting an organization at random---but the presence of transparency shifts NGOs facing crackdown from negatively preferred to indifferent, while the absence of transparency shifts NGOs with friendly relationships from positively preferred to indifferent. From a practical perspective, this suggests that NGOs under crackdown can engage in specific organizational practices to offset the negative signals that accompany their legal difficulties.
 
-TODO: Speculation about why that's the case
+Second, worsening host government relationships weaken the positive effect of transparency. On its own, as seen in @fig-all-results, engaging in transparency causes a `r amce$transparency_yes$pp_abs` percentage point increase in the probability of a respondent selecting an organization. The right panel of @fig-transp-crackdown (and @apptbl-transp-crackdown) shows how the causal effect of transparency changes across different types of government relationships. These AMCEs represent the difference in the estimated posterior marginal means of the two levels of transparency in the left panel. The effect shrinks as relationships become more negative: under friendly conditions, the median posterior AMCE of transparency is `r amce_tc$friendly_relationship_with_government$pp` percentage points (`r amce_tc$friendly_relationship_with_government$nice_ci_pd`); when an NGO is criticized, the transparency effect is `r amce_tc$criticized_by_government$pp` percentage points (`r amce_tc$criticized_by_government$nice_ci_pd`); when an NGO faces crackdown, the effect drops to `r amce_tc$under_government_crackdown$pp` percentage points (`r amce_tc$under_government_crackdown$nice_ci_pd`). The causal effect remains substantially positive regardless of the relationship---even under the worst conditions, engaging in transparency causes a 9 percentage point boost---suggesting that NGOs facing crackdown can still increase their favorability with donors by signalling their commitment to transparency and accountability.
+
+[^transp-only]: We only show the interaction of transparency and crackdown in @fig-transp-crackdown. Given the near interchangeability of the two treatments, the interaction between accountability and crackdown is nearly identical. We include both transparency and accountability in @apptbl-transp-crackdown.
+
+```{r}
+#| label: fig-transp-crackdown
+#| fig-width: 7.5
+#| fig-height: 3
+#| out-width: "100%"
+#| fig-cap: "Estimated marginal means and average marginal component effects for the interaction between transparency and crackdown"
+#| include: true
+p1 <- mms_transp_crackdown %>% 
+  ggplot(aes(x = avg, y = feat_govt, fill = feat_transp_short)) +
+  stat_halfeye() +
+  geom_vline(xintercept = 0.25, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) +
+  scale_x_continuous(labels = label_percent()) +
+  scale_y_discrete(labels = label_wrap(20)) +
+  scale_fill_manual(values = c(colorspace::lighten(clrs$prism[1], 0.6), clrs$prism[1])) +
+  labs(
+    x = "Marginal means of probabilities",
+    y = NULL,
+    title = "Posterior marginal means",
+    fill = "Transparency"
+  ) +
+  theme_ngo()
+
+p2 <- amces_transp_crackdown %>% 
+  ungroup() %>% 
+  separate_wider_delim(
+    feat_transp_short,
+    delim = " - ", 
+    names = c("feat_transp_short", "reference_level")
+  ) %>% 
+  mutate(feat_transp_short = factor(feat_transp_short, levels = levels(mms_transp_crackdown$feat_transp_short))) %>% 
+  mutate(feat_govt = factor(feat_govt, levels = levels(mms_transp_crackdown$feat_govt))) %>% 
+  ggplot(aes(x = avg, y = feat_govt, fill = "AMCE for transparency")) +
+  stat_halfeye() +
+  geom_vline(xintercept = 0, color = clrs$prism[8], linetype = "dashed", linewidth = 0.25) + 
+  scale_x_continuous(labels = label_pp) +
+  scale_y_discrete(labels = label_wrap(20)) +
+  scale_fill_manual(values = clrs$prism[7]) +
+  labs(
+    x = "Percentage point change in\nprobability of choice selection",
+    y = NULL,
+    title = "Posterior AMCEs",
+    fill = NULL
+  ) +
+  theme_ngo()
+
+p1 | p2
+```
+
 
 # Conclusion
 
 Over the last two decades, governments globally have systematically controlled and repressed NGOs using both violent tactics and administrative means over the last three decades---a phenomenon known as "closing" or "shrinking" civic space. This trend of closing civic space has important implications for local and international NGOs as well as donors. Recent research has analyzed the impact of this crackdown on public or official aid donors [@DupuyPrakash:2018; @Herrold:2020; @RightSpringmanWibbels:2022]. However, we know relatively little about how state repression of NGOs affects the preferences of foreign private donors [@ChaudhryHeiss:2021]. The responses of elite donors and foundations to government crackdown on civil society organizations remains a ripe area for research. Unlike state donors, individual and elite donors may not necessarily withdraw or reduce support for NGOs facing harassment abroad. This is important because private philanthropy towards organizations working in international affairs continues to grow despite inflation---from 2021 to 2022, individual giving to nonprofits in international affairs grew by over 10.9% in the US [@GivingUSA:2023].
 
-Given the increasing hurdles faced by these nonprofits, how do individual donors in the U.S. feel about donating to legally besieged NGOs abroad? How do organizational-level factors such as financial transparency and accountability compare with more structural-level factors such as host country politics when deciding to donate? We argue that informational heuristics about NGOs’ legal and political environments and organizational-level attributes can influence donor preferences for international giving. Using a conjoint experiment with a nationally representative sample of the U.S. population, we find that both financial transparency and accountability increases individuals' willingness to donate NGOs. Learning about host government criticism and crackdown against NGOs decreases the likelihood of donation by itself; however, organizational features such as financial transparency and accountability protect against this dampening effect. INSERT LINE/MAKE MORE SPECIFIC.
+Given the increasing hurdles faced by these nonprofits, how do individual donors in the U.S. feel about donating to legally besieged NGOs abroad? How do organizational-level factors such as financial transparency and accountability compare with more structural-level factors such as host country politics when deciding to donate? We argue that informational heuristics about NGOs’ legal and political environments and organizational-level attributes can influence donor preferences for international giving. Using a conjoint experiment with a nationally representative sample of the U.S. population, we find that both financial transparency and accountability increases individuals' willingness to donate NGOs. Learning about host government criticism and crackdown against NGOs decreases the likelihood of donation by itself; however, organizational features such as financial transparency and accountability protect against this dampening effect, increasing the probability of support by nine percentage points under the worst conditions of legal crackdown.
 
-These results have important implications for NGO operations, fundraising and survivability at a time when a number of INGOs are dealing with hostile host governments. A comparison of the effects of these organizational and structural factors is critical to NGO fundraising---while NGOs have control over transparency and accountability, as well as public perception of these organizational characteristics, they may little to no control over host government crackdowns over their organizations. As a result, they may need to rely entirely on improving individual donor perception of the causes of such crackdown, its impact on NGO operations and the need for private donor funds. This article provides an insight into the importance of different framing or informational heuristics that can motivate such individual donor giving. 
+These results have important implications for NGO operations, fundraising, and survivability at a time when a number of INGOs are dealing with hostile host governments. A comparison of the effects of these organizational and structural factors is critical to NGO fundraising---while NGOs have control over transparency and accountability, as well as public perception of these organizational characteristics, they may little to no control over host government crackdowns over their organizations. As a result, they may need to rely entirely on improving individual donor perception of the causes of such crackdown, its impact on NGO operations and the need for private donor funds. This article provides insight into the importance of different framing or informational heuristics that can motivate such individual donor giving. 
 
-Government crackdown on civil society organizations is even more challenging for local NGOs in Global South countries, where much government and public support is channeled via service delivery organizations. Local groups tackling contentious issues may not be able to raise funds domestically, as publics may prefer donating to service organizations focusing on health, education, and poverty [@AbsarCrowRon:2017]. Even local philanthropists may be deterred from giving to organizations focusing on contentious causes such as advocacy, media freedom, and anti-corruption initiatives due to poor tax incentives or a fear of retribution [@Brechenmacher:2017; @DupuyRonPrakash:2015; @Baoumi:2016]. Our results highlight the importance of organizational characteristics like transparency and accountability even in an era of closing civic space. By finding new ways to communicate about organizational transparency and accountability to potential donors, as well as the causes of government crackdowns on even transparent organizations, NGOs can help overcome individual donors' concerns about host governments' criticisms of and crackdown on these groups.
+Government crackdown on civil society organizations is even more challenging for local NGOs in Global South countries, where much government and public support is channeled via service delivery organizations. Local groups tackling contentious issues may not be able to raise funds domestically, as individuals may prefer donating to service organizations focusing on health, education, and poverty [@AbsarCrowRon:2017]. Even local philanthropists may be deterred from giving to organizations focusing on contentious causes such as advocacy, media freedom, and anti-corruption initiatives due to poor tax incentives or a fear of retribution [@Brechenmacher:2017; @DupuyRonPrakash:2015; @Baoumi:2016]. Our results highlight the importance of organizational characteristics like transparency and accountability even in an era of closing civic space. By finding new ways to communicate about organizational transparency and accountability to potential donors, as well as the causes of government crackdowns on even transparent organizations, NGOs can help overcome individual donors' concerns about host governments' criticisms of and crackdown on these groups.
 
 Future research should test how well these results map on to elite individual donors, not just the average private donor, as well as determine the extent to which these preferences translate into behavior. Future research should also test the generalizability of these findings to non-American populations. Donors in European countries may have different preferences when choosing to donate to NGOs, as nonprofits in the European sector typically do not rely as much on government funding, and already receive more support from private donors compared to the American context.
 
-# References
+# References 
+
+::: {#refs}
+:::
+
+\newpage
+
+:::: {#appendix-count}
+
+# Appendix
+
+## Sample details
+
+::: {#apptbl-sample-details}
+
+```{r}
+#| label: table-sample-details
+#| include: true
+tbl_participant_summary <- participant_summary %>% 
+  select(
+    category, 
+    Question = clean_name,
+    Response = level,
+    N = count,
+    `%` = nice_prop
+  )
+
+base_table <- tbl_participant_summary %>% 
+  group_by(category) %>% 
+  gt()
+
+base_table$`_data` <- base_table$`_data` %>% 
+  mutate(Question = ifelse(!duplicated(Question), as.character(Question), ""))
+
+base_table %>% 
+  tab_style(
+    style = cell_fill(color = "grey90"),
+    locations = cells_row_groups()
+  ) %>% 
+  opts_theme() |>
+  tab_options(
+    quarto.disable_processing = TRUE
+  )
+# tbl_participant_summary %>%
+#   kbl(
+#     align = c("l", "l", "c", "c"),
+#     longtable = TRUE, booktabs = TRUE, linesep = ""
+#   ) %>%
+#   pack_rows(
+#     index = table(fct_inorder(participant_summary$category)),
+#     latex_gap_space = "1.5em", indent = FALSE
+#   ) %>%
+#   collapse_rows(columns = 1, valign = "top", latex_hline = "major") %>% 
+#   kable_styling(latex_options = c("repeat_header"))
+```
+
+Summary of individual respondent characteristics
+
+:::
+
+## All marginal means and AMCEs
+
+::: {#apptbl-all-results}
+
+```{r}
+#| label: table-all-results
+#| include: true
+mms_all_tbl <- mms_all %>% 
+  drop_na(feature_level) %>% 
+  group_by(feature_nice_paper, feature_level = fct_rev(feature_level)) %>% 
+  median_qi(avg) %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  select(feature_nice_paper, feature_level, mm_nice = nice)
+
+amces_all_tbl <- amces_all %>% 
+  mutate(feature_level = factor(feature_level, levels = levels(mms_all$feature_level))) %>% 
+  mutate(contrast = glue("{feature_level}−{reference_level}")) %>% 
+  group_by(feature_nice_paper, feature_level = fct_rev(feature_level), contrast) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>% 
+  ungroup() %>% 
+  mutate(is_reference = str_detect(contrast, "−NA")) %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0)) %>% 
+  mutate(contrast = ifelse(is_reference, "*(Reference)*", contrast)) %>% 
+  mutate(nice = ifelse(is_reference, NA, glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}"))) %>% 
+  mutate(pd = ifelse(is_reference, NA, fmt_decimal2(p_neq_0))) %>% 
+  select(feature_nice_paper, feature_level, contrast, amce_nice = nice, pd)
+
+left_join(
+  mms_all_tbl, amces_all_tbl, 
+  by = join_by(feature_nice_paper, feature_level)
+) %>% 
+  mutate(across(c(feature_level, contrast), ~{
+    .x %>% 
+      str_replace_all("Transparency: ", "") %>% 
+      str_replace_all("Accountability: ", "")
+  })) %>% 
+  # mutate(contrast = str_replace_all(contrast, "[Transparency: |Accountability: ]", "")) %>% 
+  group_by(feature_nice_paper) %>% 
+  gt() %>% 
+  sub_missing(columns = everything(), missing_text = "—") %>% 
+  fmt_markdown(columns = c(mm_nice, amce_nice, contrast)) %>%
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = c(feature_level, contrast)) %>% 
+  cols_label(
+    feature_level = "Feature", 
+    mm_nice = "Posterior EMM",
+    contrast = "Contrast",
+    amce_nice = "Posterior AMCE",
+    pd = "*p*~direction~",
+    .fn = md
+  ) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  tab_style(
+    style = cell_fill(color = "grey90"),
+    locations = cells_row_groups()
+  ) %>% 
+  tab_footnote(
+    footnote = "Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.",
+    locations = cells_column_labels(columns = c(mm_nice, amce_nice))
+  ) %>% 
+  tab_footnote(
+    footnote = md("The probability of direction (*p*~direction~) is the probability that the posterior AMCE is strictly positive or negative—it is the proportion of the posterior AMCE that is the sign of the median."),
+    locations = cells_column_labels(columns = pd)
+  ) %>% 
+  gt_add_divider(columns = mm_nice, style = "dashed", weight = px(1)) %>% 
+  opt_footnote_marks(marks = "standard") %>% 
+  opt_horizontal_padding(3) %>% 
+  opts_theme() %>% 
+  tab_options(
+    quarto.disable_processing = TRUE
+  )
+```
+
+Complete results
+
+:::
+
+## Additional marginal means and AMCEs
+
+::: {#apptbl-mms-trans-acc}
+
+```{r}
+#| label: table-mms-trans-acc
+#| include: true
+mms_trans_acc_all %>% 
+  group_by(feat_transp, feat_acc) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  select(feat_transp, feat_acc, nice) %>% 
+  group_by(feat_transp) %>% 
+  gt() %>% 
+  fmt_markdown(columns = c(nice)) %>%
+  cols_align(align = "center", columns = c(nice)) %>% 
+  cols_align(align = "left", columns = c(feat_transp, feat_acc)) %>% 
+  cols_label(
+    feat_acc = "Features", 
+    nice = "Posterior EMM",
+  ) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  tab_style(
+    style = cell_fill(color = "grey90"),
+    locations = cells_row_groups()
+  ) %>% 
+  tab_footnote(
+    footnote = "Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.",
+    locations = cells_column_labels(columns = c(nice))
+  ) %>% 
+  opt_footnote_marks(marks = "standard") %>% 
+  opt_horizontal_padding(3) %>% 
+  opts_theme() %>% 
+  tab_options(
+    quarto.disable_processing = TRUE
+  )
+```
+
+Marginal means for all combinations of transparency and accountability
+
+:::
+
+::: {#apptbl-transp-crackdown}
+
+```{r}
+#| label: table-transp-crackdown
+#| include: true
+
+mms_transp_crackdown_tbl <- mms_transp_crackdown %>% 
+  group_by(feat_transp_short, feat_govt) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  ungroup() %>% 
+  arrange(desc(feat_govt), desc(feat_transp_short)) %>% 
+  select(feat_transp_short, feat_govt, nice)
+
+amces_transp_crackdown_tbl <- amces_transp_crackdown_medians %>% 
+  ungroup() %>% 
+  mutate(nice = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_transp_short = str_replace(feat_transp_short, " - ", "−<br>")) %>% 
+  mutate(across(starts_with("p_"), ~fmt_decimal(.))) %>% 
+  arrange(desc(feat_govt)) %>% 
+  select(contrast = feat_transp_short, diff_nice = nice, p_neq_0)
+
+mms_acc_crackdown_tbl <- mms_acc_crackdown %>% 
+  group_by(feat_acc_short, feat_govt) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  ungroup() %>% 
+  arrange(desc(feat_govt), desc(feat_acc_short)) %>% 
+  select(feat_acc_short, feat_govt, nice)
+
+amces_acc_crackdown_tbl <- amces_acc_crackdown_medians %>% 
+  ungroup() %>% 
+  mutate(nice = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_acc_short = str_replace(feat_acc_short, " - ", "−<br>")) %>% 
+  mutate(across(starts_with("p_"), ~fmt_decimal(.))) %>% 
+  arrange(desc(feat_govt)) %>% 
+  select(contrast = feat_acc_short, diff_nice = nice, p_neq_0)
+
+bind_rows(
+  bind_cols(
+    mms_transp_crackdown_tbl, 
+    amces_transp_crackdown_tbl %>% 
+      add_row(contrast = NA, .after = 1) %>% 
+      add_row(contrast = NA, .after = 3) %>% 
+      add_row(contrast = NA, .after = 5)
+  ) %>% 
+    mutate(feat_level = paste("Transparency:", feat_transp_short)) %>% 
+    select(-feat_transp_short),
+  bind_cols(
+    mms_acc_crackdown_tbl, 
+    amces_acc_crackdown_tbl %>% 
+      add_row(contrast = NA, .after = 1) %>% 
+      add_row(contrast = NA, .after = 3) %>% 
+      add_row(contrast = NA, .after = 5)
+  ) %>% 
+    mutate(feat_level = paste("Accountability:", feat_acc_short)) %>% 
+    select(-feat_acc_short)
+) %>% 
+  relocate(feat_level) %>% 
+  mutate(feat_govt = fct_relabel(feat_govt, ~paste("Relationship with government:", .x))) %>% 
+  group_by(feat_govt) %>% 
+  gt() %>% 
+  sub_missing(columns = everything(), missing_text = "—") %>% 
+  fmt_markdown(columns = c(nice, diff_nice, contrast)) %>%
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = c(feat_level, contrast)) %>% 
+  cols_label(
+    feat_level = "Feature", 
+    nice = "Posterior EMM",
+    contrast = "Contrast",
+    diff_nice = "Posterior ∆",
+    p_neq_0 = "*p*~direction~",
+    .fn = md
+  ) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>% 
+  tab_style(
+    style = cell_fill(color = "grey90"),
+    locations = cells_row_groups()
+  ) %>% 
+  tab_footnote(
+    footnote = "Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.",
+    locations = cells_column_labels(columns = c(nice, diff_nice))
+  ) %>% 
+  tab_footnote(
+    footnote = md("The probability of direction (*p*~direction~) is the probability that the posterior difference in marginal means is strictly positive or negative—it is the proportion of the posterior difference in marginal means that is the sign of the median."),
+    locations = cells_column_labels(columns = p_neq_0)
+  ) %>% 
+  gt_add_divider(columns = nice, style = "dashed", weight = px(1)) %>% 
+  opt_footnote_marks(marks = "standard") %>% 
+  opt_horizontal_padding(3) %>% 
+  opts_theme() %>% 
+  tab_options(
+    quarto.disable_processing = TRUE
+  )
+```
+
+Marginal means and AMCEs for interaction between transparency, accountability, and government relationships
+
+:::
+
+
+## Original model coefficients
+
+::: {#apptbl-coefs-orig}
+
+```{r}
+#| label: table-coefs-orig
+#| include: true
+notes <- c(
+  "Estimates are median posterior log odds from a multinomial logistic regression model with three possible categories, and the columns for µ1, µ2, and µ3 represent estimates for each of the outcomes;",
+  "95% credible intervals (equal-tailed quantile intervals) in brackets."
+)
+
+base_table <- modelsummary(
+  list("Posterior medians" = model_summary_table, "95% credible intervals" = model_summary_table),
+  shape = Feature + term ~ group,
+  estimate = c("estimate", "[{conf.low}, {conf.high}]"),
+  statistic = NULL,
+  output = "gt",
+  fmt = fmt_significant(2)
+) 
+
+base_table$`_data` <- base_table$`_data` %>% 
+  mutate(Feature = ifelse(!duplicated(Feature), as.character(Feature), ""))
+
+base_table %>% 
+  tab_footnote(footnote = notes) %>% 
+  opts_theme() |>
+  tab_options(
+    quarto.disable_processing = TRUE
+  )
+```
+
+Original model coefficients
+
+:::
+
+## Original survey
+
+TODO: That goes here.
+
+## Preregistration
+
+TODO: That goes here.
+
+::::
