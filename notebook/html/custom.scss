@@ -50,14 +50,6 @@ thead th {
   text-transform: none;
 }
 
-// Fix line height in sidebar
-.sidebar-navigation .sidebar-section .sidebar-item,
-.sidebar-navigation .sidebar-item {
-  line-height: 1.2;
-  padding-top: 0.2rem;
-  padding-bottom: 0.2rem;
-}
-
 div.sidebar-item-container .active {
   color: $red;
 }
