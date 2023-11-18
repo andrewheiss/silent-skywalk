@@ -791,6 +791,88 @@ The responses of elite donors and foundations to government crackdown on civil s
 
 # Appendix
 
+## Calculating marginal means and AMCEs from a multinomial model using a reference grid
+
+To find the causal effects defined in each of our estimands, we calculate estimated marginal means (EMMs) by finding the fitted probability-scale values for each cell in a balanced reference grid of all 576 possible combinations of feature levels (2 transparency × 2 accountability × 3 government relationships × 4 organizations × 4 issues × 3 funding = 576 rows). We then calculate group averages and contrasts in group averages for each of the features of interest, marginalizing over all other features. At its core, a "marginal mean" refers to the literal mean in the margins in a contingency table of model predictions, and differences in marginal means are equivalent to marginal effects or regression coefficients.
+
+When working with the results for our multinomial regression model, we rely on estimated marginal means rather than raw regression coefficients because of the complexity of the model. As seen in @apptbl-coefs-orig, the model returns three sets of coefficients per conjoint level. Each coefficient shows the shift in probability that someone will choose an organization from column 1, column 2, or column 3, so we get a coefficient for each of those outcomes (or µ1, µ2, and µ3). Under experimental conditions where cells in the contingency table are randomly assigned, it is safe to assume that the cell proportions are equal and then marginalize (i.e. find the average) across the rows or columns. This allows us to take the average of each set of coefficients (e.g. µ1, µ2, and µ3 for "Transparency = Yes") to create a single value per coefficient. 
+
+To convert EMMs and AMCEs to a more interpretable probability scale (rather than the original log odds scale), we generate predicted values (marginalized across the three µ terms) for each of the 576 unique combinations of feature levels. @apptbl-grid-example provides an excerpt from this grid, showing six rows where accountability, organization, issue area, and funding are identical and held constant, while transparency and government relations vary.
+
+::: {#apptbl-grid-example}
+
+\footnotesize
+
+```{r}
+#| label: table-grid-example
+#| include: true
+grid_example <- expand_grid(
+  feat_transp = c("Transparency: Yes", "Transparency: No"), 
+  feat_acc = "Accountability: Yes", 
+  feat_govt = c("Friendly relationship with government", "Criticized by government", "Under government crackdown"),
+  feat_org = "Red Cross", 
+  feat_issue = "Emergency response", 
+  feat_funding = "Funded primarily by many small private donations"
+)
+
+preds_small <- preds_all %>% 
+  group_by(feat_org, feat_issue, feat_transp, feat_acc, feat_funding, feat_govt) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  inner_join(
+    grid_example, 
+    by = join_by(feat_org, feat_issue, feat_transp, feat_acc, feat_funding, feat_govt)
+  ) %>% 
+  mutate(avg_nice = label_comma(accuracy = 0.001)(avg))
+
+p_sm <- preds_small %>% 
+  group_by(feat_transp) %>% 
+  summarize(
+    emm_numeric = mean(avg),
+    emm = label_comma(accuracy = 0.001)(mean(avg)),
+    list = knitr::combine_words(avg_nice, sep = " + ", and = "")
+  ) %>% 
+  mutate(feat_transp = janitor::make_clean_names(feat_transp)) %>% 
+  split(~feat_transp)
+
+amce_fake <- p_sm$transparency_yes$emm_numeric - p_sm$transparency_no$emm_numeric
+amce_tr_fake <- label_comma(accuracy = 0.001)(amce_fake)
+amce_tr_fake_pp <- label_comma(accuracy = 1, scale = 100)(amce_fake)
+
+preds_small %>% 
+  select(-avg) %>% 
+  ungroup() %>% 
+  gt() %>% 
+  cols_label(
+    feat_transp = "Transparency", 
+    feat_acc = "Accountability", 
+    feat_govt = "Government",
+    feat_org = "Organization",
+    feat_issue = "Issue",
+    feat_funding = "Funding",
+    avg_nice = "EMM"
+  ) %>%
+  cols_width(everything() ~ gt_pct(12)) %>% 
+  cols_width(avg_nice ~ gt_pct(7)) %>% 
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>%
+  opts_theme() |>
+  tab_options(
+    quarto.disable_processing = TRUE
+  )
+```
+
+Excerpt from complete reference grid of all 576 possible combinations of attribute features and levels
+
+:::
+
+To calculate the marginal mean for a feature, we find the average predicted value across each the levels of that feature. To illustrate, assume that @apptbl-grid-example represents the full reference grid of all experimental features and levels. The marginal means for transparency would be (`r p_sm$transparency_no$list`)/3 = `r p_sm$transparency_no$emm` when transparency is set to "no", and (`r p_sm$transparency_yes$list`)/3 = `r p_sm$transparency_yes$emm` when transparency is set to "yes". In reality, the marginal mean for transparency reported in @fig-all-results and @apptbl-all-results represent the average of 288 rows where transparency is no and 288 rows where transparency is yes.
+
+To calculate the AMCE for a feature, we find the difference in estimated marginal means. If we again assume that @apptbl-grid-example contains the full reference grid, the AMCE for transparency would be `r p_sm$transparency_yes$emm` − `r p_sm$transparency_no$emm`, or `r amce_tr_fake`, or `r amce_tr_fake_pp` percentage points. Again, this is not actually the true causal effect—the real AMCE in @fig-all-results and @apptbl-all-results is the difference in marginal means for the 288 rows where transparency is no and the 288 rows where transparency is yes.
+
+## Additional tables
+
 ```{=latex}
 \floatstyle{plaintop}
 \restylefloat{apptbl}
@@ -1181,14 +1263,18 @@ Original model coefficients
 
 \newpage
 
-## Original survey
-
-TODO: That goes here.
-
-\newpage
+::: {.content-visible when-profile="ms"}
+\singlespacing
+:::
 
 ## Preregistration
 
-TODO: That goes here.
+::: {.callout-important icon=false}
+### Consensed preregistration
+
+This is an anonymized and condensed version of our full OSF preregistration protocol.
+:::
+
+{{< include text/preregistration.md >}}
 
 ::::
