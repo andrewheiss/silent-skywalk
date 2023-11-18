@@ -1,7 +1,7 @@
 ---
 title: "Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy"
 short-title: "Why Donors Donate"
-date: "2023-11-14"
+date: "2023-11-18"
 author:
 - name: Suparna Chaudhry
   affiliation: Lewis and Clark College
@@ -28,7 +28,7 @@ code-repo: "Access the code, data, and analysis at <https://github.com/andrewhei
 bibliography: references.bib
 csl: csl/british-journal-of-political-science.csl
 link-citations: true
-word-count: 9324
+word-count: 9350
 
 crossref:
   custom:
@@ -550,6 +550,10 @@ Example possible experimental task, with three randomized combinations of organi
 
 :::
 
+::: {.content-visible when-profile="ms"}
+\clearpage
+:::
+
 ## Modeling and estimands
 
 We analyze the results using a multilevel Bayesian multinomial model. Our experimental data has a natural hierarchical structure, with 3 questions nested inside 12 separate experimental tasks, nested inside each of the 1,016 respondents, which lends itself to multilevel modeling. Relying on standard OLS regression can discard valuable information about (1) the relationships and covariance between the different combinations of feature levels offered to respondents, and (2) individual-specific differences in how respondents react to different feature levels [@JensenMarbleScheve:2021]. Since it was impossible for every respondent to see every possible all 12,000 experimental tasks, multilevel modeling allows us to pool together information about respondents with similar characteristics facing similar sets of choices. Moreover, using random respondent effects provides natural regularization and shrinkage for our estimates---experimental tasks that happened to appear more often due to chance will be accounted for and their frequency will not bias the overall causal effect.
@@ -574,7 +578,7 @@ b_{0_j} \sim&\ \mathcal{N}(0, \sigma_0) && \text{Respondent-specific offsets fro
 \end{aligned}
 $$
 
-We do not include any respondent-level covariates beyond the treatment variables. Because this is an experimental design, any statistical confounding is accounted for during the process of randomization and covariates should have no systematic effect on treatment effects. We do not work with the raw results of the model directly (though a complete table of results is included in @apptbl-coefs-orig). Given the conjoint design, we instead create a complete balanced grid of all 576 combinations of feature levels (4 organizations × 4 issues × 2 transparency × 2 accountability × 3 funding × 3 government relationships) and use the model to calculate predicted probabilities of choice selection for each row of possible treatment values. We then collapse this set of predicted probabilities into estimated marginal means (EMMs) for specific features of interested while marginalizing or averaging over all other predicted variables. To calculate the causal effect of a treatment, we find the average marginal component effect (AMCE), which is equivalent to the difference in estimated marginal means for specific feature levels. For example, when estimating the marginal means of the transparency treatment, we find the average predicted probability across the 288 rows of the reference grid where transparency is true and across the 288 rows where transparency is false---the difference between these two estimated marginal means is the AMCE, or the causal effect of the treatment holding all other values constant, on the probability scale.
+We do not include any respondent-level covariates beyond the treatment variables. Because this is an experimental design, any statistical confounding is accounted for during the process of randomization and covariates should have no systematic effect on treatment effects. We do not work with the raw results of the model directly (though a complete table of results is included in @apptbl-coefs-orig). Given the conjoint design, we instead create a complete balanced grid of all 576 combinations of feature levels (2 transparency × 2 accountability × 3 government relationships × 4 organizations × 4 issues × 3 funding) and use the model to calculate predicted probabilities of choice selection for each row of possible treatment values. We then collapse this set of predicted probabilities into estimated marginal means (EMMs) for specific features of interested while marginalizing or averaging over all other predicted variables. To calculate the causal effect of a treatment, we find the average marginal component effect (AMCE), which is equivalent to the difference in estimated marginal means for specific feature levels. For example, when estimating the marginal means of the transparency treatment, we find the average predicted probability across the 288 rows of the reference grid where transparency is true and across the 288 rows where transparency is false---the difference between these two estimated marginal means is the AMCE, or the causal effect of the treatment holding all other values constant, on the probability scale (see the appendix for an extended illustration and demonstration of the EMM and AMCE calculating process).
 
 # Results
 
@@ -582,11 +586,10 @@ We present the posterior distributions of the marginal means and AMCEs for each 
 
 ```{r}
 #| label: fig-all-results
-#| fig-width: 12
-#| fig-height: 6
+#| fig-width: 7.5
+#| fig-height: 8.5
 #| out-width: "100%"
 #| fig-cap: "Estimated marginal means and average marginal component effects for conjoint experiment results"
-#| column: page
 #| include: true
 mms_all <- bind_rows(
   lst(mms_org, mms_issue, mms_transp, mms_acc, mms_funding, mms_govt),
@@ -607,6 +610,7 @@ p1 <- ggplot(
   guides(fill = "none") +
   facet_col(facets = "feature_nice_paper", scales = "free_y", space = "free") +
   scale_x_continuous(labels = label_percent()) +
+  scale_y_discrete(labels = label_wrap(20)) +
   scale_fill_manual(values = clrs$prism[1:6]) +
   labs(
     x = "Marginal means of probabilities",
@@ -623,9 +627,10 @@ p2 <- ggplot(
   guides(fill = "none") +
   facet_col(facets = "feature_nice_paper", scales = "free_y", space = "free") +
   scale_x_continuous(labels = label_pp) +
+  scale_y_discrete(labels = label_wrap(20)) +
   scale_fill_manual(values = clrs$prism[1:6]) +
   labs(
-    x = "Percentage point change in probability of choice selection",
+    x = "Percentage point change in\nprobability of choice selection",
     y = NULL,
     title = "Posterior AMCEs"
   )
@@ -718,10 +723,6 @@ In addition to these overall trends in preferences, we can measure the causal ef
 
 Financial transparency and accountability practices both have a positive (and likely interchangeable) effect on NGO favorability, while government criticism and crackdown have a negative effect and discourage potential donors from donating. As seen in @fig-transp-crackdown (and @apptbl-transp-crackdown), these heuristics also interact with each other.[^transp-only] The estimated posterior marginal means for different relationships with host governments move in the same direction regardless of whether an organization engages in transparency practices: organizations with friendly relationships with their host governments are most preferred, while organizations under government crackdown are least preferred. Transparency practices in the presence of crackdown seem to have two general effects. First, engaging in transparency offsets most of the negative effect of facing crackdown. The estimated marginal mean for an organization with friendly host government relationships and no transparency is `r mms_tc$no_friendly_relationship_with_government$pct`, which is equivalent to the estimated marginal mean for an organization under government crackdown that does engage in transparency. On average, donors are indifferent to both situations---again, a marginal mean of 25% represents the probability of selecting an organization at random---but the presence of transparency shifts NGOs facing crackdown from negatively preferred to indifferent, while the absence of transparency shifts NGOs with friendly relationships from positively preferred to indifferent. From a practical perspective, this suggests that NGOs under crackdown can focus on improving specific organizational practices to offset the negative signals that accompany their legal difficulties.
 
-Second, worsening host government relationships weaken the positive effect of transparency. On its own, as seen in @fig-all-results, engaging in transparency causes a `r amce$transparency_yes$pp_abs` percentage point increase in the probability of a respondent selecting an organization. The right panel of @fig-transp-crackdown (and @apptbl-transp-crackdown) shows how the causal effect of transparency changes across different types of government relationships. These AMCEs represent the difference in the estimated posterior marginal means of the two levels of transparency in the left panel. The effect shrinks as relationships become more negative: under friendly conditions, the median posterior AMCE of transparency is `r amce_tc$friendly_relationship_with_government$pp` percentage points (`r amce_tc$friendly_relationship_with_government$nice_ci_pd`); when an NGO is criticized, the transparency effect is `r amce_tc$criticized_by_government$pp` percentage points (`r amce_tc$criticized_by_government$nice_ci_pd`); when an NGO faces crackdown, the effect drops to `r amce_tc$under_government_crackdown$pp` percentage points (`r amce_tc$under_government_crackdown$nice_ci_pd`). The causal effect remains substantially positive regardless of the relationship---even under the worst conditions, engaging in transparency causes a 9 percentage point boost---suggesting that NGOs facing crackdown can still increase their favorability with donors by signalling their commitment to transparency and accountability.
-
-[^transp-only]: We only show the interaction of transparency and crackdown in @fig-transp-crackdown. Given the near interchangeability of the two treatments, the interaction between accountability and crackdown is nearly identical. We include both transparency and accountability in @apptbl-transp-crackdown.
-
 ```{r}
 #| label: fig-transp-crackdown
 #| fig-width: 7.5
@@ -769,6 +770,10 @@ p2 <- amces_transp_crackdown %>%
 
 p1 | p2
 ```
+
+Second, worsening host government relationships weaken the positive effect of transparency. On its own, as seen in @fig-all-results, engaging in transparency causes a `r amce$transparency_yes$pp_abs` percentage point increase in the probability of a respondent selecting an organization. The right panel of @fig-transp-crackdown (and @apptbl-transp-crackdown) shows how the causal effect of transparency changes across different types of government relationships. These AMCEs represent the difference in the estimated posterior marginal means of the two levels of transparency in the left panel. The effect shrinks as relationships become more negative: under friendly conditions, the median posterior AMCE of transparency is `r amce_tc$friendly_relationship_with_government$pp` percentage points (`r amce_tc$friendly_relationship_with_government$nice_ci_pd`); when an NGO is criticized, the transparency effect is `r amce_tc$criticized_by_government$pp` percentage points (`r amce_tc$criticized_by_government$nice_ci_pd`); when an NGO faces crackdown, the effect drops to `r amce_tc$under_government_crackdown$pp` percentage points (`r amce_tc$under_government_crackdown$nice_ci_pd`). The causal effect remains substantially positive regardless of the relationship---even under the worst conditions, engaging in transparency causes a 9 percentage point boost---suggesting that NGOs facing crackdown can still increase their favorability with donors by signalling their commitment to transparency and accountability.
+
+[^transp-only]: We only show the interaction of transparency and crackdown in @fig-transp-crackdown. Given the near interchangeability of the two treatments, the interaction between accountability and crackdown is nearly identical. We include both transparency and accountability in @apptbl-transp-crackdown.
 
 # Conclusion
 
