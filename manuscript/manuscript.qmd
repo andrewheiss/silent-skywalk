@@ -50,16 +50,21 @@ if (is.null(knitr::pandoc_to())) {
   fmt_out <- knitr::pandoc_to()
 }
 
-knitr::opts_chunk$set(echo = FALSE, include = FALSE, 
-                      warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(
+  echo = FALSE, include = FALSE,
+  warning = FALSE, message = FALSE
+)
 
-knitr::opts_chunk$set(fig.align = "center", fig.retina = 3,
-                      fig.width = 6, fig.height = (6 * 0.618),
-                      out.width = "100%", collapse = TRUE)
+knitr::opts_chunk$set(
+  fig.align = "center", fig.retina = 3,
+  fig.width = 6, fig.height = (6 * 0.618),
+  out.width = "100%", collapse = TRUE
+)
 
-options(digits = 3, width = 120,
-        dplyr.summarise.inform = FALSE,
-        knitr.kable.NA = "")
+options(
+  digits = 3, width = 120,
+  dplyr.summarise.inform = FALSE
+)
 ```
 
 ```{r libraries-data}
@@ -73,7 +78,6 @@ library(scales)
 library(glue)
 library(gt)
 library(gtExtras)
-library(kableExtra)
 library(modelsummary)
 library(here)
 
@@ -94,6 +98,33 @@ invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
 invisible(list2env(tar_read(table_functions), .GlobalEnv))
 
 theme_set(theme_ngo())
+
+gt_linebreak <- function(x) {
+  if (fmt_out == "latex") {
+    x %>% 
+      str_replace_all("\\[", "{[}") %>% 
+      str_replace_all("\\]", "{]}") %>% 
+      kableExtra::linebreak(align = "c")
+  } else {
+    str_replace(x, "\\n", "<br>")
+  }
+}
+
+fmt_markdown_latex <- function(x, columns) {
+  if (fmt_out == "latex") {
+    fmt_passthrough(x, columns = columns, escape = FALSE)
+  } else {
+    fmt_markdown(x, columns = columns)
+  }
+}
+
+gt_pct <- function(x, page_width = 6) {
+  if (knitr::pandoc_to("latex")) {
+    paste0(page_width * (x / 100), "in")
+  } else {
+    gt::pct(x)
+  }
+}
 ```
 
 ```{r calc-mms}
@@ -413,15 +444,23 @@ While the ability to select key attributes and marginalize over others provides 
 
 We recruited survey participants through Centiment, a commercial online provider of high quality non-probability opt-in survey panels. Centiment ensures panel quality by actively recruiting representative samples of the US population and provides monetary incentives and rewards to participants. To see how varying NGO characteristics influence the decision to donate, our sample was representative of the population of people who are likely to donate to charity. We asked potential participants a screening question about their philanthropic behavior early in the survey---if a participant responded that they give once every few years or never, they were disqualified from the study. Our reported causal effects are therefore not representative of the entire population and instead are only valid for people interested in charitable giving. We also included an attention check question early in the survey and removed respondents who failed the question. Importantly, these screening questions were presented *prior to* the experimental manipulation to avoid post-treatment bias [@MontgomeryNyhanTorres:2018].
 
-Following screening, we received 1,016 viable responses. @apptbl-sample-details provides a detailed breakdown of the individual characteristics of our sample. In general, respondents were well balanced across genders and tended to be older than the national median age of 36---less than 20% of respondents were under 36 years old. The majority of respondents (45%) had never been married, while nearly 40% were married, with 10% divorced. A quarter of the sample had a high school degree, with the remainder attending some level of college or university. The majority (58%) earned less than the national median income (\$61,372). Since we limited the sample to people who frequently donate to charities, most respondents have a favorable opinion of nonprofits and charities, with more than half reporting a 5 or greater (on a 7-point scale) of trust in charities. Nearly 90% of respondents indicated that it is important to trust charities, rating importance of trust at least a 3 on a 7-point scale. The majority of respondents volunteer at least once a year, donate to charity at least once a year, and give between \$1--\$999 annually. Most rarely attend church, but feel that religion is important. Respondents are also engaged civically (three quarters voted in the last election) and follow national news closely (70% follow the news daily). Respondents are fairly balanced ideologically, with the majority reporting a 3, 4, or 5 on a 7-point scale of liberal--conservative political ideology.
+Following screening, we received 1,016 viable responses. @apptbl-sample-details-demographics, @apptbl-sample-details-charity, and @apptbl-sample-details-politics provide a detailed breakdown of the individual characteristics of our sample. In general, respondents were well balanced across genders and tended to be older than the national median age of 36---less than 20% of respondents were under 36 years old. The majority of respondents (45%) had never been married, while nearly 40% were married, with 10% divorced. A quarter of the sample had a high school degree, with the remainder attending some level of college or university. The majority (58%) earned less than the national median income (\$61,372). Since we limited the sample to people who frequently donate to charities, most respondents have a favorable opinion of nonprofits and charities, with more than half reporting a 5 or greater (on a 7-point scale) of trust in charities. Nearly 90% of respondents indicated that it is important to trust charities, rating importance of trust at least a 3 on a 7-point scale. The majority of respondents volunteer at least once a year, donate to charity at least once a year, and give between \$1--\$999 annually. Most rarely attend church, but feel that religion is important. Respondents are also engaged civically (three quarters voted in the last election) and follow national news closely (70% follow the news daily). Respondents are fairly balanced ideologically, with the majority reporting a 3, 4, or 5 on a 7-point scale of liberal--conservative political ideology.
+
+::: {.content-visible when-profile="nice"}
+\clearpage
+:::
 
 ## Experimental design
 
 After collecting baseline information on respondent demographics and attitudes toward charity and voluntarism, we presented respondents with three randomly generated hypothetical international nonprofit organizations with six randomly assigned features. In this paper, we hypothesize and empirically test the effect of financial transparency, accountability, and host country relationship on the likelihood of donations. In our experiment, we included a few additional treatments to aid with the interpretation and comparison of effect sizes for our treatments of interest. In total, we varied six different organizational and structural attributes that might have an effect on donor behavior: (1) organization name and branding, (2) organization issue area, (3) financial transparency practices, (4) accountability practices, (5) funding sources, and (6) relationship with host government (see @tbl-design).
 
+::: {#tbl-design}
+
+\footnotesize
+\renewcommand*{\arraystretch}{1.75}
+
 ```{r}
-#| label: tbl-design
-#| tbl-cap: "All experimental features and levels included in the conjoint experiment"
+#| label: table-design
 #| include: true
 transparency <- c("Doesn't engage in transparency", "Engages in transparency")
 accountability <- c("Doesn't engage in accountability", "Engages in accountability")
@@ -430,7 +469,7 @@ orgs <- c("Amnesty International", "Greenpeace", "Oxfam", "Red Cross")
 issues <- c("Emergency response", "Environment", "Human rights", "Refugee relief")
 funding <- c("Funded primarily by many small private donations", "Funded primarily by a handful of wealthy private donors", "Funded primarily by government grants")
 
-tribble(
+tbl_features_levels <- tribble(
   ~type, ~feature, ~levels,
   "H~1a~", "Financial transparency", inline_listify(transparency),
   "H~1b~", "Accountability", inline_listify(accountability),
@@ -438,30 +477,47 @@ tribble(
   "Comparison", "Organization", inline_listify(orgs),
   "Comparison", "Issue area", inline_listify(issues),
   "Comparison", "Funding source", inline_listify(funding)
-) %>% 
-  gt() %>% 
-  cols_label(feature = "Feature/Attribute", levels = "Levels", type = "Purpose") %>% 
-  fmt_markdown(columns = c(type)) %>% 
+) 
+
+tbl_features_levels %>%
+  rowwise() %>% 
+  mutate(type = ifelse(
+    fmt_out == "latex",
+    str_replace_all(type, "~([^~]+)~", "\\\\textsubscript{\\1}"),
+    type
+  )) %>%
+  gt() %>%
+  cols_label(feature = "Feature/Attribute", levels = "Levels", type = "Purpose") %>%
+  cols_width(feature ~ gt_pct(20), levels ~ gt_pct(50), type ~ gt_pct(15)) %>% 
+  fmt_markdown_latex(columns = c("type")) %>%
   tab_style(
     style = cell_text(v_align = "top"),
     locations = cells_body()
-  ) %>% 
+  ) %>%
   opts_theme() |>
   tab_options(
     quarto.disable_processing = TRUE
   )
 ```
 
+All experimental features and levels included in the conjoint experiment
+
+:::
+
 Charity Navigator---a large database of U.S. nonprofit financial information---categorizes its nonprofit organizations into four core sectors: humanitarian relief, human rights, development, and the environment. Accordingly, we used four nonprofits that are stereotypical for each issue: the International Committee of the Red Cross (humanitarian relief), Amnesty International (human rights), Oxfam (development), and Greenpeace (environment). We also varied several other features, including four issue areas (emergency response, environmental advocacy, human rights advocacy, and refugee relief), two organizational practices (financial transparency and third-party accountability audits), three funding sources (many small private donations, a handful of wealthy private donors, and government grants), and three relationships with host governments (friendly, criticized by the government, and under government crackdown).
 
 After presenting respondents with three organizations, we asked them which of the three they would be willing to donate to, along with an option for no selection (see @tbl-example for an example). We then repeated the process eleven more times for a total of twelve randomized iterations of hypothetical combinations of attributes, resulting in 12,192 completed experimental tasks (12 iterations × 1,016 respondents).
 
+::: {#tbl-example}
+
+\footnotesize
+\renewcommand*{\arraystretch}{1.75}
+
 ```{r}
-#| label: tbl-example
-#| tbl-cap: "Example possible experimental task, with three randomized combinations of organizational attributes"
+#| label: table-example
 #| include: true
 withr::with_seed(12345, {
-  tribble(
+  tbl_example_task <- tribble(
     ~Attribute, ~`Option 1`, ~`Option 2`, ~`Option 3`, ~None,
     "Organization", sample(orgs, 1), sample(orgs, 1), sample(orgs, 1), "—",
     "Issue area", sample(issues, 1), sample(issues, 1), sample(issues, 1), "—",
@@ -469,22 +525,28 @@ withr::with_seed(12345, {
     "Accountability", sample(accountability, 1), sample(accountability, 1), sample(accountability, 1), "—",
     "Funding sources", sample(funding, 1), sample(funding, 1), sample(funding, 1), "—",
     "Relationship with host government", sample(govt, 1), sample(govt, 1), sample(govt, 1), "—"
-  ) %>%
-    gt() %>%
-    cols_align(align = "center", columns = everything()) %>%
-    cols_align(align = "left", columns = Attribute) %>%
-    cols_width(everything() ~ pct(20)) %>%
-    tab_style(
-      style = cell_text(v_align = "top"),
-      locations = cells_body()
-    ) %>%
-    tab_style(
-      style = cell_text(weight = "bold"),
-      location = cells_body(columns = Attribute)
-    ) %>%
-    opts_theme()
+  )
 })
+
+tbl_example_task %>%
+  gt() %>%
+  cols_align(align = "center", columns = everything()) %>%
+  cols_align(align = "left", columns = Attribute) %>%
+  cols_width(everything() ~ gt_pct(17)) %>%
+  tab_style(
+    style = cell_text(v_align = "top"),
+    locations = cells_body()
+  ) %>%
+  tab_style(
+    style = cell_text(weight = "bold"),
+    location = cells_body(columns = Attribute)
+  ) %>%
+  opts_theme()
 ```
+
+Example possible experimental task, with three randomized combinations of organizational attributes
+
+:::
 
 ## Modeling and estimands
 
@@ -721,7 +783,7 @@ Future research should test how well these results map on to elite individual do
 
 # References 
 
-::: {#refs}
+::: {#refs .bibliography}
 :::
 
 \newpage
@@ -730,12 +792,17 @@ Future research should test how well these results map on to elite individual do
 
 # Appendix
 
-## Sample details
+```{=latex}
+\floatstyle{plaintop}
+\restylefloat{apptbl}
+```
 
-::: {#apptbl-sample-details}
+::: {#apptbl-sample-details-demographics}
+
+\footnotesize
 
 ```{r}
-#| label: table-sample-details
+#| label: table-sample-details-demographics
 #| include: true
 tbl_participant_summary <- participant_summary %>% 
   select(
@@ -744,44 +811,84 @@ tbl_participant_summary <- participant_summary %>%
     Response = level,
     N = count,
     `%` = nice_prop
-  )
-
-base_table <- tbl_participant_summary %>% 
-  group_by(category) %>% 
-  gt()
-
-base_table$`_data` <- base_table$`_data` %>% 
-  mutate(Question = ifelse(!duplicated(Question), as.character(Question), ""))
-
-base_table %>% 
-  tab_style(
-    style = cell_fill(color = "grey90"),
-    locations = cells_row_groups()
   ) %>% 
+  split(~category)
+
+tbl_participant_summary$Demographics %>% 
+  select(-category) %>% 
+  group_by(Question) %>% 
+  gt() %>% 
+  tab_spanner(label = "Demographics", columns = everything()) %>% 
+  cols_width(Response ~ gt_pct(30), everything() ~ gt_pct(15)) %>% 
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = Response) %>% 
   opts_theme() |>
   tab_options(
     quarto.disable_processing = TRUE
   )
-# tbl_participant_summary %>%
-#   kbl(
-#     align = c("l", "l", "c", "c"),
-#     longtable = TRUE, booktabs = TRUE, linesep = ""
-#   ) %>%
-#   pack_rows(
-#     index = table(fct_inorder(participant_summary$category)),
-#     latex_gap_space = "1.5em", indent = FALSE
-#   ) %>%
-#   collapse_rows(columns = 1, valign = "top", latex_hline = "major") %>% 
-#   kable_styling(latex_options = c("repeat_header"))
 ```
 
-Summary of individual respondent characteristics
+Demographics
 
 :::
 
-## All marginal means and AMCEs
+\newpage
+
+::: {#apptbl-sample-details-charity}
+
+\footnotesize
+
+```{r}
+#| label: table-sample-details-charity
+#| include: true
+tbl_participant_summary$`Attitudes toward charity` %>% 
+  select(-category) %>% 
+  group_by(Question) %>% 
+  gt() %>% 
+  tab_spanner(label = "Attitudes toward charity", columns = everything()) %>% 
+  cols_width(Response ~ gt_pct(30), everything() ~ gt_pct(15)) %>% 
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = Response) %>% 
+  opts_theme() |>
+  tab_options(
+    quarto.disable_processing = TRUE
+  )
+```
+
+Attitudes toward charity
+
+:::
+
+::: {#apptbl-sample-details-politics}
+
+\footnotesize
+
+```{r}
+#| label: table-sample-details-politics
+#| include: true
+tbl_participant_summary$`Politics, ideology, and religion` %>% 
+  select(-category) %>% 
+  group_by(Question) %>% 
+  gt() %>% 
+  tab_spanner(label = "Politics, ideology, and religion", columns = everything()) %>% 
+  cols_width(Response ~ gt_pct(30), everything() ~ gt_pct(15)) %>% 
+  cols_align(align = "center", columns = everything()) %>% 
+  cols_align(align = "left", columns = Response) %>% 
+  opts_theme() |>
+  tab_options(
+    quarto.disable_processing = TRUE
+  )
+```
+
+Politics, ideology, and religion
+
+:::
+
+\newpage
 
 ::: {#apptbl-all-results}
+
+\scriptsize
 
 ```{r}
 #| label: table-all-results
@@ -790,7 +897,7 @@ mms_all_tbl <- mms_all %>%
   drop_na(feature_level) %>% 
   group_by(feature_nice_paper, feature_level = fct_rev(feature_level)) %>% 
   median_qi(avg) %>% 
-  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}\n{build_ci(.lower, .upper)}")) %>% 
   select(feature_nice_paper, feature_level, mm_nice = nice)
 
 amces_all_tbl <- amces_all %>% 
@@ -805,7 +912,7 @@ amces_all_tbl <- amces_all %>%
   mutate(is_reference = str_detect(contrast, "−NA")) %>% 
   mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0)) %>% 
   mutate(contrast = ifelse(is_reference, "*(Reference)*", contrast)) %>% 
-  mutate(nice = ifelse(is_reference, NA, glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}"))) %>% 
+  mutate(nice = ifelse(is_reference, NA, glue("{fmt_decimal(y)}\n{build_ci(ymin, ymax)}"))) %>% 
   mutate(pd = ifelse(is_reference, NA, fmt_decimal2(p_neq_0))) %>% 
   select(feature_nice_paper, feature_level, contrast, amce_nice = nice, pd)
 
@@ -819,10 +926,12 @@ left_join(
       str_replace_all("Accountability: ", "")
   })) %>% 
   # mutate(contrast = str_replace_all(contrast, "[Transparency: |Accountability: ]", "")) %>% 
+  mutate(across(c(mm_nice, amce_nice), ~gt_linebreak(.))) %>% 
   group_by(feature_nice_paper) %>% 
   gt() %>% 
   sub_missing(columns = everything(), missing_text = "—") %>% 
-  fmt_markdown(columns = c(mm_nice, amce_nice, contrast)) %>%
+  fmt_markdown_latex(columns = c("mm_nice", "amce_nice")) %>% 
+  fmt_markdown(columns = c(contrast)) %>%
   cols_align(align = "center", columns = everything()) %>% 
   cols_align(align = "left", columns = c(feature_level, contrast)) %>% 
   cols_label(
@@ -832,6 +941,13 @@ left_join(
     amce_nice = "Posterior AMCE",
     pd = "*p*~direction~",
     .fn = md
+  ) %>% 
+  cols_width(
+    feature_level ~ gt_pct(18),
+    mm_nice ~ gt_pct(12),
+    contrast ~ gt_pct(35),
+    amce_nice ~ gt_pct(12),
+    pd ~ gt_pct(6)
   ) %>% 
   tab_style(
     style = cell_text(v_align = "top"),
@@ -862,9 +978,11 @@ Complete results
 
 :::
 
-## Additional marginal means and AMCEs
+\newpage
 
 ::: {#apptbl-mms-trans-acc}
+
+\footnotesize
 
 ```{r}
 #| label: table-mms-trans-acc
@@ -872,11 +990,12 @@ Complete results
 mms_trans_acc_all %>% 
   group_by(feat_transp, feat_acc) %>% 
   median_qi() %>% 
-  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}\n{build_ci(.lower, .upper)}")) %>% 
+  mutate(across(c(nice), ~gt_linebreak(.))) %>% 
   select(feat_transp, feat_acc, nice) %>% 
   group_by(feat_transp) %>% 
   gt() %>% 
-  fmt_markdown(columns = c(nice)) %>%
+  fmt_markdown_latex(columns = c("nice")) %>% 
   cols_align(align = "center", columns = c(nice)) %>% 
   cols_align(align = "left", columns = c(feat_transp, feat_acc)) %>% 
   cols_label(
@@ -907,7 +1026,10 @@ Marginal means for all combinations of transparency and accountability
 
 :::
 
+
 ::: {#apptbl-transp-crackdown}
+
+\footnotesize
 
 ```{r}
 #| label: table-transp-crackdown
@@ -916,15 +1038,15 @@ Marginal means for all combinations of transparency and accountability
 mms_transp_crackdown_tbl <- mms_transp_crackdown %>% 
   group_by(feat_transp_short, feat_govt) %>% 
   median_qi() %>% 
-  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}\n{build_ci(.lower, .upper)}")) %>% 
   ungroup() %>% 
   arrange(desc(feat_govt), desc(feat_transp_short)) %>% 
   select(feat_transp_short, feat_govt, nice)
 
 amces_transp_crackdown_tbl <- amces_transp_crackdown_medians %>% 
   ungroup() %>% 
-  mutate(nice = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")) %>% 
-  mutate(feat_transp_short = str_replace(feat_transp_short, " - ", "−<br>")) %>% 
+  mutate(nice = glue("{fmt_decimal(y)}\n{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_transp_short = str_replace(feat_transp_short, " - ", "−")) %>% 
   mutate(across(starts_with("p_"), ~fmt_decimal(.))) %>% 
   arrange(desc(feat_govt)) %>% 
   select(contrast = feat_transp_short, diff_nice = nice, p_neq_0)
@@ -932,15 +1054,15 @@ amces_transp_crackdown_tbl <- amces_transp_crackdown_medians %>%
 mms_acc_crackdown_tbl <- mms_acc_crackdown %>% 
   group_by(feat_acc_short, feat_govt) %>% 
   median_qi() %>% 
-  mutate(nice = glue("{fmt_decimal(avg)}<br>{build_ci(.lower, .upper)}")) %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}\n{build_ci(.lower, .upper)}")) %>% 
   ungroup() %>% 
   arrange(desc(feat_govt), desc(feat_acc_short)) %>% 
   select(feat_acc_short, feat_govt, nice)
 
 amces_acc_crackdown_tbl <- amces_acc_crackdown_medians %>% 
   ungroup() %>% 
-  mutate(nice = glue("{fmt_decimal(y)}<br>{build_ci(ymin, ymax)}")) %>% 
-  mutate(feat_acc_short = str_replace(feat_acc_short, " - ", "−<br>")) %>% 
+  mutate(nice = glue("{fmt_decimal(y)}\n{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_acc_short = str_replace(feat_acc_short, " - ", "−")) %>% 
   mutate(across(starts_with("p_"), ~fmt_decimal(.))) %>% 
   arrange(desc(feat_govt)) %>% 
   select(contrast = feat_acc_short, diff_nice = nice, p_neq_0)
@@ -964,13 +1086,16 @@ bind_rows(
   ) %>% 
     mutate(feat_level = paste("Accountability:", feat_acc_short)) %>% 
     select(-feat_acc_short)
-) %>% 
+) %>%
+  mutate(contrast = ifelse(is.na(contrast), "*(Reference)*", contrast)) %>% 
+  mutate(across(c(nice, diff_nice), ~gt_linebreak(.))) %>% 
   relocate(feat_level) %>% 
   mutate(feat_govt = fct_relabel(feat_govt, ~paste("Relationship with government:", .x))) %>% 
   group_by(feat_govt) %>% 
   gt() %>% 
   sub_missing(columns = everything(), missing_text = "—") %>% 
-  fmt_markdown(columns = c(nice, diff_nice, contrast)) %>%
+  fmt_markdown_latex(columns = c("nice", "diff_nice")) %>% 
+  fmt_markdown(columns = contrast) %>% 
   cols_align(align = "center", columns = everything()) %>% 
   cols_align(align = "left", columns = c(feat_level, contrast)) %>% 
   cols_label(
@@ -1011,9 +1136,11 @@ Marginal means and AMCEs for interaction between transparency, accountability, a
 :::
 
 
-## Original model coefficients
+\blandscape
 
 ::: {#apptbl-coefs-orig}
+
+\footnotesize
 
 ```{r}
 #| label: table-coefs-orig
@@ -1032,11 +1159,15 @@ base_table <- modelsummary(
   fmt = fmt_significant(2)
 ) 
 
-base_table$`_data` <- base_table$`_data` %>% 
+base_table$`_data` <- base_table$`_data` %>%
   mutate(Feature = ifelse(!duplicated(Feature), as.character(Feature), ""))
 
+# lol there's a weird bug in {gt} where there's an error if the footnote is a
+# vector with multiple elements? So we flatten it when knitting to latex
 base_table %>% 
-  tab_footnote(footnote = notes) %>% 
+  tab_footnote(
+    footnote = ifelse(fmt_out == "latex", paste(notes, collapse = " "), notes)
+  ) %>%
   opts_theme() |>
   tab_options(
     quarto.disable_processing = TRUE
@@ -1047,9 +1178,15 @@ Original model coefficients
 
 :::
 
+\elandscape
+
+\newpage
+
 ## Original survey
 
 TODO: That goes here.
+
+\newpage
 
 ## Preregistration
 
