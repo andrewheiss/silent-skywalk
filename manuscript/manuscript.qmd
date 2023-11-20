@@ -407,7 +407,7 @@ Accountability is another factor that can impact donor willingness to donate. Ac
 
 Explaining actions to stakeholders can be important because many NGOs, even when well-intentioned ones, can devote excessive resources towards marketing and overheads [@Bowman:2006]. Private donors, subsequently, may be more likely to dislike NGOs that spend a large share of their revenues for unproductive purposes [@Rose-Ackerman:1982], or rather, a large share of resources on administration, management and fundraising. Lack of accountability is associated with lesser public trust, reputation, perceived quality and donation behavior [@Becker:2018]. As @Tremblay-BoirePrakash:2017 point out, while individuals would like to have some assurance that their resources will be used appropriately and organizations are not spending too much on overhead, donors do not necessarily have the time to research charities thoroughly. 
 
-To judge organizational accountability, donors may use ratings by watchdog organizations like Charity Navigator and GuideStar as heuristics to guide their decisions. Research shows that initiatives to address accountability gaps by these organizations can affect donations to organizations in a significant manner [@Sloan:2009; @GordonKnockNeely:2009]
+To judge organizational accountability, donors may use ratings by watchdog organizations like Charity Navigator and GuideStar as heuristics to guide their decisions. Research shows that initiatives to address accountability gaps by these organizations can affect donations to organizations in a significant manner [@Sloan:2009; @GordonKnockNeely:2009].
 
 > **H~1b~**: If NGOs are accountable and hold regular third-party audits, then individual private donors will be more likely to donate to them.
 
@@ -660,7 +660,7 @@ There is also some evidence that these two effects are equivalent and perhaps in
 #| fig-width: 6
 #| fig-height: 2.5
 #| out-width: "80%"
-#| fig-cap: "Estimated marginal means for the four combinations of transparency and accountability"
+#| fig-cap: "Estimated marginal means for the four combinations of transparency and accountability."
 #| include: true
 mms_trans_acc_all <- mms_transp_acc %>% 
   filter(
@@ -873,7 +873,7 @@ Excerpt from complete reference grid of all 576 possible combinations of attribu
 
 :::
 
-To calculate the marginal mean for a feature, we find the average predicted value across each the levels of that feature. To illustrate, assume that @apptbl-grid-example represents the full reference grid of all experimental features and levels. The marginal means for transparency would be (`r p_sm$transparency_no$list`)/3 = `r p_sm$transparency_no$emm` when transparency is set to "no", and (`r p_sm$transparency_yes$list`)/3 = `r p_sm$transparency_yes$emm` when transparency is set to "yes". In reality, the marginal mean for transparency reported in @fig-all-results and @apptbl-all-results represent the average of 288 rows where transparency is no and 288 rows where transparency is yes.
+To calculate the marginal mean for a feature, we find the average predicted value across each the levels of that feature. To illustrate, assume that @apptbl-grid-example represents the full reference grid of all experimental features and levels. The marginal means for transparency would be (`r p_sm$transparency_no$list`)/3 = `r p_sm$transparency_no$emm` when transparency is set to "no", and (`r p_sm$transparency_yes$list`)/3 = `r p_sm$transparency_yes$emm` when transparency is set to "yes". In reality, the marginal mean for transparency reported in @fig-all-results and @apptbl-all-results reflects the average of 288 rows where transparency is no and 288 rows where transparency is yes.
 
 To calculate the AMCE for a feature, we find the difference in estimated marginal means. If we again assume that @apptbl-grid-example contains the full reference grid, the AMCE for transparency would be `r p_sm$transparency_yes$emm` − `r p_sm$transparency_no$emm`, or `r amce_tr_fake`, or `r amce_tr_fake_pp` percentage points. Again, this is not actually the true causal effect—the real AMCE in @fig-all-results and @apptbl-all-results is the difference in marginal means for the 288 rows where transparency is no and the 288 rows where transparency is yes.
 
