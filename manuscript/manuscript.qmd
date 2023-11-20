@@ -788,6 +788,22 @@ These results have important implications for NGO operations, fundraising, and s
 
 The responses of elite donors and foundations to government crackdown on civil society organizations remains a ripe area for research. Future research should test how well these results map on to elite individual donors, not just the average private donor, as well as determine the extent to which these preferences translate into behavior. Future research should also test the generalizability of these findings to non-American populations. Donors in European countries may have different preferences when choosing to donate to NGOs, as nonprofits in the European sector typically do not rely as much on government funding, and already receive more support from private donors compared to the American context. Government crackdown on civil society organizations is even more challenging for local NGOs in Global South countries, where much government and public support is channeled via service delivery organizations. Local groups tackling contentious issues may not be able to raise funds domestically, as individuals may prefer donating to service organizations focusing on health, education, and poverty [@AbsarCrowRon:2017]. Even local philanthropists may be deterred from giving to organizations focusing on contentious causes such as advocacy, media freedom, and anti-corruption initiatives due to poor tax incentives or a fear of retribution [@Brechenmacher:2017; @DupuyRonPrakash:2015; @Baoumi:2016]. Future research should examine how local NGOs can overcome individual foreign donors’ concerns about host governments' criticisms of and crackdown on these groups.
 
+# Data availability statement
+
+All data and replication code is available at `DATAVERSE DOI` and at `OSF DOI`.
+
+# Supplementary material
+
+A companion statistical analysis notebook with a fuller description of the data, modeling details and diagnostics, and additional explanations of the Bayesian multinomial modeling approach, along with links to the data and replication code, is available at `ANONYMIZED URL/DOI`.
+
+# Funding
+
+This research received no external funding.
+
+# Competing interests
+
+The authors report there are no competing interests to declare.
+
 # References 
 
 ::: {#refs .bibliography}
