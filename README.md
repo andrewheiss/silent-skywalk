@@ -16,15 +16,21 @@ College
 
 ## Abstract
 
-As space for civil society has closed around the world, transnational
-NGOs have faced a crisis of funding. We explore how NGOs have shifted
-from traditionally Northern funding sources toward grassroots private
-philanthropic money. How do individual donors in the US feel about
-donating to legally besieged NGOs abroad? Do legal restrictions on NGOs
-influence donors’ decision to donate? We use a conjoint survey
-experiment to argue that domestic political environments of NGO host
-countries influence preferences of private donors and that legal
-crackdowns on NGOs serve as a heuristic of organizational deservingness.
+Non-governmental organizations (NGOs) are a core component of global
+governance. Over the last two decades, however, many host governments
+have cracked down on NGOs using a series of laws that adversely affect
+the availability and use of traditional NGO funding. In response to this
+dramatic shift in the funding landscape, international NGOs have
+increasingly turned to individual donors to offset the loss funding.
+Prior research on NGO fundraising has examined how financial
+transparency and organizational accountability influence individual
+donor behavior. How do these elements of private donor decision-making
+interact with structural-level factors such as worsening host country
+civic environments when deciding to donate? Using a conjoint experiment
+with likely donors in the US, we find that transparency and
+accountability can protect against the dampening effect of host
+government crackdown and criticism of NGOs. Our results have important
+implications for how NGOs can adapt to worsening civic environments.
 
 ### 🤐🌥️🚶: Note on “silent skywalk” project name
 
