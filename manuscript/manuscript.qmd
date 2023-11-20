@@ -29,7 +29,7 @@ code-repo: "Access the code, data, and analysis at <https://github.com/andrewhei
 bibliography: references.bib
 csl: csl/british-journal-of-political-science.csl
 link-citations: true
-word-count: 9350
+word-count: 7912
 
 crossref:
   custom:
