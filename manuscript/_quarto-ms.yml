@@ -6,6 +6,8 @@ format:
   hikmah-manuscript-pdf:
     cite-method: citeproc
     output-file: "manuscript-ms.pdf"
+    left-aligned: true
+    endnotes: true
 
     # Custom fonts
     mainfont: "Linux Libertine O"

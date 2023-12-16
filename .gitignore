@@ -11,6 +11,7 @@ _site/
 _freeze/
 manuscript/output/
 manuscript/output-ms/
+*.ent
 
 *.pdf
 *.html
