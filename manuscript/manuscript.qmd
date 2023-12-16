@@ -1,7 +1,7 @@
 ---
 title: "Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy"
 short-title: "Why Donors Donate"
-date: "2023-11-20"
+date: "2023-12-15"
 author:
 - name: Suparna Chaudhry
   affiliation: Lewis and Clark College
@@ -31,6 +31,8 @@ author:
 correspondence-prefix: "Correspondence concerning this article should be addressed to"
 abstract: |
   Non-governmental organizations (NGOs) are a core component of global governance. Over the last two decades, however, many host governments have cracked down on NGOs using a series of laws that adversely affect the availability and use of traditional NGO funding. In response to this dramatic shift in the funding landscape, international NGOs have increasingly turned to individual donors to offset the loss funding. Prior research on NGO fundraising has examined how financial transparency and organizational accountability influence individual donor behavior. How do these elements of private donor decision-making interact with structural-level factors such as worsening host country civic environments when deciding to donate? Using a conjoint experiment with likely donors in the US, we find that transparency and accountability can protect against the dampening effect of host government crackdown and criticism of NGOs. Our results have important implications for how NGOs can adapt to worsening civic environments. 
+additional-info: |
+  **Data Availability:** All data and replication code are publicly available at <https://github.com/andrewheiss/silent-skywalk>
 keywords:
   - philanthropy
   - conjoint experiments
@@ -41,19 +43,17 @@ keywords:
   - nonprofits
 code-repo: "Access the code, data, and analysis at <https://github.com/andrewheiss/silent-skywalk>"
 bibliography: references.bib
-csl: csl/british-journal-of-political-science.csl
+csl: csl/apa.csl
 link-citations: true
-word-count: "7,955"
+word-count: "9,878"
 
 crossref:
   custom:
     - kind: float
-      prefix: Table A
-      space-before-numbering: false
-      name: Table A
-      ref-type: apptbl
+      key: apptbl
       latex-env: apptbl
-      latex-list-of-file-extension: lost
+      reference-prefix: Table A
+      space-before-numbering: false
       latex-list-of-description: Appendix Table
 apptbl-cap-location: top
 ---
@@ -449,7 +449,7 @@ Importantly, when testing these hypotheses, we do not assume that individual don
 
 # Research design
 
-It is possible to study the effects of both organizational and structural heuristics on donor decision making individually, but disentangling the interaction of the two heuristics from individual donor characteristics adds complex dimensionality and makes more standard experimental work difficult, costly, and statistically fraught. To address this, we use conjoint analysis to simultaneously test individual donor preferences in the face of both organizational and structural heuristics. Conjoint analysis is generally applicable whenever individuals face complex, multi-dimensional tradeoffs that make it difficult (or even impossible) to explicitly elicit preferences. Conjoint designs have been used extensively in political science to study complex preferences for elections, laws, public policy, and public opinion [@HainmuellerHopkinsYamamoto:2014; @Mummolo:2016; @KertzerRenshonYarhi-Milo:2021; @BansakHainmuellerHopkins:2021; @BremerBurgisser:2023]. @KnudsenJohannesson:2019 argue that research related to respondent opinions requires conjoint analysis because it accounts for the masking effects of factors as well as the complexity of a respondent's judgment of credibility. Because we also want to capture the complexity of a respondent's judgment of philanthropic preferences, we use a conjoint design to evaluate the effect of organizational and structural heuristics on philanthropic preferences.
+It is possible to study the effects of both organizational and structural heuristics on donor decision making individually, but disentangling the interaction of the two heuristics from individual donor characteristics adds complex dimensionality and makes more standard experimental work difficult, costly, and statistically fraught. To address this, we use conjoint analysis to simultaneously test individual donor preferences in the face of both organizational and structural heuristics. Conjoint analysis is generally applicable whenever individuals face complex, multi-dimensional tradeoffs that make it difficult (or even impossible) to explicitly elicit preferences. Conjoint designs have been used extensively in political science to study complex preferences for elections, laws, public policy, and public opinion [@HainmuellerHopkinsYamamoto:2014; @Mummolo:2016; @KertzerRenshonYarhi-Milo:2021; @BansakHainmuellerHopkins:2021; @BremerBurgisser:2023], and conjoint experiments are becoming more common in nonprofit studies, particularly for studying individual donor behavior [@SilviaChildWitesman:2023; @HirschmannMoritzBlock:2022; @BachkeAlfnesWik:2014; @Kottasz:2004]. @KnudsenJohannesson:2019 argue that research related to respondent opinions requires conjoint analysis because it accounts for the masking effects of factors as well as the complexity of a respondent's judgment of credibility. Because we also want to capture the complexity of a respondent's judgment of philanthropic preferences, we use a conjoint design to evaluate the effect of organizational and structural heuristics on philanthropic preferences.
 
 A conjoint research design also allows us to calculate treatment effects even if respondents do not see every combination of organization attributes, and correspondingly provides a substantial increase in statistical power. In standard factorial experimental designs, participants would ordinarily need to be shown all possible combinations of experimental attributes. In our experiment, we presented respondents with six possible treatments with randomized attributes for each treatment, yielding 576 possible unique combinations of features. Even with respondents answering twelve iterations of the experiment, not every combination was seen. However, as long as all the possible organizational attributes are well randomized and there are no systematic biases toward specific options (i.e. more respondents select the first option because it is the first) or toward earlier iterations of attribute choices (i.e. respondents are more careful and attentive for the first hypothetical organization than the last), we can pool all observations together for specific attributes of interest while marginalizing across all other attributes [@KertzerRenshonYarhi-Milo:2021]. This allows us to (1) estimate the effect of each experimental treatment even if some unique combinations of attributes were unseen, and (2) use a much smaller sample size than would be required in a more traditional factorial design.
 
@@ -820,9 +820,23 @@ This research received no external funding.
 
 The authors report there are no competing interests to declare.
 
+::: {.content-visible when-profile="ms"}
+```{=latex}
+\newpage
+\begingroup
+\singlespacing
+\parindent 0pt
+\parskip 2ex
+\def\enotesize{\normalsize}
+\theendnotes
+\endgroup
+\newpage
+```
+:::
+
 # References 
 
-::: {#refs .bibliography}
+::: {#refs}
 :::
 
 \newpage
