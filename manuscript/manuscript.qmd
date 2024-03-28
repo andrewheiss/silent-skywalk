@@ -1,7 +1,7 @@
 ---
 title: "Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy"
 short-title: "Why Donors Donate"
-date: "2024-03-27"
+date: "2024-03-28"
 author:
 - name: Suparna Chaudhry
   affiliation: Lewis and Clark College
