@@ -1,4 +1,5 @@
 
+
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
 # Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy
