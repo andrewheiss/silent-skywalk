@@ -9,9 +9,9 @@ author:
   email: schaudhry@lclark.edu
   orcid: 0000-0003-3506-7590
 - name: Marc Dotson
-  affiliation: Brigham Young University
-  url: https://marriottschool.byu.edu/directory/details?id=50683
-  email: marc_dotson@byu.edu
+  affiliation: Utah State University
+  url: https://occasionaldivergences.com/
+  email: marc.dotson@usu.edu
   orcid: 0000-0001-7846-3660
 - name: Andrew Heiss
   affiliations: 
