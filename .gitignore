@@ -25,6 +25,7 @@ data/private_data/
 original_data.rds
 
 models/
+private/
 
 # Miscellaneous
 *.~lock.*
