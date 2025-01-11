@@ -9,9 +9,13 @@
 /.luarc.json
 _site/
 _freeze/
+manuscript/submissions/
 manuscript/output/
-manuscript/output-ms/
 *.ent
+manuscript/*.html.md
+manuscript/*.pdf.md
+manuscript/*.docx.md
+manuscript/*.odt.md
 
 *.pdf
 *.html

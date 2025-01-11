@@ -27,7 +27,8 @@ format:
         dev: "cairo_pdf"
 
 
-  # # Manuscript-y Word output
+  # Manuscript-y Word output
+  hikmah-manuscript-docx: default
   # hikmah-manuscript-odt:
   #   output-file: "manuscript-ms.odt"
   #   prefer-html: true
