@@ -1,0 +1,943 @@
+---
+title: 'Appendix for "Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy"'
+short-title: 'Appendix for "Why Donors Donate'
+date: "2025-01-11"
+author:
+- name: Suparna Chaudhry
+  affiliation: Lewis and Clark College
+  url: http://www.suparnachaudhry.com/
+  email: schaudhry@lclark.edu
+  orcid: 0000-0003-3506-7590
+- name: Marc Dotson
+  affiliation: Utah State University
+  url: https://occasionaldivergences.com/
+  email: marc.dotson@usu.edu
+  orcid: 0000-0001-7846-3660
+- name: Andrew Heiss
+  affiliations: 
+    - id: gsu
+      name: Georgia State University
+      department: Andrew Young School of Policy Studies, Department of Public Management and Policy
+      address: "55 Park Place NE, #464"
+      city: Atlanta
+      region: GA
+      country: USA
+      postal-code: 30303
+  url: https://www.andrewheiss.com/
+  email: aheiss@gsu.edu
+  orcid: 0000-0002-3948-3914
+  attributes:
+    corresponding: true
+code-repo: "Access the code, data, and analysis at <https://github.com/andrewheiss/silent-skywalk>"
+bibliography: references.bib
+csl: csl/apa.csl
+link-citations: true
+crossref:
+  custom:
+    - kind: float
+      key: appfig
+      latex-env: appfig
+      reference-prefix: Figure A
+      space-before-numbering: false
+      latex-list-of-description: Appendix Figure
+    - kind: float
+      key: apptbl
+      latex-env: apptbl
+      reference-prefix: Table A
+      space-before-numbering: false
+      latex-list-of-description: Appendix Table
+apptbl-cap-location: top
+toc: true
+toc-depth: 2
+---
+
+```{r setup, include=FALSE}
+if (is.null(knitr::pandoc_to())) {
+  fmt_out <- "interactive"
+} else {
+  fmt_out <- knitr::pandoc_to()
+}
+
+knitr::opts_chunk$set(
+  echo = FALSE, include = FALSE,
+  warning = FALSE, message = FALSE
+)
+
+knitr::opts_chunk$set(
+  fig.align = "center", fig.retina = 3,
+  fig.width = 6, fig.height = (6 * 0.618),
+  out.width = "100%", collapse = TRUE
+)
+
+options(
+  digits = 3, width = 120,
+  dplyr.summarise.inform = FALSE
+)
+```
+
+```{r libraries-data}
+library(tidyverse)
+library(targets)
+library(tidybayes)
+library(scales)
+library(glue)
+library(tinytable)
+library(modelsummary)
+library(here)
+
+# Targets stuff
+tar_config_set(
+  store = here("_targets"),
+  script = here("_targets.R")
+)
+
+tar_load(c(
+  participant_summary, model_summary_table, feature_lookup, level_lookup
+))
+
+preds_all <- tar_read(preds_conditional_treatment_only)
+
+invisible(list2env(tar_read(graphic_functions), .GlobalEnv))
+invisible(list2env(tar_read(table_functions), .GlobalEnv))
+
+if (fmt_out == "latex") {
+  theme_appendix <- function(x) theme_tt(x, "tabular", style = "tabularray")
+  options(tinytable_tt_theme = theme_appendix)
+}
+
+tt_md <- function(text) {
+  if (fmt_out %in% c("html", "interactive")) {
+    map_chr(text, \(x) {
+      x %>%
+        markdown::mark_html(text = ., template = FALSE) %>%
+        trimws() %>%
+        str_remove_all("<p>") %>%
+        str_remove_all("</p>")
+    })
+  } else if (fmt_out == "latex") {
+    map_chr(text, \(x) {
+      x %>%
+        markdown::mark_latex(text = ., template = FALSE) %>%
+        trimws()
+    })
+  } else {
+    map_chr(text, \(x) x)
+  }
+}
+
+tt_linebreak <- function(text) {
+  if (fmt_out == "latex") {
+    map_chr(text, \(x) {
+      if (is.na(x)) {
+        return(x)
+      }
+      x %>%
+        str_replace_all("\\[", "{[}") %>% 
+        str_replace_all("\\]", "{]}") %>% 
+        str_replace_all("\\n", r"(\\\\)") %>%
+        paste0("{", ., "}")
+    })
+  } else {
+    map_chr(text, \(x) {
+      if (is.na(x)) {
+        return(x)
+      }
+      str_replace(x, "\\n", "<br>")
+    })
+  }
+}
+
+get_row_group_index <- function(x) {
+  if (is.factor(x)) {
+    x <- as.character(x)
+  }
+
+  x_rle <- rle(x)
+  x_i <- cumsum(c(1, utils::head(x_rle$lengths, -1)))
+  x_i_adjusted <- as.numeric(x_i) + 0:(length(x_i) - 1)
+  return(x_i_adjusted)
+}
+```
+
+```{r calc-mms}
+mms_org <- preds_all %>% 
+  group_by(feature_level = feat_org, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_issue <- preds_all %>% 
+  group_by(feature_level = feat_issue, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_transp <- preds_all %>% 
+  group_by(feature_level = feat_transp, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_acc <- preds_all %>% 
+  group_by(feature_level = feat_acc, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_funding <- preds_all %>% 
+  group_by(feature_level = feat_funding, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_govt <- preds_all %>% 
+  group_by(feature_level = feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_all <- bind_rows(
+  lst(mms_org, mms_issue, mms_transp, mms_acc, mms_funding, mms_govt),
+  .id = "mm_var"
+) %>%
+  left_join(select(feature_lookup, mm_var, feature_nice_paper), by = join_by(mm_var))
+
+mms_all_medians <- mms_all %>% 
+  group_by(feature_nice_paper, feature_level) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_25 = sum(avg > 0.25) / n()
+  ) %>% 
+  mutate(p_neq_25 = ifelse(y >= 0.25, p_gt_25, 1 - p_gt_25))
+```
+
+```{r calc-amces}
+amces_org <- mms_org %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_issue <- mms_issue %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_transp <- mms_transp %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_acc <- mms_acc %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_funding <- mms_funding %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_govt <- mms_govt %>% 
+  group_by(feature_level) %>% 
+  compare_levels(variable = avg, by = feature_level, comparison = "control") %>% 
+  ungroup() %>% 
+    separate_wider_delim(
+    feature_level,
+    delim = " - ", 
+    names = c("feature_level", "reference_level")
+  ) %>% 
+  add_row(avg = 0, feature_level = unique(.$reference_level))
+
+amces_all <- bind_rows(
+  lst(amces_org, amces_issue, amces_transp, amces_acc, amces_funding, amces_govt),
+  .id = "amce_var"
+) %>%
+  left_join(select(feature_lookup, amce_var, feature_nice_paper), by = join_by(amce_var)) %>%
+  left_join(
+    select(level_lookup, contains("_level")), 
+    by = join_by(feature_level)
+  )
+
+amces_all_medians <- amces_all %>% 
+  group_by(feature_nice_paper, feature_level) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0))
+```
+
+\clearpage
+
+# Additional tables
+
+::: {#apptbl-sample-details-demographics}
+
+```{r}
+#| label: apptable-sample-details-demographics
+#| include: true
+tbl_participant_summary <- participant_summary %>% 
+  select(
+    category, 
+    Question = clean_name,
+    Response = level,
+    N = count,
+    `%` = nice_prop
+  ) %>% 
+  split(~category)
+
+inner <- glue("
+rowsep=0pt, row{<<header_rows>>}={abovesep=3pt, belowsep=0pt},
+cells={font=\\footnotesize}
+",
+  header_rows = paste0(get_row_group_index(tbl_participant_summary$Demographics$Question) + 2, collapse = ","),
+  .open = "<<", .close = ">>"
+)
+
+tbl_participant_summary$Demographics %>% 
+  select(-category, -Question) %>% 
+  tt(width = c(0.6, 0.15, 0.15)) %>%
+  group_tt(j = list("Demographics" = 1:3)) %>%
+  group_tt(
+    i = tbl_participant_summary$Demographics$Question, 
+    indent = 1
+  ) %>%
+  style_tt(i = -1, align = "c", bold = TRUE) %>%
+  style_tt(j = 1, align = "l") %>%
+  style_tt(j = 2:3, align = "c") %>%
+  style_tt(
+    i = get_row_group_index(tbl_participant_summary$Demographics$Question),
+    line = "b", line_width = 0.05, align = "l", bold = TRUE
+  ) %>%
+  style_tt(
+    bootstrap_class = "table table-sm",
+    tabularray_inner = inner
+  ) %>%
+  format_tt(escape = TRUE)
+```
+
+Demographics
+
+:::
+
+\newpage
+
+::: {#apptbl-sample-details-charity}
+
+```{r}
+#| label: table-sample-details-charity
+#| include: true
+
+inner <- glue("
+rowsep=0pt, row{<<header_rows>>}={abovesep=3pt, belowsep=0pt},
+cells={font=\\footnotesize}
+",
+  header_rows = paste0(get_row_group_index(tbl_participant_summary$`Attitudes toward charity`$Question) + 2, collapse = ","),
+  .open = "<<", .close = ">>"
+)
+
+tbl_participant_summary$`Attitudes toward charity` %>% 
+  select(-category, -Question) %>% 
+  tt(width = c(0.6, 0.15, 0.15)) %>%
+  group_tt(j = list("Attitudes toward charity" = 1:3)) %>%
+  group_tt(
+    i = tbl_participant_summary$`Attitudes toward charity`$Question, 
+    indent = 1
+  ) %>%
+  style_tt(i = -1, align = "c", bold = TRUE) %>%
+  style_tt(j = 1, align = "l") %>%
+  style_tt(j = 2:3, align = "c") %>%
+  style_tt(
+    i = get_row_group_index(tbl_participant_summary$`Attitudes toward charity`$Question),
+    line = "b", line_width = 0.05, align = "l", bold = TRUE
+  ) %>%
+  style_tt(
+    bootstrap_class = "table table-sm",
+    tabularray_inner = inner
+  ) %>%
+  format_tt(escape = TRUE)
+```
+
+Attitudes toward charity
+
+:::
+
+::: {#apptbl-sample-details-politics}
+
+```{r}
+#| label: table-sample-details-politics
+#| include: true
+
+inner <- glue("
+rowsep=0pt, row{<<header_rows>>}={abovesep=3pt, belowsep=0pt},
+cells={font=\\footnotesize}
+",
+  header_rows = paste0(get_row_group_index(tbl_participant_summary$`Politics, ideology, and religion`$Question) + 2, collapse = ","),
+  .open = "<<", .close = ">>"
+)
+
+tbl_participant_summary$`Politics, ideology, and religion` %>% 
+  select(-category, -Question) %>% 
+  tt(width = c(0.6, 0.15, 0.15)) %>%
+  group_tt(j = list("Politics, ideology, and religion" = 1:3)) %>%
+  group_tt(
+    i = tbl_participant_summary$`Politics, ideology, and religion`$Question, 
+    indent = 1
+  ) %>%
+  style_tt(i = -1, align = "c", bold = TRUE) %>%
+  style_tt(j = 1, align = "l") %>%
+  style_tt(j = 2:3, align = "c") %>%
+  style_tt(
+    i = get_row_group_index(tbl_participant_summary$`Politics, ideology, and religion`$Question),
+    line = "b", line_width = 0.05, align = "l", bold = TRUE
+  ) %>%
+  style_tt(
+    bootstrap_class = "table table-sm",
+    tabularray_inner = inner
+  ) %>%
+  format_tt(escape = TRUE)
+```
+
+Politics, ideology, and religion
+
+:::
+
+\newpage
+
+::: {#apptbl-all-results}
+
+\scriptsize
+
+```{r}
+#| label: table-all-results
+#| include: true
+mms_all_tbl <- mms_all %>% 
+  drop_na(feature_level) %>% 
+  group_by(feature_nice_paper, feature_level = fct_rev(feature_level)) %>% 
+  median_qi(avg) %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}\n{build_ci(.lower, .upper)}")) %>% 
+  select(feature_nice_paper, feature_level, mm_nice = nice)
+
+amces_all_tbl <- amces_all %>% 
+  mutate(feature_level = factor(feature_level, levels = levels(mms_all$feature_level))) %>% 
+  mutate(contrast = glue("{feature_level}−{reference_level}")) %>% 
+  group_by(feature_nice_paper, feature_level = fct_rev(feature_level), contrast) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>% 
+  ungroup() %>% 
+  mutate(is_reference = str_detect(contrast, "−NA")) %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0)) %>% 
+  mutate(contrast = ifelse(is_reference, "*(Reference)*", contrast)) %>% 
+  mutate(nice = ifelse(is_reference, NA, glue("{fmt_decimal(y)}\n{build_ci(ymin, ymax)}"))) %>% 
+  mutate(pd = ifelse(is_reference, NA, fmt_decimal2(p_neq_0))) %>% 
+  select(feature_nice_paper, feature_level, contrast, amce_nice = nice, pd)
+
+all_tbl <- left_join(
+  mms_all_tbl, amces_all_tbl, 
+  by = join_by(feature_nice_paper, feature_level)
+) %>% 
+  mutate(across(c(feature_level, contrast), ~{
+    .x %>% 
+      str_replace_all("Transparency: ", "") %>% 
+      str_replace_all("Accountability: ", "")
+  }))
+
+inner <- glue("
+rowsep=1.5pt, row{<<header_rows>>}={abovesep=6pt, belowsep=0pt},
+cells={font=\\scriptsize}, row{1}={valign=b}
+",
+  header_rows = paste0(get_row_group_index(all_tbl$feature_nice_paper) + 1, collapse = ","),
+  .open = "<<", .close = ">>"
+)
+
+notes <- list(
+  `*` = list(i = 0, j = c(2, 4), text = tt_md("Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.")),
+  `†` = list(i = 0, j = 5, text = tt_md("The probability of direction (*p*~direction~) is the probability that the posterior AMCE is strictly positive or negative—it is the proportion of the posterior AMCE that is the sign of the median."))
+)
+
+all_tbl %>% 
+  select(-feature_nice_paper) %>%
+  mutate(across(c(mm_nice, amce_nice), ~tt_linebreak(.))) %>%
+  setNames(
+    c("Feature", "Posterior EMM", "Contrast", "Posterior AMCE", tt_md("*p*~direction~"))
+  ) %>%
+  tt(width = c(0.18, 0.18, 0.40, 0.18, 0.06), notes = notes) %>%
+  group_tt(
+    i = as.character(all_tbl$feature_nice_paper), 
+    indent = 0
+  ) %>%
+  format_tt(replace = "—") %>%
+  format_tt(j = 3, markdown = TRUE, replace = "—") %>%
+  format_tt(j = c(2, 4, 5), escape = FALSE, replace = "—") %>%
+  style_tt(j = c(1, 3), align = "l") %>%
+  style_tt(j = c(2, 4, 5), align = "c") %>%
+  style_tt(
+    i = get_row_group_index(all_tbl$feature_nice_paper),
+    line = "b", line_width = 0.05, line_color = "#d3d8dc", align = "l", bold = TRUE,
+  ) %>%
+  style_tt(
+    i = tail(get_row_group_index(all_tbl$feature_nice_paper), -1),
+    line = "t", line_width = 0.05, line_color = "#d3d8dc",
+  ) %>%
+  style_tt(j = 2, line = "r", line_width = 0.1, line_color = "#d3d8dc") %>%
+  style_tt(
+    bootstrap_class = "table",
+    tabularray_inner = inner
+  )
+```
+
+Complete results
+
+:::
+
+\newpage
+
+::: {#apptbl-mms-trans-acc}
+
+```{r}
+#| label: table-mms-trans-acc
+#| include: true
+
+mms_transp_acc <- preds_all %>% 
+  group_by(feat_transp, feat_acc, .draw) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  ungroup()
+
+mms_trans_acc_all <- mms_transp_acc %>% 
+  filter(
+    (feat_transp == "Transparency: Yes" & feat_acc == "Accountability: Yes") | 
+      (feat_transp == "Transparency: No" & feat_acc == "Accountability: No")) %>% 
+  bind_rows(
+    mms_transp %>% 
+      filter(feature_level == "Transparency: Yes") %>% 
+      rename(feat_transp = feature_level) %>% 
+      mutate(feat_acc = "Accountability: No"),
+    mms_acc %>% 
+      filter(feature_level == "Accountability: Yes") %>% 
+      rename(feat_acc = feature_level) %>% 
+      mutate(feat_transp = "Transparency: No")
+  )
+
+mms_trans_acc_all_tbl <- mms_trans_acc_all %>% 
+  group_by(feat_transp, feat_acc) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}\n{build_ci(.lower, .upper)}")) %>% 
+  mutate(across(c(nice), ~tt_linebreak(.)))
+
+inner <- glue("
+rowsep=1pt, row{<<header_rows>>}={abovesep=6pt, belowsep=0pt},
+cells={font=\\footnotesize}, row{1}={valign=b}
+",
+  header_rows = paste0(get_row_group_index(mms_trans_acc_all_tbl$feat_transp) + 1, collapse = ","),
+  .open = "<<", .close = ">>"
+)
+
+notes <- list(
+  `*` = list(i = 0, j = 2, text = tt_md("Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets."))
+)
+
+mms_trans_acc_all_tbl %>%
+  select(Features = feat_acc, `Posterior EMM` = nice) %>% 
+  tt(width = c(0.25, 0.2), notes = notes) %>%
+  group_tt(
+    i = as.character(mms_trans_acc_all_tbl$feat_transp), 
+    indent = 0
+  ) %>%
+  style_tt(
+    i = get_row_group_index(mms_trans_acc_all_tbl$feat_transp),
+    line = "b", line_width = 0.05, line_color = "#d3d8dc", align = "l", bold = TRUE,
+  ) %>%
+  style_tt(j = 1, align = "l") %>%
+  style_tt(j = 2, align = "c") %>%
+  style_tt(
+    bootstrap_class = "table",
+    tabularray_inner = inner
+  )
+```
+
+Marginal means for all combinations of transparency and accountability
+
+:::
+
+\newpage
+
+::: {#apptbl-transp-crackdown}
+
+```{r}
+#| label: table-transp-crackdown
+#| include: true
+
+mms_transp_crackdown <- preds_all %>% 
+  group_by(feat_transp_short, feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+mms_transp_crackdown_tbl <- mms_transp_crackdown %>% 
+  group_by(feat_transp_short, feat_govt) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}\n{build_ci(.lower, .upper)}")) %>% 
+  ungroup() %>% 
+  arrange(desc(feat_govt), desc(feat_transp_short)) %>% 
+  select(feat_transp_short, feat_govt, nice)
+
+amces_transp_crackdown <- mms_transp_crackdown %>% 
+  group_by(feat_govt) %>% 
+  compare_levels(variable = avg, by = feat_transp_short, comparison = "control")
+
+amces_transp_crackdown_medians <- amces_transp_crackdown %>% 
+  group_by(feat_govt, feat_transp_short) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0))
+
+amces_transp_crackdown_tbl <- amces_transp_crackdown_medians %>% 
+  ungroup() %>% 
+  mutate(nice = glue("{fmt_decimal(y)}\n{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_transp_short = str_replace(feat_transp_short, " - ", "−")) %>% 
+  mutate(across(starts_with("p_"), ~fmt_decimal2(.))) %>% 
+  arrange(desc(feat_govt)) %>% 
+  select(contrast = feat_transp_short, diff_nice = nice, p_neq_0)
+
+mms_acc_crackdown <- preds_all %>% 
+  group_by(feat_acc_short, feat_govt, .draw) %>% 
+  summarize(avg = mean(.epred))
+
+mms_acc_crackdown_tbl <- mms_acc_crackdown %>% 
+  group_by(feat_acc_short, feat_govt) %>% 
+  median_qi() %>% 
+  mutate(nice = glue("{fmt_decimal(avg)}\n{build_ci(.lower, .upper)}")) %>% 
+  ungroup() %>% 
+  arrange(desc(feat_govt), desc(feat_acc_short)) %>% 
+  select(feat_acc_short, feat_govt, nice)
+
+amces_acc_crackdown_medians <- mms_acc_crackdown %>% 
+  group_by(feat_govt) %>% 
+  compare_levels(variable = avg, by = feat_acc_short, comparison = "control") %>% 
+  group_by(feat_govt, feat_acc_short) %>% 
+  summarize(
+    median_qi(avg),
+    p_gt_0 = sum(avg > 0) / n()
+  ) %>% 
+  mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0))
+
+amces_acc_crackdown_tbl <- amces_acc_crackdown_medians %>% 
+  ungroup() %>% 
+  mutate(nice = glue("{fmt_decimal(y)}\n{build_ci(ymin, ymax)}")) %>% 
+  mutate(feat_acc_short = str_replace(feat_acc_short, " - ", "−")) %>% 
+  mutate(across(starts_with("p_"), ~fmt_decimal2(.))) %>% 
+  arrange(desc(feat_govt)) %>% 
+  select(contrast = feat_acc_short, diff_nice = nice, p_neq_0)
+
+trans_acc_crackdown_tbl <- bind_rows(
+  bind_cols(
+    mms_transp_crackdown_tbl, 
+    amces_transp_crackdown_tbl %>% 
+      add_row(contrast = NA, .after = 1) %>% 
+      add_row(contrast = NA, .after = 3) %>% 
+      add_row(contrast = NA, .after = 5)
+  ) %>% 
+    mutate(feat_level = paste("Transparency:", feat_transp_short)) %>% 
+    select(-feat_transp_short),
+  bind_cols(
+    mms_acc_crackdown_tbl, 
+    amces_acc_crackdown_tbl %>% 
+      add_row(contrast = NA, .after = 1) %>% 
+      add_row(contrast = NA, .after = 3) %>% 
+      add_row(contrast = NA, .after = 5)
+  ) %>% 
+    mutate(feat_level = paste("Accountability:", feat_acc_short)) %>% 
+    select(-feat_acc_short)
+) %>%
+  mutate(contrast = ifelse(is.na(contrast), "*(Reference)*", contrast)) %>% 
+  mutate(across(c(nice, diff_nice), ~tt_linebreak(.))) %>% 
+  relocate(feat_level) %>%
+  mutate(feat_govt = fct_relabel(feat_govt, ~paste("Relationship with government:", .x))) %>% 
+  arrange(desc(feat_govt))
+
+inner <- glue("
+rowsep=1.5pt, row{<<header_rows>>}={abovesep=6pt, belowsep=0pt},
+cells={font=\\footnotesize}, row{1}={valign=b}
+",
+  header_rows = paste0(get_row_group_index(trans_acc_crackdown_tbl$feat_govt) + 1, collapse = ","),
+  .open = "<<", .close = ">>"
+)
+
+notes <- list(
+  `*` = list(i = 0, j = c(2, 4), text = tt_md("Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.")),
+  `†` = list(i = 0, j = 5, text = tt_md("The probability of direction (*p*~direction~) is the probability that the posterior AMCE is strictly positive or negative—it is the proportion of the posterior AMCE that is the sign of the median."))
+)
+
+trans_acc_crackdown_tbl %>%
+  select(-feat_govt) %>%
+  mutate(across(c(nice, diff_nice), ~tt_linebreak(.))) %>%
+  setNames(
+    c("Feature", "Posterior EMM", "Contrast", "Posterior ∆", tt_md("*p*~direction~"))
+  ) %>%
+  tt(width = c(0.30, 0.18, 0.25, 0.18, 0.06), notes = notes) %>%
+  group_tt(
+    i = as.character(trans_acc_crackdown_tbl$feat_govt), 
+    indent = 0
+  ) %>%
+  format_tt(replace = "—") %>%
+  format_tt(j = 3, markdown = TRUE) %>%
+  format_tt(j = c(2, 4, 5), escape = FALSE, replace = "—") %>%
+  style_tt(j = c(1, 3), align = "l") %>%
+  style_tt(j = c(2, 4, 5), align = "c") %>%
+  style_tt(
+    i = get_row_group_index(trans_acc_crackdown_tbl$feat_govt),
+    line = "b", line_width = 0.05, line_color = "#d3d8dc", align = "l", bold = TRUE,
+  ) %>%
+  style_tt(
+    i = tail(get_row_group_index(trans_acc_crackdown_tbl$feat_govt), -1),
+    line = "t", line_width = 0.05, line_color = "#d3d8dc",
+  ) %>%
+  style_tt(j = 2, line = "r", line_width = 0.1, line_color = "#d3d8dc") %>%
+  style_tt(
+    bootstrap_class = "table",
+    tabularray_inner = inner
+  )
+```
+
+Marginal means and AMCEs for interaction between transparency, accountability, and government relationships
+
+:::
+
+\newpage
+
+::: {#apptbl-coefs-orig}
+
+```{r}
+#| label: table-coefs-orig
+#| include: true
+notes <- c(
+  "Estimates are median posterior log odds from a multinomial logistic regression model with three possible categories, and the columns for µ1, µ2, and µ3 represent estimates for each of the outcomes;",
+  "95% credible intervals (equal-tailed quantile intervals) in brackets."
+)
+
+inner <- "
+rowsep=0pt,
+row{odd[2-27]}={abovesep=0pt},
+row{even[4-28]}={belowsep=6pt},
+cells={font=\\footnotesize}, row{1}={valign=b}
+"
+
+modelsummary(
+  list("Posterior medians" = model_summary_table),
+  shape = Feature + term ~ group,
+  estimate = "estimate",
+  statistic = "[{conf.low}, {conf.high}]",
+  output = "tinytable",
+  fmt = fmt_significant(2),
+  notes = tt_md(paste(notes, collapse = " "))
+) %>%
+  style_tt(
+    bootstrap_class = "table",
+    tabularray_inner = inner
+  )
+```
+
+Original model coefficients
+
+:::
+
+\clearpage
+
+::: {.content-visible when-meta="appendix-single-spacing"}
+\singlespacing
+:::
+
+# Preregistration deviations
+
+We made the following deviations from our preregistered protocol [@WillrothAtherton:2024]:
+
+1. Type
+
+   :   Analysis
+
+   Reason
+
+   :   New knowledge
+
+   Timing
+
+   :   After results known
+
+   Original wording
+
+   :   "We will examine the aggregate marginal posterior distributions of the attribute levels"
+
+   Deviation description
+
+   :   This statement was vague and seemed to imply that we would analyze the results of the model by looking only at the raw model coefficients. While is is possible to calculate exact feature contrasts by summing specific combinations of coefficients, we instead calculated estimated marginal means and their contrasts (or AMCEs) using the fitted model.
+
+   Reader impact
+
+   :   This deviation should improve readers' interpretation of the findings, since the reported results are no longer on a log-odds or logit scale, and instead are on a more interpretable percentage point scale—estimated marginal means show the percent of respondents who support an NGO given a specific features, while AMCEs show the percentage point change in support when moving from one feature to another. The risk of bias is minimal as the underlying results are identical whether reported as logit-scale coefficients or marginal means.
+
+
+2. Type
+
+   :   Hypotheses
+
+   Reason
+
+   :   Stylistic
+
+   Timing
+
+   :   After results known
+
+   Original wording
+
+   :   Q5a: "Donors will show increased willingness to donate to NGOs that are financially transparent"
+
+   Deviation description
+
+   :   We rephrased this as H~1a~: "If NGOs are financially transparent, then individual private donors will have a higher likelihood of supporting or donating to them."
+
+   Reader impact
+
+   :   This deviation has minimal impact on readers' interpretation of the findings—it is only rephrased to follow an "if… then…" formulation.
+
+
+3. Type
+
+   :   Hypotheses
+
+   Reason
+
+   :   New knowledge + stylistic
+
+   Timing
+
+   :   Direction restated after data collection, but before results were known; "if… then…" formulation added after results known
+
+   Original wording
+
+   :   Q5f: "Donors should be no more or less likely to donate to NGOs that are accountable and hold regular third party audits"
+
+   Deviation description
+
+   :   We rephrased this as H~1b~: "If NGOs are accountable and hold regular third-party audits, then individual private donors will have a higher likelihood of supporting or donating to them."
+
+   Reader impact
+
+   :   This deviation might have some impact on readers' interpretation of the findings. This deviation was the result of misunderstanding existing work on the effect of nonprofit accountability on donor behavior, and we hypothesized that there would be no effect, contrary to what is predicted by previous research. The risk of bias is low, however—we reversed our prediction after data collection but before we analyzed the data and before the results were known.
+
+
+4. Type
+
+   :   Hypotheses
+
+   Reason
+
+   :   Stylistic
+
+   Timing
+
+   :   After results known
+
+   Original wording
+
+   :   Q2a: "Donors will show increased willingness to donate to NGOs that are facing government crackdown or criticism"
+
+   Deviation description
+
+   :   We rephrased this as H~2~: "If NGOs face legal crackdowns abroad, then individual private donors will have a higher likelihood of supporting or donating to them."
+
+   Reader impact
+
+   :   This deviation has minimal impact on readers' interpretation of the findings—it is only rephrased to follow an "if… then…" formulation.
+
+
+5. Type
+
+   :   Hypotheses
+
+   Reason
+
+   :   New knowledge
+
+   Timing
+
+   :   Accountability prediction added after data collection, but before results were known; "if… then…" formulation added after results known
+
+   Original wording
+
+   :   Q5b: "Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are also financially transparent"
+
+   Deviation description
+
+   :   We explore the interaction between (1) government crackdown and financial transparency and (2) government crackdown and accountability in the paper, but we only specified the first interaction in the preregistration.
+
+   Reader impact
+
+   :   This deviation might have some impact on readers' interpretation of the findings. The omission of a prediction of the relationship between government crackdown and accountability was inadvertent and we had intended to specify it. The risk of bias is low, as we added the new crackdown+accountability hypothesis after data collection and before the results were known.
+
+
+6. Type
+
+   :   Hypotheses
+
+   Reason
+
+   :   Narrative
+
+   Timing
+
+   :   After data collection, before results were known
+
+   Original wording
+
+   :   Q1: Branding; Q3: Issue area; Q4: Funding sources
+
+   Deviation description
+
+   :   For the sake of narrative simplicity, we do not explicitly test these three predictions as hypotheses. In this paper, our primary interest is crackdown, transparency, and accountability, but we look at branding, issue area, and funding sources to help compare and give context to the magnitude of our main hypotheses.
+
+   Reader impact
+
+   :   This deviation might have some impact on readers' interpretation of the findings, as it might appear that we have selectively reported a handful of our predictions. To avoid this, and for the sake of full transparency, we include these results in @fig-all-results and @apptbl-all-results. The risk of bias is low—we decided on the narrative framing for this paper after collecting the data but before analyzing the results.
+
+\newpage
+
+# Condensed preregistration
+
+::: {.callout-important icon=false}
+### Consensed preregistration
+
+This is an anonymized and condensed version of our full OSF preregistration protocol.
+:::
+
+{{< include text/preregistration.md >}}
+
+\newpage
+
+# References
