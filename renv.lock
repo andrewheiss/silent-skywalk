@@ -1,6 +1,6 @@
 {
   "R": {
-    "Version": "4.3.2",
+    "Version": "4.3.3",
     "Repositories": [
       {
         "Name": "Stan",
@@ -62,7 +62,7 @@
     },
     "MASS": {
       "Package": "MASS",
-      "Version": "7.3-60",
+      "Version": "7.3-60.0.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -73,7 +73,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "a56a6365b3fa73293ea8d084be0d9bb0"
+      "Hash": "b765b28387acc8ec9e9c1530713cb19c"
     },
     "Matrix": {
       "Package": "Matrix",
@@ -278,9 +278,9 @@
     },
     "bayestestR": {
       "Package": "bayestestR",
-      "Version": "0.13.1",
+      "Version": "0.15.0",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "datawizard",
@@ -290,7 +290,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "61f643ea5ee9fe0e70ab0246340b3c2e"
+      "Hash": "d7c05ccb9d60d87dbbe8b4042c385f01"
     },
     "bigD": {
       "Package": "bigD",
@@ -496,15 +496,15 @@
     },
     "checkmate": {
       "Package": "checkmate",
-      "Version": "2.2.0",
+      "Version": "2.3.2",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "backports",
         "utils"
       ],
-      "Hash": "ca9c113196136f4a9ca9ce6079c2c99e"
+      "Hash": "0e14e01ce07e7c88fd25de6d4260d26b"
     },
     "cli": {
       "Package": "cli",
@@ -682,7 +682,7 @@
     },
     "crul": {
       "Package": "crul",
-      "Version": "1.4.0",
+      "Version": "1.4.2",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -693,7 +693,7 @@
         "mime",
         "urltools"
       ],
-      "Hash": "1eb00a531331c91d970f3af74b75321f"
+      "Hash": "5685d2603020d0f879a147ba23d51292"
     },
     "curl": {
       "Package": "curl",
@@ -707,18 +707,18 @@
     },
     "data.table": {
       "Package": "data.table",
-      "Version": "1.14.8",
+      "Version": "1.16.4",
       "Source": "Repository",
-      "Repository": "CRAN",
+      "Repository": "RSPM",
       "Requirements": [
         "R",
         "methods"
       ],
-      "Hash": "b4c06e554f33344e044ccd7fdca750a9"
+      "Hash": "38bbf05fc2503143db4c734a7e5cab66"
     },
     "datawizard": {
       "Package": "datawizard",
-      "Version": "0.9.0",
+      "Version": "1.0.0",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -727,7 +727,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "1706690277f29a2ee69d59483e21c5c6"
+      "Hash": "8a37ad13b9b0db70bf32d6eb2fc0a2aa"
     },
     "dbplyr": {
       "Package": "dbplyr",
@@ -1494,7 +1494,7 @@
     },
     "insight": {
       "Package": "insight",
-      "Version": "0.19.6",
+      "Version": "1.0.1",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -1503,7 +1503,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "cc21c0957774c1602ec3324a5a47d798"
+      "Hash": "3d10ce60ec5a72db736b7f6ef0670858"
     },
     "isoband": {
       "Package": "isoband",
@@ -1568,38 +1568,6 @@
       ],
       "Hash": "3bcd11943da509341838da9399e18bce"
     },
-    "kableExtra": {
-      "Package": "kableExtra",
-      "Version": "1.3.4.9000",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "kableExtra",
-      "RemoteUsername": "vincentarelbundock",
-      "RemoteRef": "dev",
-      "RemoteSha": "3a6b4dba0f5a6467b4f447bb0c892dc29c2527d9",
-      "Requirements": [
-        "R",
-        "digest",
-        "glue",
-        "grDevices",
-        "graphics",
-        "htmltools",
-        "knitr",
-        "magrittr",
-        "rmarkdown",
-        "rstudioapi",
-        "rvest",
-        "scales",
-        "stats",
-        "stringr",
-        "svglite",
-        "tools",
-        "viridisLite",
-        "xml2"
-      ],
-      "Hash": "76974ab3a258c1204b76a61c6b81ddea"
-    },
     "knitr": {
       "Package": "knitr",
       "Version": "1.43",
@@ -1640,7 +1608,7 @@
     },
     "lattice": {
       "Package": "lattice",
-      "Version": "0.21-9",
+      "Version": "0.22-5",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1651,7 +1619,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "5558c61e0136e247252f5f952cdaad6a"
+      "Hash": "7c5e89f04e72d6611c77451f6331a091"
     },
     "lazyeval": {
       "Package": "lazyeval",
@@ -1725,7 +1693,7 @@
     },
     "marginaleffects": {
       "Package": "marginaleffects",
-      "Version": "0.17.0",
+      "Version": "0.20.1",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -1737,9 +1705,10 @@
         "generics",
         "insight",
         "methods",
-        "rlang"
+        "rlang",
+        "utils"
       ],
-      "Hash": "8afe5c5de05ab33886b90c23c5ff62c2"
+      "Hash": "1f951f3823c8e7e8b21fc2f6636e30a9"
     },
     "markdown": {
       "Package": "markdown",
@@ -1834,7 +1803,7 @@
     },
     "modelsummary": {
       "Package": "modelsummary",
-      "Version": "1.4.3",
+      "Version": "2.2.0",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -1844,12 +1813,13 @@
         "generics",
         "glue",
         "insight",
-        "kableExtra",
+        "methods",
         "parameters",
         "performance",
-        "tables"
+        "tables",
+        "tinytable"
       ],
-      "Hash": "ab3f79e32ad9ea51af4f20d0c43ca67e"
+      "Hash": "b4b1ed61d9bfdc897a5a163a5db4b779"
     },
     "munsell": {
       "Package": "munsell",
@@ -1998,7 +1968,7 @@
     },
     "parameters": {
       "Package": "parameters",
-      "Version": "0.21.3",
+      "Version": "0.24.0",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -2011,7 +1981,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "d6b15d1e41faf8951b59f5b3051ad3e3"
+      "Hash": "42e4417823caf935fcc47a88ad4706e7"
     },
     "patchwork": {
       "Package": "patchwork",
@@ -2033,7 +2003,7 @@
     },
     "performance": {
       "Package": "performance",
-      "Version": "0.10.8",
+      "Version": "0.12.4",
       "Source": "Repository",
       "Repository": "RSPM",
       "Requirements": [
@@ -2041,11 +2011,10 @@
         "bayestestR",
         "datawizard",
         "insight",
-        "methods",
         "stats",
         "utils"
       ],
-      "Hash": "92873fb57cc5b73fe2aa0b09056a789a"
+      "Hash": "64e61921ea6b2a4d76c81290d5ecce25"
     },
     "pillar": {
       "Package": "pillar",
@@ -2800,18 +2769,6 @@
       ],
       "Hash": "894d0aff9585344af4ab78e2b4d60ab7"
     },
-    "svglite": {
-      "Package": "svglite",
-      "Version": "2.1.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "cpp11",
-        "systemfonts"
-      ],
-      "Hash": "124a41fdfa23e8691cb744c762f10516"
-    },
     "sys": {
       "Package": "sys",
       "Version": "3.4.2",
@@ -2832,7 +2789,7 @@
     },
     "tables": {
       "Package": "tables",
-      "Version": "0.9.17",
+      "Version": "0.9.25",
       "Source": "Repository",
       "Repository": "CRAN",
       "Requirements": [
@@ -2842,7 +2799,7 @@
         "stats",
         "utils"
       ],
-      "Hash": "22af1e94a64cf8713c4f79362eeb0fd6"
+      "Hash": "5540393ad9fed813e150fc4c7dfa08b8"
     },
     "tarchetypes": {
       "Package": "tarchetypes",
@@ -3066,6 +3023,17 @@
         "cpp11"
       ],
       "Hash": "8548b44f79a35ba1791308b61e6012d7"
+    },
+    "tinytable": {
+      "Package": "tinytable",
+      "Version": "0.6.1",
+      "Source": "Repository",
+      "Repository": "RSPM",
+      "Requirements": [
+        "R",
+        "methods"
+      ],
+      "Hash": "284426416e795014477cf40a556eff76"
     },
     "tinytex": {
       "Package": "tinytex",
