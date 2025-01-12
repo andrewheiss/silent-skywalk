@@ -401,11 +401,11 @@ cells={font=\\footnotesize}
 )
 
 tbl_participant_summary$`Politics, ideology, and religion` %>% 
-  select(-category, -Question) %>% 
+  select(-category, -Question) %>%
   tt(width = c(0.6, 0.15, 0.15)) %>%
   group_tt(j = list("Politics, ideology, and religion" = 1:3)) %>%
   group_tt(
-    i = tbl_participant_summary$`Politics, ideology, and religion`$Question, 
+    i = tbl_participant_summary$`Politics, ideology, and religion`$Question,
     indent = 1
   ) %>%
   style_tt(i = -1, align = "c", bold = TRUE) %>%
@@ -924,7 +924,7 @@ We made the following deviations from our preregistered protocol [@WillrothAther
 
    Reader impact
 
-   :   This deviation might have some impact on readers' interpretation of the findings, as it might appear that we have selectively reported a handful of our predictions. To avoid this, and for the sake of full transparency, we include these results in @fig-all-results and @apptbl-all-results. The risk of bias is low—we decided on the narrative framing for this paper after collecting the data but before analyzing the results.
+   :   This deviation might have some impact on readers' interpretation of the findings, as it might appear that we have selectively reported a handful of our predictions. To avoid this, and for the sake of full transparency, we include these results in Figure 1 in the paper and @apptbl-all-results. The risk of bias is low—we decided on the narrative framing for this paper after collecting the data but before analyzing the results.
 
 \newpage
 

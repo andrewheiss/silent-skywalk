@@ -12,6 +12,7 @@ _freeze/
 manuscript/submissions/
 manuscript/output/
 *.ent
+manuscript/*_files/
 manuscript/*.html.md
 manuscript/*.pdf.md
 manuscript/*.docx.md
