@@ -6,11 +6,12 @@
 
 [Suparna Chaudhry](http://www.suparnachaudhry.com/) • Lewis & Clark
 College  
-[Marc Dotson](https://occasionaldivergences.com/about)
-• Utah State University  
+[Marc Dotson](https://occasionaldivergences.com/about) • Utah State
+University  
 [Andrew Heiss](https://www.andrewheiss.com) • Georgia State University
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
 ------------------------------------------------------------------------
