@@ -6,33 +6,33 @@ page-layout: full
 
 ```{r include=FALSE}
 # Add the manuscript target as a dependency to the overall website
-targets::tar_load(c(output_nice, output_ms))
+targets::tar_load(manuscript)
 ```
 
 ```{=html}
 <p class="text-center">
   <a class="btn btn-success btn-sm mb-1" href="/manuscript/output/manuscript.html" target="manuscript">
-  <iconify-icon inline="" icon="fa6-solid:file-lines"></iconify-icon> &ensp;HTML
-  </a> 
-  
+  <i class="fa-solid fa-file-lines"></i> &ensp;HTML
+  </a>
+
   <a class="btn btn-success btn-sm mb-1" href="/manuscript/output/manuscript.html" target="_blank">
-  <iconify-icon inline="" icon="fa6-solid:arrow-up-right-from-square"></iconify-icon> &ensp;HTML <small>(new window)</small>
+  <i class="fa-solid fa-arrow-up-right-from-square"></i>&ensp;HTML <small>(new window)</small>
   </a>
 
   <a class="btn btn-danger btn-sm mb-1" href="/manuscript/output/manuscript.pdf" target="manuscript">
-  <iconify-icon inline="" icon="fa6-solid:file-pdf"></iconify-icon> &ensp;PDF
-  </a> 
-  
-  <a class="btn btn-danger btn-sm mb-1" target="_blank" href="/manuscript/output/manuscript.pdf">
-  <iconify-icon inline="" icon="fa6-solid:file-arrow-down"></iconify-icon> &ensp;PDF <small>(download)</small>
+  <i class="fa-solid fa-file-pdf"></i>&ensp;PDF
   </a>
-  
-  <a class="btn btn-warning btn-sm mb-1" href="/manuscript/output-ms/manuscript-ms.pdf" target="manuscript">
-  <iconify-icon inline="" icon="fa6-solid:file-pdf"></iconify-icon> &ensp;Manuscripty PDF
-  </a> 
-  
-  <a class="btn btn-warning btn-sm mb-1" target="_blank" href="/manuscript/output-ms/manuscript-ms.pdf">
-  <iconify-icon inline="" icon="fa6-solid:file-arrow-down"></iconify-icon> &ensp;Manuscripty PDF <small>(download)</small>
+
+  <a class="btn btn-danger btn-sm mb-1" target="_blank" href="/manuscript/output/manuscript.pdf">
+  <i class="fa-solid fa-file-arrow-down"></i>&ensp;PDF <small>(download)</small>
+  </a>
+
+  <a class="btn btn-warning btn-sm mb-1" href="/manuscript/output/manuscript+ms.pdf" target="manuscript">
+  <i class="fa-solid fa-file-pdf"></i>&ensp;Manuscripty PDF
+  </a>
+
+  <a class="btn btn-warning btn-sm mb-1" target="_blank" href="/manuscript/output/manuscript+ms.pdf">
+  <i class="fa-solid fa-file-arrow-down"></i>&ensp;Manuscripty PDF <small>(download)</small>
   </a>
 </p>
 
