@@ -499,13 +499,16 @@ all_tbl %>%
   style_tt(j = c(2, 4, 5), align = "c") %>%
   style_tt(
     i = get_row_group_index(all_tbl$feature_nice_paper),
-    line = "b", line_width = 0.05, line_color = "#d3d8dc", align = "l", bold = TRUE,
+    # line = "b", line_width = 0.05, line_color = "#d3d8dc", align = "l", bold = TRUE,
+    line = "b", line_width = 0.05, align = "l", bold = TRUE
   ) %>%
   style_tt(
     i = tail(get_row_group_index(all_tbl$feature_nice_paper), -1),
-    line = "t", line_width = 0.05, line_color = "#d3d8dc",
+    # line = "t", line_width = 0.05, line_color = "#d3d8dc",
+    line = "t", line_width = 0.05
   ) %>%
-  style_tt(j = 2, line = "r", line_width = 0.1, line_color = "#d3d8dc") %>%
+  # style_tt(j = 2, line = "r", line_width = 0.1, line_color = "#d3d8dc") %>%
+  style_tt(j = 2, line = "r", line_width = 0.1) %>%
   style_tt(
     bootstrap_class = "table",
     tabularray_inner = inner
@@ -571,7 +574,8 @@ mms_trans_acc_all_tbl %>%
   ) %>%
   style_tt(
     i = get_row_group_index(mms_trans_acc_all_tbl$feat_transp),
-    line = "b", line_width = 0.05, line_color = "#d3d8dc", align = "l", bold = TRUE,
+    # line = "b", line_width = 0.05, line_color = "#d3d8dc", align = "l", bold = TRUE,
+    line = "b", line_width = 0.05, align = "l", bold = TRUE
   ) %>%
   style_tt(j = 1, align = "l") %>%
   style_tt(j = 2, align = "c") %>%
@@ -712,13 +716,16 @@ trans_acc_crackdown_tbl %>%
   style_tt(j = c(2, 4, 5), align = "c") %>%
   style_tt(
     i = get_row_group_index(trans_acc_crackdown_tbl$feat_govt),
-    line = "b", line_width = 0.05, line_color = "#d3d8dc", align = "l", bold = TRUE,
+    # line = "b", line_width = 0.05, line_color = "#d3d8dc", align = "l", bold = TRUE,
+    line = "b", line_width = 0.05, align = "l", bold = TRUE
   ) %>%
   style_tt(
     i = tail(get_row_group_index(trans_acc_crackdown_tbl$feat_govt), -1),
-    line = "t", line_width = 0.05, line_color = "#d3d8dc",
+    # line = "t", line_width = 0.05, line_color = "#d3d8dc"
+    line = "t", line_width = 0.05
   ) %>%
-  style_tt(j = 2, line = "r", line_width = 0.1, line_color = "#d3d8dc") %>%
+  # style_tt(j = 2, line = "r", line_width = 0.1, line_color = "#d3d8dc") %>%
+  style_tt(j = 2, line = "r", line_width = 0.1) %>%
   style_tt(
     bootstrap_class = "table",
     tabularray_inner = inner
