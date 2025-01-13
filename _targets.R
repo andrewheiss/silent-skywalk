@@ -99,8 +99,7 @@ list(
   tar_target(model_summary_table, build_modelsummary(m_treatment_only)),
   
   ## Manuscript and notebook ----
-  tar_quarto(output_nice, path = "manuscript", quiet = FALSE, profile = "nice"),
-  tar_quarto(output_ms, path = "manuscript", quiet = FALSE, profile = "ms"),
+  tar_quarto(manuscript, path = "manuscript", quiet = FALSE),
   tar_quarto(website, path = ".", quiet = FALSE),
   tar_target(deploy_script, here_rel("deploy.sh"), format = "file"),
   tar_target(deploy, {
