@@ -1,0 +1,34 @@
+% Ew this is gross but it works! This adds all the figure and table captions to 
+% the table of contents automatically so that there's no need for separate 
+% \listoffigures or \listoftables sections. 
+%
+% At first I tried modifying the \caption command to inject 
+% \addcontentsline{}{}{} in it (both with \patchcmd{\@caption}{blah} and with 
+% etoolbox), but that apparently doesn't work because of LaTeX's two-pass system 
+% for numbering, or something. Either the captions wouldn't appear in the TOC, 
+% or they'd appear misnumbered---the first table would appear as Table 0 in the 
+% TOC, but be Table 1 in the document
+%
+% So this uses some conditional flags to help LaTeX recognize when it's in a 
+% table or figure, and then adds TOC entries accordingly.
+\newif\ifintable
+\newif\ifinfigure
+\intablefalse
+\infigurefalse
+
+\AtBeginEnvironment{table}{\intabletrue}
+\AtEndEnvironment{table}{\intablefalse}
+\AtBeginEnvironment{figure}{\infiguretrue}
+\AtEndEnvironment{figure}{\infigurefalse}
+
+\DeclareCaptionTextFormat{withtoc}{%
+  \ifintable
+    \addcontentsline{toc}{subsection}{Table A\thetable: #1}%
+  \fi
+  \ifinfigure
+    \addcontentsline{toc}{subsection}{Figure A\thefigure: #1}%
+  \fi
+  #1%
+}
+
+\captionsetup{textformat=withtoc}

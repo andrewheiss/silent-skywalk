@@ -1,6 +1,6 @@
 ---
 title: 'Appendix for "Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy"'
-short-title: 'Appendix for "Why Donors Donate'
+short-title: 'Appendix for "Why Donors Donate"'
 date: "2025-01-11"
 author:
 - name: Suparna Chaudhry
@@ -32,23 +32,18 @@ code-repo: "Access the code, data, and analysis at <https://github.com/andrewhei
 bibliography: references.bib
 csl: csl/apa.csl
 link-citations: true
-crossref:
-  custom:
-    - kind: float
-      key: appfig
-      latex-env: appfig
-      reference-prefix: Figure A
-      space-before-numbering: false
-      latex-list-of-description: Appendix Figure
-    - kind: float
-      key: apptbl
-      latex-env: apptbl
-      reference-prefix: Table A
-      space-before-numbering: false
-      latex-list-of-description: Appendix Table
-apptbl-cap-location: top
+crossref: 
+  tbl-title: "Table&nbsp;A"
+  fig-title: "Figure&nbsp;A"
 toc: true
 toc-depth: 2
+format: 
+  hikmah-pdf:
+    include-in-header: 
+      - tex/tbl-fig-to-toc.tex
+  hikmah-manuscript-pdf+ms:
+    include-in-header: 
+      - tex/tbl-fig-to-toc.tex
 ---
 
 ```{r setup, include=FALSE}
@@ -291,14 +286,22 @@ amces_all_medians <- amces_all %>%
   mutate(p_neq_0 = ifelse(y >= 0, p_gt_0, 1 - p_gt_0))
 ```
 
+```{=latex}
 \clearpage
+```
 
-# Additional tables
+::: {.content-visible when-meta="appendix-single-spacing"}
+```{=latex}
+\begin{singlespace}
+```
+:::
 
-::: {#apptbl-sample-details-demographics}
+# Respondent demographics
 
 ```{r}
-#| label: apptable-sample-details-demographics
+#| label: tbl-sample-details-demographics
+#| tbl-cap: Respondent demographics
+#| tbl-pos: H
 #| include: true
 tbl_participant_summary <- participant_summary %>% 
   select(
@@ -340,16 +343,17 @@ tbl_participant_summary$Demographics %>%
   format_tt(escape = TRUE)
 ```
 
-Demographics
-
+::: {.content-visible when-meta="appendix-single-spacing"}
+```{=latex}
+\end{singlespace}
+```
 :::
 
 \newpage
 
-::: {#apptbl-sample-details-charity}
-
 ```{r}
-#| label: table-sample-details-charity
+#| label: tbl-sample-details-charity
+#| tbl-cap: Respondent attitudes toward charity
 #| include: true
 
 inner <- glue("
@@ -382,14 +386,9 @@ tbl_participant_summary$`Attitudes toward charity` %>%
   format_tt(escape = TRUE)
 ```
 
-Attitudes toward charity
-
-:::
-
-::: {#apptbl-sample-details-politics}
-
 ```{r}
-#| label: table-sample-details-politics
+#| label: tbl-sample-details-politics
+#| tbl-cap: Respondent politics, ideology, and religion
 #| include: true
 
 inner <- glue("
@@ -422,18 +421,112 @@ tbl_participant_summary$`Politics, ideology, and religion` %>%
   format_tt(escape = TRUE)
 ```
 
-Politics, ideology, and religion
+\clearpage
 
-:::
+# Model coefficients and estimated marginal means
 
-\newpage
+When working with the results for our multinomial regression model, we rely on estimated marginal means (EMMs) rather than raw regression coefficients because of the complexity of the model. At its core, a "marginal mean" refers to the literal mean in the margins in a contingency table of model predictions, and differences in marginal means are equivalent to marginal effects or regression coefficients.
 
-::: {#apptbl-all-results}
+To find the causal effects defined in each of our estimands, we calculate EMMs by finding the fitted probability-scale values for each cell in a balanced reference grid of all 576 possible combinations of feature levels (2 transparency × 2 accountability × 3 government relationships × 4 organizations × 4 issues × 3 funding = 576 rows). We then calculate group averages and contrasts in group averages for each of the features of interest, marginalizing over all other features.
 
-\scriptsize
+## Raw model coefficients
+
+As seen in @tbl-coefs-orig, the model returns three sets of coefficients per conjoint level. Each coefficient shows the shift in probability that someone will choose an organization from that appears as the first, second, and third option in the experimental task, represented by µ1, µ2, and µ3. Under experimental conditions where all the feature levels are randomly assigned, it is safe to assume that the cell proportions are equal and then marginalize (i.e. find the average) across the rows or columns. This allows us to take the average of each set of coefficients (e.g. µ1, µ2, and µ3 for "Transparency = Yes") to create a single value per coefficient.
 
 ```{r}
-#| label: table-all-results
+#| label: tbl-coefs-orig
+#| tbl-cap: Original multinomial logistic regression model coefficients
+#| include: true
+notes <- c(
+  "Estimates are median posterior log odds from a multinomial logistic regression model with three possible categories, and the columns for µ1, µ2, and µ3 represent estimates for each of the outcomes;",
+  "95% credible intervals (equal-tailed quantile intervals) in brackets."
+)
+
+inner <- "
+rowsep=0pt,
+row{odd[2-27]}={abovesep=0pt},
+row{even[4-28]}={belowsep=6pt},
+cells={font=\\footnotesize}, row{1}={valign=b}
+"
+
+modelsummary(
+  list("Posterior medians" = model_summary_table),
+  shape = Feature + term ~ group,
+  estimate = "estimate",
+  statistic = "[{conf.low}, {conf.high}]",
+  output = "tinytable",
+  fmt = fmt_significant(2),
+  notes = tt_md(paste(notes, collapse = " "))
+) %>%
+  style_tt(
+    bootstrap_class = "table",
+    tabularray_inner = inner
+  )
+```
+
+
+## Converting coefficients to estimated marginal means
+
+To convert EMMs and AMCEs to a more interpretable probability scale (rather than the original log odds scale), we generate predicted values (marginalized across the three µ terms) for each of the 576 unique combinations of feature levels. @tbl-grid-example provides an excerpt from this grid, showing six rows where accountability, organization, issue area, and funding are identical and held constant, while transparency and government relations vary.
+
+```{r}
+#| label: tbl-grid-example
+#| tbl-cap: Excerpt from complete reference grid of all 576 possible combinations of attribute features and levels
+#| include: true
+grid_example <- expand_grid(
+  feat_transp = c("Transparency: Yes", "Transparency: No"), 
+  feat_acc = "Accountability: Yes", 
+  feat_govt = c("Friendly relationship with government", "Criticized by government", "Under government crackdown"),
+  feat_org = "Red Cross", 
+  feat_issue = "Emergency response", 
+  feat_funding = "Funded primarily by many small private donations"
+)
+
+preds_small <- preds_all %>% 
+  group_by(feat_org, feat_issue, feat_transp, feat_acc, feat_funding, feat_govt) %>% 
+  summarize(avg = mean(.epred)) %>% 
+  inner_join(
+    grid_example, 
+    by = join_by(feat_org, feat_issue, feat_transp, feat_acc, feat_funding, feat_govt)
+  ) %>% 
+  mutate(avg_nice = label_comma(accuracy = 0.001)(avg))
+
+p_sm <- preds_small %>% 
+  group_by(feat_transp) %>% 
+  summarize(
+    emm_numeric = mean(avg),
+    emm = label_comma(accuracy = 0.001)(mean(avg)),
+    list = knitr::combine_words(avg_nice, sep = " + ", and = "")
+  ) %>% 
+  mutate(feat_transp = janitor::make_clean_names(feat_transp)) %>% 
+  split(~feat_transp)
+
+amce_fake <- p_sm$transparency_yes$emm_numeric - p_sm$transparency_no$emm_numeric
+amce_tr_fake <- label_comma(accuracy = 0.001)(amce_fake)
+amce_tr_fake_pp <- label_comma(accuracy = 1, scale = 100)(amce_fake)
+
+preds_small %>% 
+  select(
+    Organization = feat_org, Issue = feat_issue, Transparency = feat_transp,
+    Accountability = feat_acc, Funding = feat_funding, Government = feat_govt,
+    EMM = avg_nice) %>%
+  tt(width = c(rep(0.15, 6), 0.07)) %>%
+  style_tt(
+    align = "l",
+    bootstrap_class = "table table-sm",
+    tabularray_inner = "rowsep=2pt, cells={font=\\footnotesize}, row{1}={valign=b}"
+  )
+```
+
+To calculate the marginal mean for a feature, we find the average predicted value across each the levels of that feature. To illustrate, assume that @tbl-grid-example represents the full reference grid of all experimental features and levels. The marginal means for transparency would be (`r p_sm$transparency_no$list`)/3 = `r p_sm$transparency_no$emm` when transparency is set to "no", and (`r p_sm$transparency_yes$list`)/3 = `r p_sm$transparency_yes$emm` when transparency is set to "yes". In reality, the marginal mean for transparency reported in thee paper reflects the average of 288 rows where transparency is no and 288 rows where transparency is yes.
+
+To calculate the AMCE for a feature, we find the difference in estimated marginal means. If we again assume that @tbl-grid-example contains the full reference grid, the AMCE for transparency would be `r p_sm$transparency_yes$emm` − `r p_sm$transparency_no$emm`, or `r amce_tr_fake`, or `r amce_tr_fake_pp` percentage points. Again, this is not actually the true causal effect—the real AMCE for transparency reported in the paper is the difference in marginal means for the 288 rows where transparency is no and the 288 rows where transparency is yes.
+
+In the main paper, we include plots of the marginal means and AMCEs for all experimental features. The tables below correspond to each figure in the paper.
+
+```{r}
+#| label: tbl-all-results
+#| tbl-cap: "Complete marginal means and AMCEs (see Figure 1 in main paper)"
 #| include: true
 mms_all_tbl <- mms_all %>% 
   drop_na(feature_level) %>% 
@@ -507,24 +600,17 @@ all_tbl %>%
     # line = "t", line_width = 0.05, line_color = "#d3d8dc",
     line = "t", line_width = 0.05
   ) %>%
-  # style_tt(j = 2, line = "r", line_width = 0.1, line_color = "#d3d8dc") %>%
-  style_tt(j = 2, line = "r", line_width = 0.1) %>%
   style_tt(
     bootstrap_class = "table",
     tabularray_inner = inner
   )
 ```
 
-Complete results
-
-:::
-
 \newpage
 
-::: {#apptbl-mms-trans-acc}
-
 ```{r}
-#| label: table-mms-trans-acc
+#| label: tbl-mms-trans-acc
+#| tbl-cap: "Marginal means for all combinations of transparency and accountability (see Figure 2 in main paper)"
 #| include: true
 
 mms_transp_acc <- preds_all %>% 
@@ -585,16 +671,11 @@ mms_trans_acc_all_tbl %>%
   )
 ```
 
-Marginal means for all combinations of transparency and accountability
-
-:::
-
 \newpage
 
-::: {#apptbl-transp-crackdown}
-
 ```{r}
-#| label: table-transp-crackdown
+#| label: tbl-transp-crackdown
+#| tbl-cap: "Marginal means and AMCEs for interaction between transparency, accountability, and government relationships (see Figure 3 in paper)"
 #| include: true
 
 mms_transp_crackdown <- preds_all %>% 
@@ -724,55 +805,11 @@ trans_acc_crackdown_tbl %>%
     # line = "t", line_width = 0.05, line_color = "#d3d8dc"
     line = "t", line_width = 0.05
   ) %>%
-  # style_tt(j = 2, line = "r", line_width = 0.1, line_color = "#d3d8dc") %>%
-  style_tt(j = 2, line = "r", line_width = 0.1) %>%
   style_tt(
     bootstrap_class = "table",
     tabularray_inner = inner
   )
 ```
-
-Marginal means and AMCEs for interaction between transparency, accountability, and government relationships
-
-:::
-
-\newpage
-
-::: {#apptbl-coefs-orig}
-
-```{r}
-#| label: table-coefs-orig
-#| include: true
-notes <- c(
-  "Estimates are median posterior log odds from a multinomial logistic regression model with three possible categories, and the columns for µ1, µ2, and µ3 represent estimates for each of the outcomes;",
-  "95% credible intervals (equal-tailed quantile intervals) in brackets."
-)
-
-inner <- "
-rowsep=0pt,
-row{odd[2-27]}={abovesep=0pt},
-row{even[4-28]}={belowsep=6pt},
-cells={font=\\footnotesize}, row{1}={valign=b}
-"
-
-modelsummary(
-  list("Posterior medians" = model_summary_table),
-  shape = Feature + term ~ group,
-  estimate = "estimate",
-  statistic = "[{conf.low}, {conf.high}]",
-  output = "tinytable",
-  fmt = fmt_significant(2),
-  notes = tt_md(paste(notes, collapse = " "))
-) %>%
-  style_tt(
-    bootstrap_class = "table",
-    tabularray_inner = inner
-  )
-```
-
-Original model coefficients
-
-:::
 
 \clearpage
 
@@ -931,7 +968,7 @@ We made the following deviations from our preregistered protocol [@WillrothAther
 
    Reader impact
 
-   :   This deviation might have some impact on readers' interpretation of the findings, as it might appear that we have selectively reported a handful of our predictions. To avoid this, and for the sake of full transparency, we include these results in Figure 1 in the paper and @apptbl-all-results. The risk of bias is low—we decided on the narrative framing for this paper after collecting the data but before analyzing the results.
+   :   This deviation might have some impact on readers' interpretation of the findings, as it might appear that we have selectively reported a handful of our predictions. To avoid this, and for the sake of full transparency, we include these results in Figure 1 in the paper and @tbl-all-results. The risk of bias is low—we decided on the narrative framing for this paper after collecting the data but before analyzing the results.
 
 \newpage
 
