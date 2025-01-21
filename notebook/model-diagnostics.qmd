@@ -63,7 +63,7 @@ plot_trace(m_treatment_only, params_to_show)
 
 ### Trace rank plots (trank plots)
 
-These are histograms of the ranks of the parameter draws across the four chains. If the chains are exploring the same space efficiently, the histograms should be similar and overlapping and no one chain should have a specific rank for a long time [@McElreath:2020, 284].
+These are histograms of the ranks of the parameter draws across the four chains. If the chains are exploring the same space efficiently, the histograms should be similar and overlapping and no one chain should have a specific rank for a long time [@McElreath:2020a, 284].
 
 They do.
 
