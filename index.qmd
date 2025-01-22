@@ -1,5 +1,6 @@
 ---
-title: "Why Donors Donate"
+title: "Navigating Hostility"
+subtitle: "The Effect of Nonprofit Transparency and Accountability on Donor Preferences in the Face of Shrinking Civic Space"
 author: "Suparna Chaudhry, Marc Dotson, and Andrew Heiss"
 format:
   html:
@@ -9,7 +10,7 @@ format:
 
 ## Abstract
 
-Non-governmental organizations (NGOs) are a core component of global governance. Over the last two decades, however, many host governments have cracked down on NGOs using a series of laws that adversely affect the availability and use of traditional NGO funding. In response to this dramatic shift in the funding landscape, international NGOs have increasingly turned to individual donors to offset the loss funding. Prior research on NGO fundraising has examined how financial transparency and organizational accountability influence individual donor behavior. How do these elements of private donor decision-making interact with structural-level factors such as worsening host country civic environments when deciding to donate? Using a conjoint experiment with likely donors in the US, we find that transparency and accountability can protect against the dampening effect of host government crackdown and criticism of NGOs. Our results have important implications for how NGOs can adapt to worsening civic environments. 
+Governments across the world have increasingly used laws to restrict the work of nonprofits, which has led to a reduction in public or official foreign aid directed towards these groups. Many international nonprofits, in response, have turned to individual donors to offset the loss of traditional funding. What are individual donors' preferences regarding donating to legally besieged nonprofits abroad? We conducted a conjoint experiment on a nationally representative sample of likely donors in the US and found that learning about host government criticism and legal restrictions on nonprofits decreases individuals' preferences to donate to them. However, organizational features such as financial transparency and accountability can protect against this dampening effect. Our results have important implications both for understanding private international philanthropy and how nonprofits can better frame their fundraising appeals at a time when they are facing restrictive civic spaces and hostile governments abroad.
 
 ## Code
 

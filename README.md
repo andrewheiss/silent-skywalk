@@ -2,7 +2,7 @@
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
-# Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy
+# Navigating Hostility: The Effect of Nonprofit Transparency and Accountability on Donor Preferences in the Face of Shrinking Civic Space
 
 [Suparna Chaudhry](http://www.suparnachaudhry.com/) • Lewis & Clark
 College  

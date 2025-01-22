@@ -20,6 +20,7 @@ format:
   # Nice HTML output
   html:
     toc: true
+    toc-depth: 4
     include-in-header:
       - text: |
           <style type="text/css">
