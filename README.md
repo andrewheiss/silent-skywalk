@@ -1,46 +1,35 @@
+# Navigating Hostility: The Effect of Nonprofit Transparency and Accountability on Donor Preferences in the Face of Shrinking Civic Space
 
+
+- [Abstract](#abstract)
+- [🤐🌥️🚶: Note on “silent skywalk” project name](#zipper_mouth_facesun_behind_large_cloudwalking-note-on-silent-skywalk-project-name)
+- [Licenses](#licenses)
+- [Contributions and Code of Conduct](#contributions-and-code-of-conduct)
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
 
-# Navigating Hostility: The Effect of Nonprofit Transparency and Accountability on Donor Preferences in the Face of Shrinking Civic Space
+------------------------------------------------------------------------
 
-[Suparna Chaudhry](http://www.suparnachaudhry.com/) • Lewis & Clark
-College  
-[Marc Dotson](https://occasionaldivergences.com/about) • Utah State
-University  
+[Suparna Chaudhry](http://www.suparnachaudhry.com/) • Lewis & Clark College  
+[Marc Dotson](https://occasionaldivergences.com/about) • Utah State University  
 [Andrew Heiss](https://www.andrewheiss.com) • Georgia State University
+
+------------------------------------------------------------------------
 
 <!-- badges: start -->
 
+[![Preprint](https://img.shields.io/badge/Preprint-10.31235%2Fosf.io%2Fg3z6n-blue)](https://doi.org/10.31235/osf.io/g3z6n) [![OSF DOI](https://img.shields.io/badge/OSF%20project-10.17605%2FOSF.IO%2FWXPRN-blue)](https://doi.org/10.17605/OSF.IO/WXPRN) [![Code DOI](https://img.shields.io/badge/Code-10.5281%2Fzenodo.14220206-blue)](https://doi.org/10.5281/zenodo.14220206)
 <!-- badges: end -->
 
 ------------------------------------------------------------------------
 
 ## Abstract
 
-Non-governmental organizations (NGOs) are a core component of global
-governance. Over the last two decades, however, many host governments
-have cracked down on NGOs using a series of laws that adversely affect
-the availability and use of traditional NGO funding. In response to this
-dramatic shift in the funding landscape, international NGOs have
-increasingly turned to individual donors to offset the loss funding.
-Prior research on NGO fundraising has examined how financial
-transparency and organizational accountability influence individual
-donor behavior. How do these elements of private donor decision-making
-interact with structural-level factors such as worsening host country
-civic environments when deciding to donate? Using a conjoint experiment
-with likely donors in the US, we find that transparency and
-accountability can protect against the dampening effect of host
-government crackdown and criticism of NGOs. Our results have important
-implications for how NGOs can adapt to worsening civic environments.
+Governments across the world have increasingly used laws to restrict the work of nonprofits, which has led to a reduction in public or official foreign aid directed towards these groups. Many international nonprofits, in response, have turned to individual donors to offset the loss of traditional funding. What are individual donors’ preferences regarding donating to legally besieged nonprofits abroad? We conducted a conjoint experiment on a nationally representative sample of likely donors in the US and found that learning about host government criticism and legal restrictions on nonprofits decreases individuals’ preferences to donate to them. However, organizational features such as financial transparency and accountability can protect against this dampening effect. Our results have important implications both for understanding private international philanthropy and how nonprofits can better frame their fundraising appeals at a time when they are facing restrictive civic spaces and hostile governments abroad.
 
-### 🤐🌥️🚶: Note on “silent skywalk” project name
+## 🤐🌥️🚶: Note on “silent skywalk” project name
 
-Because project titles change all the time with revisions, rewriting,
-and peer review, we used [{codename}](http://svmiller.com/codename/) to
-generate a
-[NICKA](https://en.wikipedia.org/wiki/List_of_U.S._Department_of_Defense_and_partner_code_names)-style
-internal-to-us project name that won’t change.
+Because project titles change all the time with revisions, rewriting, and peer review, we used [{codename}](http://svmiller.com/codename/) to generate a [NICKA](https://en.wikipedia.org/wiki/List_of_U.S._Department_of_Defense_and_partner_code_names)-style internal-to-us project name that won’t change.
 
 ``` r
 library(codename)
@@ -53,15 +42,10 @@ codename(type = "nicka", seed = "why donors donate")
 
 ## Licenses
 
-**Text and figures:** All prose and images are licensed under Creative
-Commons ([CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)).
+**Text and figures:** All prose and images are licensed under Creative Commons ([CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)).
 
 **Code:** All code is licensed under the [MIT License](LICENSE.md).
 
 ## Contributions and Code of Conduct
 
-We welcome contributions from everyone. Before you get started, please
-see our [contributor guidelines](CONTRIBUTING.md). Please note that this
-project is released with a [Contributor Code of
-Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html).
-By contributing to this project, you agree to abide by its terms.
+We welcome contributions from everyone. Before you get started, please see our [contributor guidelines](CONTRIBUTING.md). Please note that this project is released with a [Contributor Code of Conduct](https://contributor-covenant.org/version/2/0/CODE_OF_CONDUCT.html). By contributing to this project, you agree to abide by its terms.

@@ -1,5 +1,29 @@
 ---
-format: gfm
+title: "Navigating Hostility: The Effect of Nonprofit Transparency and Accountability on Donor Preferences in the Face of Shrinking Civic Space"
+format: 
+  gfm: 
+    wrap: preserve
+    toc: true
+  typst:
+    toc: true
+    toc-title: " "
+    include-in-header: README_stuff/better-layout.typ
+    author:
+    - name: Suparna Chaudhry
+      affiliation: Lewis and Clark College
+      orcid: 0000-0003-3506-7590
+      url: https://www.suparnachaudhry.com/
+      email: schaudhry@lclark.edu
+    - name: Marc Dotson
+      affiliation: Utah State University
+      orcid: 0000-0001-7846-3660
+      url: https://occasionaldivergences.com/
+      email: marc.dotson@usu.edu
+    - name: Andrew Heiss
+      affiliation: Georgia State University
+      orcid: 0000-0002-3948-3914
+      url: https://www.andrewheiss.com
+      email: aheiss@gsu.edu
 ---
 
 <!-- README.md is generated from README.qmd. Please edit that file -->
@@ -13,25 +37,46 @@ knitr::opts_chunk$set(
 )
 
 library(emoji)
+
+manuscript_target <- targets::tar_read(manuscript)
+
+yaml_metadata <- rmarkdown::yaml_front_matter(here::here("manuscript", "manuscript.qmd"))
+title <- yaml_metadata$title
+abstract <- yaml_metadata$abstract
+
+if (knitr::pandoc_to() == "typst") {
+  # typst doesn't support emoji as of 0.11.0, so we include SVG versions from 
+  # Noto Emoji (https://github.com/googlefonts/noto-emoji) instead
+  emoji_out <- "![](README_stuff/noto-emoji-svgs/emoji_u1f910.svg){height=1em}![](README_stuff/noto-emoji-svgs/emoji_u1f325.svg){height=1em}![](README_stuff/noto-emoji-svgs/emoji_u1f6b6.svg){height=1em}"
+} else {
+  emoji_out <- emoji_glue(":zipper_mouth_face::sun_behind_large_cloud::person_walking:")
+}
 ```
 
-# Navigating Hostility: The Effect of Nonprofit Transparency and Accountability on Donor Preferences in the Face of Shrinking Civic Space
+::: {.content-visible when-format="markdown"}
+
+---
 
 [Suparna Chaudhry](http://www.suparnachaudhry.com/) • Lewis & Clark College  
 [Marc Dotson](https://occasionaldivergences.com/about) • Utah State University  
 [Andrew Heiss](https://www.andrewheiss.com) • Georgia State University
 
+---
+
 <!-- badges: start -->
+[![Preprint](https://img.shields.io/badge/Preprint-10.31235%2Fosf.io%2Fhu6a5-blue)](https://doi.org/10.31235/osf.io/hu6a5) [![OSF DOI](https://img.shields.io/badge/OSF%20project-10.17605%2FOSF.IO%2FR59XZ-blue)](https://doi.org/10.17605/OSF.IO/R59XZ) [![Code DOI](https://img.shields.io/badge/Code-10.5281%2Fzenodo.14220206-blue)](https://doi.org/10.5281/zenodo.14220206)
 <!-- badges: end -->
+
+:::
 
 ---
 
 ## Abstract
 
-Non-governmental organizations (NGOs) are a core component of global governance. Over the last two decades, however, many host governments have cracked down on NGOs using a series of laws that adversely affect the availability and use of traditional NGO funding. In response to this dramatic shift in the funding landscape, international NGOs have increasingly turned to individual donors to offset the loss funding. Prior research on NGO fundraising has examined how financial transparency and organizational accountability influence individual donor behavior. How do these elements of private donor decision-making interact with structural-level factors such as worsening host country civic environments when deciding to donate? Using a conjoint experiment with likely donors in the US, we find that transparency and accountability can protect against the dampening effect of host government crackdown and criticism of NGOs. Our results have important implications for how NGOs can adapt to worsening civic environments.
+`r abstract`
 
 
-### `r emoji_glue(":zipper_mouth_face::sun_behind_large_cloud::person_walking:")`: Note on "silent skywalk" project name
+## `r emoji_out`: Note on "silent skywalk" project name
 
 Because project titles change all the time with revisions, rewriting, and peer review, we used [{codename}](http://svmiller.com/codename/) to generate a [NICKA](https://en.wikipedia.org/wiki/List_of_U.S._Department_of_Defense_and_partner_code_names)-style internal-to-us project name that won't change.
 
@@ -50,6 +95,7 @@ codename(type = "nicka", seed = "why donors donate")
 **Text and figures:** All prose and images are licensed under Creative Commons ([CC-BY-4.0](http://creativecommons.org/licenses/by/4.0/)).
 
 **Code:** All code is licensed under the [MIT License](LICENSE.md).
+
 
 ## Contributions and Code of Conduct
 
