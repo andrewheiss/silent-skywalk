@@ -212,7 +212,7 @@ calc_cps_diffs <- function(participant_summary, cps_props) {
     model <- brm(
       bf(n_yes | trials(n_total) ~ 1),
       data = df,
-      family = binomial(link = "identity"),
+      family = stats::binomial(link = "identity"),
       prior = c(prior(beta(1, 1), class = "Intercept", lb = 0, ub = 1)),
       chains = 4, warmup = 1000, iter = 2000, seed = BAYES_SEED,
       refresh = 0,
