@@ -18,7 +18,7 @@
 
 <!-- badges: start -->
 
-[![Preprint](https://img.shields.io/badge/Preprint-10.31235%2Fosf.io%2Fg3z6n-blue)](https://doi.org/10.31235/osf.io/g3z6n) [![OSF DOI](https://img.shields.io/badge/OSF%20project-10.17605%2FOSF.IO%2FWXPRN-blue)](https://doi.org/10.17605/OSF.IO/WXPRN) [![Code DOI](https://img.shields.io/badge/Code-10.5281%2Fzenodo.14220206-blue)](https://doi.org/10.5281/zenodo.14220206)
+[![Preprint](https://img.shields.io/badge/Preprint-10.31235%2Fosf.io%2Fhu6a5-blue)](https://doi.org/10.31235/osf.io/hu6a5) [![OSF DOI](https://img.shields.io/badge/OSF%20project-10.17605%2FOSF.IO%2FR59XZ-blue)](https://doi.org/10.17605/OSF.IO/R59XZ) [![Code DOI](https://img.shields.io/badge/Code-10.5281%2Fzenodo.14220206-blue)](https://doi.org/10.5281/zenodo.14220206)
 <!-- badges: end -->
 
 ------------------------------------------------------------------------
