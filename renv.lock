@@ -628,21 +628,6 @@
       ],
       "Hash": "859d96e65ef198fd43e82b9628d593ef"
     },
-    "crul": {
-      "Package": "crul",
-      "Version": "1.5.0",
-      "Source": "Repository",
-      "Repository": "RSPM",
-      "Requirements": [
-        "R6",
-        "curl",
-        "httpcode",
-        "jsonlite",
-        "mime",
-        "urltools"
-      ],
-      "Hash": "22e70c5046981d39b7bf7af74433e396"
-    },
     "curl": {
       "Package": "curl",
       "Version": "6.1.0",
@@ -1320,13 +1305,6 @@
       ],
       "Hash": "04291cc45198225444a397606810ac37"
     },
-    "httpcode": {
-      "Package": "httpcode",
-      "Version": "0.3.0",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Hash": "13641a1c6d2cc98801b76764078e17ea"
-    },
     "httpuv": {
       "Package": "httpuv",
       "Version": "1.6.15",
@@ -1809,25 +1787,6 @@
         "askpass"
       ],
       "Hash": "37a7f0abce0349f5950ce49f38c7626b"
-    },
-    "osfr": {
-      "Package": "osfr",
-      "Version": "0.2.9",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "crul",
-        "fs",
-        "httr",
-        "jsonlite",
-        "memoise",
-        "purrr",
-        "rlang",
-        "stringi",
-        "tibble"
-      ],
-      "Hash": "1f8c66528602fda4eef0c2e11eda5a57"
     },
     "paletteer": {
       "Package": "paletteer",
@@ -2883,16 +2842,6 @@
       ],
       "Hash": "3ec7e3ddcacc2d34a9046941222bf94d"
     },
-    "triebeard": {
-      "Package": "triebeard",
-      "Version": "0.4.1",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "Rcpp"
-      ],
-      "Hash": "642507a148b0dd9b5620177e0a044413"
-    },
     "tweenr": {
       "Package": "tweenr",
       "Version": "2.0.3",
@@ -2918,19 +2867,6 @@
         "cpp11"
       ],
       "Hash": "f561504ec2897f4d46f0c7657e488ae1"
-    },
-    "urltools": {
-      "Package": "urltools",
-      "Version": "1.7.3",
-      "Source": "Repository",
-      "Repository": "CRAN",
-      "Requirements": [
-        "R",
-        "Rcpp",
-        "methods",
-        "triebeard"
-      ],
-      "Hash": "e86a704261a105f4703f653e05defa3e"
     },
     "utf8": {
       "Package": "utf8",

@@ -1,14 +1,3 @@
-get_from_osf <- function(osf_url, out_dir) {
-  library(osfr)
-  
-  get_osf <- osf_retrieve_file(osf_url) %>%
-    osf_download(path = out_dir,
-      conflicts = "overwrite",
-      progress = TRUE)
-  
-  return(get_osf$local_path)
-}
-
 make_clean_data <- function(path) {
   # Load original pre-anonymized Qualtrics data
   data_raw <- read_csv(path, guess_max = 1500, show_col_types = FALSE)
