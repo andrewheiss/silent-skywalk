@@ -1,7 +1,7 @@
 ---
 title: 'Appendix for "Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy"'
 short-title: 'Appendix for "Why Donors Donate"'
-date: "2025-01-20"
+date: "2025-01-22"
 author:
 - name: Suparna Chaudhry
   affiliation: Lewis and Clark College
@@ -36,7 +36,7 @@ crossref:
   tbl-title: "Table&nbsp;A"
   fig-title: "Figure&nbsp;A"
 toc: true
-toc-depth: 3
+toc-depth: 4
 format: 
   html: default
   hikmah-pdf:
