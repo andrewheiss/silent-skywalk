@@ -1,6 +1,6 @@
 ---
-title: 'Appendix for "Why Donors Donate: Disentangling Organizational and Structural Heuristics for International Philanthropy"'
-short-title: 'Appendix for "Why Donors Donate"'
+title: 'Appendix for "Navigating Hostility: The Effect of Nonprofit Transparency and Accountability on Donor Preferences in the Face of Shrinking Civic Space"'
+short-title: 'Appendix for "Navigating Hostility"'
 date: "2025-01-22"
 author:
 - name: Suparna Chaudhry
@@ -36,7 +36,6 @@ crossref:
   tbl-title: "Table&nbsp;A"
   fig-title: "Figure&nbsp;A"
 toc: true
-toc-depth: 4
 format: 
   html: default
   hikmah-pdf:
@@ -473,6 +472,13 @@ cps_diffs %>%
 ```
 
 \clearpage
+
+# Model details
+
+We use Stan [@Stan-2-32-2 v2.32.2; @cmdstan-2-36 v2.36] through R [@rproject-4-4-2 v4.4.2] and {brms} [@Burkner:2017 v2.22] to estimate the model. We simulate 4 MCMC chains with 5,000 draws in each chain, 1,000 of which are used for warmup, resulting in 16,000 (4,000 × 4) draws per model parameter. We assess convergence with visual inspection, and all chains converge.
+
+Complete results from the model, along with posterior predictive checks, goodness-of-fit measures, and model diagnostics---as well as our code and data---are available at a companion statistical analysis compendium at `ANONYMIZED_URL`.
+
 
 # Model coefficients and estimated marginal means
 
@@ -978,6 +984,31 @@ We made the following deviations from our preregistered protocol [@WillrothAther
 
    Reason
 
+   :   Stylistic
+
+   Timing
+
+   :   After results known
+
+   Original wording
+
+   :   Q5b: "Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are also financially transparent"
+
+   Deviation description
+
+   :   We rephrased this as H~3~: "If NGOs face legal restrictions abroad *and* are financially transparent, then individual private donors will have a higher likelihood of supporting or donating to them."
+
+   Reader impact
+
+   :   This deviation has minimal impact on readers' interpretation of the findings—it is only rephrased to follow an "if… then…" formulation.
+
+
+6. Type
+
+   :   Hypotheses
+
+   Reason
+
    :   New knowledge
 
    Timing
@@ -997,7 +1028,7 @@ We made the following deviations from our preregistered protocol [@WillrothAther
    :   This deviation might have some impact on readers' interpretation of the findings. The omission of a prediction of the relationship between government crackdown and accountability was inadvertent and we had intended to specify it. The risk of bias is low, as we added the new crackdown+accountability hypothesis after data collection and before the results were known.
 
 
-6. Type
+7. Type
 
    :   Hypotheses
 
@@ -1020,6 +1051,7 @@ We made the following deviations from our preregistered protocol [@WillrothAther
    Reader impact
 
    :   This deviation might have some impact on readers' interpretation of the findings, as it might appear that we have selectively reported a handful of our predictions. To avoid this, and for the sake of full transparency, we include these results in Figure 1 in the paper and @tbl-all-results. The risk of bias is low—we decided on the narrative framing for this paper after collecting the data but before analyzing the results.
+
 
 \newpage
 
