@@ -2859,14 +2859,19 @@
     },
     "tinytable": {
       "Package": "tinytable",
-      "Version": "0.6.1",
-      "Source": "Repository",
-      "Repository": "RSPM",
+      "Version": "0.6.1.8",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteUsername": "vincentarelbundock",
+      "RemoteRepo": "tinytable",
+      "RemoteRef": "main",
+      "RemoteSha": "d6b39eab5d01c0660043efbce09343fcdd4dcb97",
       "Requirements": [
         "R",
         "methods"
       ],
-      "Hash": "284426416e795014477cf40a556eff76"
+      "Hash": "f5caa06cf9697d85a6ae3507da30f036"
     },
     "tinytex": {
       "Package": "tinytex",

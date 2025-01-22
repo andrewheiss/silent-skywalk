@@ -59,7 +59,14 @@ build_ci <- function(lower, upper) {
 fmt_decimal <- \(x) scales::label_number(accuracy = 0.001, style_negative = "minus")(x)
 fmt_decimal2 <- \(x) scales::label_number(accuracy = 0.01, style_negative = "minus")(x)
 
+fmt_pct <- \(x) scales::label_percent(accuracy = 0.01, style_negative = "minus")(x)
+
 fmt_pp_int <- \(x) scales::label_number(accuracy = 0.1, scale = 100, style_negative = "minus")(x)
+
+fmt_pp2 <- function(x) {
+  scales::label_number(accuracy = 0.1, scale = 100, 
+    suffix = " pp.", style_negative = "minus")(x)
+}
 
 label_pp <- function(x) {
   scales::label_number(accuracy = 1, scale = 100, 

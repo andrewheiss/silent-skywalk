@@ -624,19 +624,19 @@ make_clean_data <- function(path) {
       Q5.16_6 = factor(Q5.16_6, labels = str_c("Race: ", c("Not Other", "Other"))),
       # *Q5.17*: How old are you?
       # 
-      # - Under 18 → More/less than median (base case = less than median)
-      # - 18 - 24 → More/less than median
-      # - 25 - 34 → More/less than median
-      # - 35 - 44 → More/less than median
-      # - 45 - 54 → More/less than median
-      # - 55 - 64 → More/less than median
-      # - 65 - 74 → More/less than median
-      # - 75 - 84 → More/less than median
-      # - 85 or older → More/less than median
+      # - 1: Under 18 → More/less than median (base case = less than median)
+      # - 2: 18 - 24 → More/less than median
+      # - 3: 25 - 34 → More/less than median
+      # - 4: 35 - 44 → More/less than median
+      # - 5: 45 - 54 → More/less than median
+      # - 6: 55 - 64 → More/less than median
+      # - 7: 65 - 74 → More/less than median
+      # - 8: 75 - 84 → More/less than median
+      # - 9: 85 or older → More/less than median
       Q5.17 = factor(
         case_when(
-          Q5.17 >= 3 ~ "More than median", # Median age in 2017 was 36
-          Q5.17 < 3 ~ "Less than median"
+          Q5.17 >= 4 ~ "More than median", # Median age in 2017 was 36
+          Q5.17 < 4 ~ "Less than median"
         ),
         levels = c("Less than median", "More than median"),
         labels = str_c(

@@ -36,8 +36,9 @@ crossref:
   tbl-title: "Table&nbsp;A"
   fig-title: "Figure&nbsp;A"
 toc: true
-toc-depth: 2
+toc-depth: 3
 format: 
+  html: default
   hikmah-pdf:
     include-in-header: 
       - tex/tbl-fig-to-toc.tex
@@ -87,7 +88,7 @@ tar_config_set(
 )
 
 tar_load(c(
-  participant_summary, model_summary_table, feature_lookup, level_lookup
+  participant_summary, model_summary_table, feature_lookup, level_lookup, cps_diffs
 ))
 
 preds_all <- tar_read(preds_conditional_treatment_only)
@@ -303,7 +304,14 @@ amces_all_medians <- amces_all %>%
 #| tbl-cap: Respondent demographics
 #| tbl-pos: H
 #| include: true
-tbl_participant_summary <- participant_summary %>% 
+tbl_participant_summary <- participant_summary$participant_summary %>% 
+  mutate(level = case_match(
+    level,
+    "Age: Less than median" ~ "Less than 2017 national median (36)",
+    "Income: Less than median" ~ "Less than 2017 national median ($61,372)",
+    .default = level
+  )) %>%
+  mutate(level = str_remove(level, "^[^:]+: ")) %>%
   select(
     category, 
     Question = clean_name,
@@ -419,6 +427,49 @@ tbl_participant_summary$`Politics, ideology, and religion` %>%
     tabularray_inner = inner
   ) %>%
   format_tt(escape = TRUE)
+```
+
+\clearpage
+
+```{r}
+#| label: tbl-sample-cps
+#| tbl-cap: Sample characteristics compared to nationally representative Current Population Survey (CPS) estimates
+#| include: true
+
+rows_with_dagger <- cps_diffs %>%
+  mutate(row = row_number()) %>%
+  filter(cps_prop_outside_ci == TRUE) %>%
+  pull(row)
+
+notes <- list(
+  `*` = list(i = 0, j = 4, text = tt_md("Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.")),
+  `†` = list(i = rows_with_dagger, j = 3, text = tt_md("National value is substantially different from the sample; the 95% posterior credible interval for the difference between the sample and national proportions contains 0.")),
+  a = list(i = 1:5, j = 1, text = "Annual Social and Economic Supplement (ASEC) of the Current Population Survey (CPS), March 2019"),
+  b = list(i = 6:7, j = 1, text = "Monthly CPS, September 2019"),
+  c = list(i = 8, j = 1, text = "Monthly CPS, November 2018")
+)
+
+cps_diffs %>%
+  mutate(across(c(prop_sample, national_value,), fmt_pct)) %>%
+  mutate(diff_ci = glue::glue(
+    "{fmt_pp_int(y)}\n[{fmt_pp_int(ymin)}, {fmt_pp_int(ymax)}]"
+  )) %>%
+  select(
+    Variable = variable,
+    Sample = prop_sample,
+    National = national_value,
+    `∆` = diff_ci
+  ) %>%
+  mutate(`∆` = tt_linebreak(`∆`)) %>%
+  tt(width = c(0.45, 0.1, 0.1, 0.15), notes = notes) %>%
+  format_tt(j = 4, escape = FALSE) %>%
+  format_tt(j = 1:3, escape = TRUE) %>%
+  style_tt(j = 1, align = "l") %>%
+  style_tt(j = 2:4, align = "c") %>%
+  style_tt(
+    bootstrap_class = "table table-sm",
+    tabularray_inner = "rowsep=2pt, cells={font=\\footnotesize}, row{1}={valign=b}"
+  )
 ```
 
 \clearpage

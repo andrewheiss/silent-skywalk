@@ -45,16 +45,21 @@ lapply(list.files("R", full.names = TRUE, recursive = TRUE), source)
 
 # Actual pipeline ---------------------------------------------------------
 list(
-  ## Data and draws ----
-  tar_target(survey_results_file,
-    get_from_osf(osf_url = "https://osf.io/n2hwm/",
-      out_dir = here_rel("data", "raw_data")),
-    format = "file"),
-  tar_target(survey_results, read_rds(survey_results_file)),
-  
+  ## Data and draws ----  
   tar_target(
     qualtrics_anonymized_file,
     here_rel("data", "raw_data", "conjointqsf_final.csv"),
+    format = "file"
+  ),
+
+  tar_target(
+    ipums_dat_file,
+    here_rel("data", "raw_data", "ipums-cps", "cps_00006.dat.gz"),
+    format = "file"
+  ),
+  tar_target(
+    ipums_ddi_file,
+    here_rel("data", "raw_data", "ipums-cps", "cps_00006.xml"),
     format = "file"
   ),
   
@@ -65,7 +70,7 @@ list(
   ## Graphics and tables ----
   tar_target(graphic_functions, lst(
     theme_ngo, set_annotation_fonts, clrs, 
-    build_ci, fmt_decimal, fmt_decimal2, fmt_pp_int, label_pp
+    build_ci, fmt_decimal, fmt_decimal2, fmt_pp_int, label_pp, fmt_pct, fmt_pp2
   )),
   tar_target(table_functions, lst(opts_int, opts_theme, inline_listify)),
   tar_target(diagnostic_functions, lst(plot_trace, plot_trank, plot_pp)),
@@ -95,8 +100,11 @@ list(
   tar_target(feature_lookup, make_feature_lookup()),
   
   ## Miscellaneous analysis stuff
-  tar_target(participant_summary, create_sample_summary(survey_results)),
   tar_target(model_summary_table, build_modelsummary(m_treatment_only)),
+  
+  tar_target(participant_summary, create_sample_summary(data_sans_conjoint)),
+  tar_target(cps_props, calc_population_props(ipums_dat_file, ipums_ddi_file)),
+  tar_target(cps_diffs, calc_cps_diffs(participant_summary, cps_props)),
   
   ## Manuscript and notebook ----
   tar_quarto(manuscript, path = "manuscript", quiet = FALSE),
