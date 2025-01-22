@@ -752,20 +752,6 @@ This research received no external funding.
 The authors report there are no competing interests to declare.
 
 
-::: {.content-visible when-profile="ms"}
-```{=latex}
-\newpage
-\begingroup
-\singlespacing
-\parindent 0pt
-\parskip 2ex
-\def\enotesize{\normalsize}
-\theendnotes
-\endgroup
-\newpage
-```
-:::
-
 # References 
 
 ::: {#refs}
