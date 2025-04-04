@@ -45,13 +45,6 @@ invisible(list2env(tar_read(table_functions), .GlobalEnv))
 theme_set(theme_ngo())
 ```
 
-
-TODO: Hypotheses
-
-- General basic ones, like only each lever, one at a time
-- More specific ones that we preregistered. These conditional ones are tricky because there are so many different possible questions we could explore (at least 576 of them!). To avoid selective p-hacking, we pre-registered a handful that we're most interested in, and we only explore those. 
-
-
 ```{r calc-mms}
 mms_org <- preds_all %>% 
   group_by(feat_org, .draw) %>% 

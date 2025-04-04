@@ -2,9 +2,33 @@
 title: "Model definitions"
 ---
 
-TODO: Formal math for the models
+## Formal math
 
-# Model
+$$
+\begin{aligned}
+&\ \textbf{Multinomial probability of selection of choice}_i \textbf{ in respondent}_j \\
+\text{Choice}_{i_j} \sim&\ \operatorname{Categorical}(\{\mu_{1,i_j}, \mu_{2,i_j}, \mu_{3,i_j}\}) \\[10pt]
+&\ \textbf{Model for probability of each option} \\
+\{\mu_{1,i_j}, \mu_{2,i_j}, \mu_{3,i_j}\} =&\ (\beta_0 + b_{0_j}) + \beta_1 \text{Organization[Greenpeace]}_{i_j} + \beta_2 \text{Organization[Oxfam]}_{i_j} + \\
+&\ \beta_3 \text{Organization[Red Cross]}_{i_j} + \beta_4 \text{Issue[Environment]}_{i_j} + \\
+&\ \beta_5 \text{Issue[Human rights]}_{i_j} + \beta_6 \text{Issue[Refugee relief]}_{i_j} + \\
+&\ \beta_7 \text{Transparency[Yes]}_{i_j} + \beta_8 \text{Accountability[Yes]}_{i_j} + \\
+&\ \beta_9 \text{Funding[Few wealthy donors]}_{i_j} + \beta_{10} \text{Funding[Government grants]}_{i_j} + \\
+&\ \beta_{11} \text{Government relationship[Criticized]}_{i_j} + \\
+&\ \beta_{12} \text{Government relationship[Under crackdown]}_{i_j} \\[5pt]
+b_{0_j} \sim&\ \mathcal{N}(0, \sigma_0) \qquad\quad\quad \text{Respondent-specific offsets from global probability} \\[10pt]
+&\ \textbf{Priors} \\
+\beta_{0 \dots 12} \sim&\ \mathcal{N} (0, 3) \qquad\qquad\ \ \text{Prior for choice-level coefficients} \\
+\sigma_0 \sim&\ \operatorname{Exponential}(1) \quad \text{Prior for between-respondent variability}
+\end{aligned}
+$$
 
-TODO: Intercept only because (1) LOO is best, and (2) it makes most sense causally since all confounding arrows are deleted due to randomization
+## R code
 
+```{r}
+#| eval: false
+#| echo: true
+#| code-fold: false
+#| file: "../R/funs_models.R"
+#| filename: "R/funs_models.R"
+```

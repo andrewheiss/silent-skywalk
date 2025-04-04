@@ -159,8 +159,3 @@ clrs$peach %>% show_nice_pal(show_text = TRUE)
 #| code-fold: show
 clrs$peach %>% set_names(1:length(.))
 ```
-
-
-## Color mappings
-
-TODO: Color sets for specific features/levels/contrasts

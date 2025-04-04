@@ -61,6 +61,7 @@ $$
 \theta =&\ \textbf{E}\bigl[ Y_i \mid \operatorname{do}\left( \text{Transparency} = \text{Yes} \right) \bigr]
 \end{aligned}
 $$
+
 ```{r h5a-calc-estimands}
 h5a_mms <- preds_all %>% 
   group_by(feat_transp_short, .draw) %>% 
@@ -569,10 +570,6 @@ p_h5c_amces
 **Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are also financially transparent and work in less contentious areas (emergency response and refugee relief)**
 :::
 
-## Estimand
-
-TODO
-
 ```{r h5d-calc-estimands}
 h5d_mms <- preds_all %>% 
   group_by(feat_transp_short, feat_govt, feat_issue, .draw) %>% 
@@ -890,4 +887,3 @@ bind_cols(
   opt_horizontal_padding(3) %>% 
   opts_theme()
 ```
-
