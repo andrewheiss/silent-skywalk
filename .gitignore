@@ -4,6 +4,10 @@
 .RData
 .Ruserdata
 
+# Targets stuff
+_targets
+_targets.yaml
+
 # Quarto stuff
 /.quarto/
 /.luarc.json
