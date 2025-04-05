@@ -13,6 +13,7 @@ RUN apt-get update -y \
     # For compiling things
     build-essential \
     clang-3.6 \
+    cmake \
     # For downloading things
     curl \
     && apt-get clean \
@@ -64,11 +65,14 @@ RUN tlmgr install \
     enumitem textcase titlesec footmisc caption pdflscape ulem multirow \
     wrapfig colortbl tabu threeparttable threeparttablex environ makecell \
     sidenotes marginnote changepage siunitx mathtools \
-    setspace ragged2e fancyhdr pdftex preprint
+    setspace ragged2e fancyhdr pdftex preprint \
+    endnotes tikzfill.image tcolorbox pdfcol fontawesome5
 USER root
 
 # Add fonts
 COPY ../docker/misc/fonts/libre-franklin/*.ttf /usr/share/fonts/
+COPY ../docker/misc/fonts/linux-libertine-o/*.otf /usr/share/fonts/
+COPY ../docker/misc/fonts/libertinus-math/*.otf /usr/share/fonts/
 RUN fc-cache -f -v
 
 
