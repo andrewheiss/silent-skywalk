@@ -818,7 +818,6 @@ trans_acc_crackdown_tbl <- bind_rows(
     select(-feat_acc_short)
 ) %>%
   mutate(contrast = ifelse(is.na(contrast), "*(Reference)*", contrast)) %>% 
-  mutate(across(c(nice, diff_nice), ~tt_linebreak(.))) %>% 
   relocate(feat_level) %>%
   mutate(feat_govt = fct_relabel(feat_govt, ~paste("Relationship with government:", .x))) %>% 
   arrange(desc(feat_govt))
