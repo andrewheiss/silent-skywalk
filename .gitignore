@@ -29,7 +29,7 @@ manuscript/*.odt.md
 !README.pdf
 
 # Data stuff
-data/raw_data/
+data/raw_data_orig/
 data/derived_data/
 data/private_data/
 original_data.rds
