@@ -29,6 +29,6 @@ $$
 #| eval: false
 #| echo: true
 #| code-fold: false
-#| file: "../R/funs_models.R"
+#| file: "R/funs_models.R"
 #| filename: "R/funs_models.R"
 ```
