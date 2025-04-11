@@ -75,6 +75,22 @@ COPY ../docker/misc/fonts/linux-libertine-o/*.otf /usr/share/fonts/
 COPY ../docker/misc/fonts/libertinus-math/*.otf /usr/share/fonts/
 RUN fc-cache -f -v
 
+# Change RStudio settings so it doesn't log out so early
+#
+# This conflicts with Rocker's password-less authentication approach.
+# Normally setting the DISABLE_AUTH=true environment variable (either in the
+# Dockerfile here or in docker-compose.yml_ disables authentication. But if
+# you do that, the entire /etc/rstudio/rserver.conf file is overwritten
+# (https://github.com/rocker-org/rocker-versioned2/issues/296#issuecomment-981293935)
+#
+# So the workaround is to *not* use DISABLE_AUTH and instead manually set up
+# password-less authentication here with these other rserver.conf settings.
+# We also need to specify the USER in /etc/environment, since the Rocker
+# image does that too when overwriting rsession.conf
+RUN echo "session-timeout-minutes=0" >> /etc/rstudio/rsession.conf && \
+    echo "auth-timeout-minutes=0" >> /etc/rstudio/rserver.conf && \
+    echo "auth-none=1" >> /etc/rstudio/rserver.conf && \
+    echo "USER=rstudio" >> /etc/environment
 
 # ------------------------------------------------------------------------------
 # STAGE 2: Use the pre-built image for the actual analysis + {targets} pipeline

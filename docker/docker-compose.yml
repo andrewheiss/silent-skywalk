@@ -11,7 +11,7 @@ services:
       - 127.0.0.1:8787:8787
 
     environment:
-      - DISABLE_AUTH=true  # Allow password-less login to RStudio server instance
+    #   - DISABLE_AUTH=true  # Allow password-less login to RStudio server instance
       - IS_DOCKER=true  # R uses this in the notebook
       - CMDSTAN="/home/rstudio/.cmdstan/cmdstan-2.36.0"
 
