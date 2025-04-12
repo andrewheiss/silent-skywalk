@@ -88,7 +88,7 @@
       row-gutter: 1.5em,
       ..authors.map(author =>
           align(center)[
-            #author.name \
+            #text(weight: "bold")[#author.name] \
             #author.affiliation \
             #author.email
           ]
