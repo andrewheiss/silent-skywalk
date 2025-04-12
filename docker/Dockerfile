@@ -45,7 +45,7 @@ RUN R -e 'cmdstanr::install_cmdstan(dir = "/home/rstudio/.cmdstan", cpp_options 
 RUN chown -R rstudio:rstudio /home/rstudio/.cmdstan
 
 # Install Quarto
-ARG QUARTO_VERSION="1.6.1"
+ARG QUARTO_VERSION="1.7.23"
 RUN curl -L -o /tmp/quarto-linux-amd64.deb https://github.com/quarto-dev/quarto-cli/releases/download/v${QUARTO_VERSION}/quarto-${QUARTO_VERSION}-linux-amd64.deb && \
     dpkg -i /tmp/quarto-linux-amd64.deb || true && \
     apt-get install -fy && \
