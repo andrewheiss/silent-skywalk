@@ -87,10 +87,15 @@ RUN fc-cache -f -v
 # password-less authentication here with these other rserver.conf settings.
 # We also need to specify the USER in /etc/environment, since the Rocker
 # image does that too when overwriting rsession.conf
-RUN echo "session-timeout-minutes=0" >> /etc/rstudio/rsession.conf && \
-    echo "auth-timeout-minutes=0" >> /etc/rstudio/rserver.conf && \
-    echo "auth-none=1" >> /etc/rstudio/rserver.conf && \
-    echo "USER=rstudio" >> /etc/environment
+#
+# BUT ALSO this doesn't seem to actually work and things still time out after
+# 30ish minutes? These settings might just be for the commercial Posit Workbench
+# instead of RStudio Server? idk
+#
+# RUN echo "session-timeout-minutes=0" >> /etc/rstudio/rsession.conf && \
+#     echo "auth-timeout-minutes=0" >> /etc/rstudio/rserver.conf && \
+#     echo "auth-none=1" >> /etc/rstudio/rserver.conf && \
+#     echo "USER=rstudio" >> /etc/environment
 
 # ------------------------------------------------------------------------------
 # STAGE 2: Use the pre-built image for the actual analysis + {targets} pipeline
