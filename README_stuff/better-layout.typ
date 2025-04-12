@@ -1,20 +1,20 @@
 #set text(number-type: "old-style")
 
-#show link: set text(fill: rgb("c06636"))
+#show link: set text(fill: rgb("e17c05"))
 
 #show heading.where(
   level: 1
 ): it => block(width: 100%, above: 2em, below: 1em)[
   #set align(center)
-  #set text(1em, weight: "regular", tracking: 2pt, hyphenate: false)
-  #smallcaps(lower(it.body))
+  #set text(0.9em, font: "Libre Franklin", weight: "semibold", hyphenate: false)
+  #it.body
 ]
 
 #show heading.where(
   level: 2
 ): it => block(width: 100%, above: 2em, below: 1em)[
   #set align(center)
-  #set text(0.9em, weight: "bold", hyphenate: false)
+  #set text(0.8em, font: "Libre Franklin", weight: "bold", hyphenate: false)
   #it.body
 ]
 
@@ -30,16 +30,17 @@
   paper: "us-letter",
   lang: "en",
   region: "US",
-  font: "linux libertine",
+  font: "libertinus serif",
   fontsize: 11pt,
   title-size: 1.5em,
   subtitle-size: 1.25em,
-  heading-family: "linux libertine",
+  heading-family: "Libre Franklin",
   heading-weight: "bold",
   heading-style: "normal",
   heading-color: black,
   heading-line-height: 0.65em,
   sectionnumbering: none,
+  pagenumbering: "1",
   toc: false,
   toc_title: none,
   toc_depth: none,
@@ -49,7 +50,7 @@
   set page(
     paper: paper,
     margin: margin,
-    numbering: "1",
+    numbering: pagenumbering,
   )
   set par(justify: true)
   set text(lang: lang,
@@ -63,17 +64,17 @@
       #if (heading-family != none or heading-weight != "bold" or heading-style != "normal"
            or heading-color != black or heading-decoration == "underline"
            or heading-background-color != none) {
-        set text(font: heading-family, weight: heading-weight, style: heading-style, fill: heading-color)
-        text(size: title-size, hyphenate: false)[#title]
+        set text(font: heading-family, weight: heading-weight, style: heading-style, fill: heading-color, hyphenate: false)
+        text(size: title-size)[#title]
         if subtitle != none {
           parbreak()
-          text(size: subtitle-size)[#subtitle]
+          text(size: subtitle-size, hyphenate: false)[#subtitle]
         }
       } else {
-        text(weight: "bold", size: title-size)[#title]
+        text(weight: "bold", size: title-size, hyphenate: false)[#title]
         if subtitle != none {
           parbreak()
-          text(weight: "bold", size: subtitle-size)[#subtitle]
+          text(weight: "bold", size: subtitle-size, hyphenate: false)[#subtitle]
         }
       }
     ]]
@@ -113,7 +114,7 @@
     } else {
       toc_title
     }
-    block(above: 2em, below: 2em)[
+    block(above: 3em, below: 2em)[
     #outline(
       title: toc_title,
       depth: toc_depth,
