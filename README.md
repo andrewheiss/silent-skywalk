@@ -39,7 +39,7 @@ Governments across the world have increasingly used laws to restrict the work of
 
 To maximize replicability, we wrote our manuscript using [Quarto](https://quarto.org/), which allowed us to mix computational figures, text, and tables with the actual prose of the manuscript. This means that there’s no need to rely on comments within code to identify the location of each appropriate result in the manuscript—all results are programmatically included when rendering the document.
 
-We use the [{renv} package](https://rstudio.github.io/renv/articles/renv.html) to create a stable version-specific library of R packages, and we use the [{targets} package](https://docs.ropensci.org/targets/index.html) to manage all the file dependencies and run the analysis. {targets} is especially helpful with long-running objects like the main models, which take ≈40 minutes to run—as long as upstream dependencies don’t change, the models only need to run once, and can be loaded from {targets}’s data store thereafter.
+We use the [{renv} package](https://rstudio.github.io/renv/articles/renv.html) to create a stable version-specific library of R packages, and we use the [{targets} package](https://docs.ropensci.org/targets/index.html) to manage all the file dependencies and run the analysis. {targets} is especially helpful with long-running objects like the main model, which takes ≈40 minutes to run—as long as upstream dependencies don’t change, the model only needs to run once, and can be loaded from {targets}’s data store thereafter.
 
 Because it can often be difficult to set up and configure version-specific libraries of R packages and install specific versions of Stan, we provide three methods for replicating our analysis:
 
