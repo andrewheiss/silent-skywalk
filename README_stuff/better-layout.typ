@@ -1,7 +1,18 @@
+// Nicer numbers
 #set text(number-type: "old-style")
 
+// Links
 #show link: set text(fill: rgb("e17c05"))
 
+// Inline code
+#show raw.where(
+  block: false
+): it => box(fill: rgb("#f5f5f5"), radius: 2pt, outset: 2pt)[
+  #set text(fill: rgb("#994E95"), weight: "bold")
+  #it
+]
+
+// H1
 #show heading.where(
   level: 1
 ): it => block(width: 100%, above: 2em, below: 1em)[
@@ -10,6 +21,7 @@
   #it.body
 ]
 
+// H2
 #show heading.where(
   level: 2
 ): it => block(width: 100%, above: 2em, below: 1em)[

@@ -116,7 +116,7 @@ It’s also possible to not use Docker and instead run everything locally in a s
 
     - **R 4.4.2** (or later) and **RStudio**.
 
-    - **Quarto 1.6.1** (or later). As of this writing, the current stable version of Quarto is 1.6.
+    - **Quarto 1.7.23** (or later). As of this writing, the current stable version of Quarto is 1.7.
 
     - **A C++ compiler and GNU Make**. Complete instructions for macOS, Windows, and Linux [are available at CmdStan’s documentation](https://mc-stan.org/docs/cmdstan-guide/installation.html#cpp-toolchain). In short, do this:
 
@@ -180,7 +180,7 @@ Finally, it’s also possible to not use Docker *and* not use {renv} and instead
 
     - **R 4.4.2** (or later) and **RStudio**.
 
-    - **Quarto 1.6.1** (or later). As of this writing, the current stable version of Quarto is 1.6.
+    - **Quarto 1.7.23** (or later). As of this writing, the current stable version of Quarto is 1.7.
 
     - **A C++ compiler and GNU Make**. Complete instructions for macOS, Windows, and Linux [are available at CmdStan’s documentation](https://mc-stan.org/docs/cmdstan-guide/installation.html#cpp-toolchain). In short, do this:
 
