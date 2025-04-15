@@ -119,11 +119,4 @@ format:
         dev: "cairo_pdf"
 
   # Manuscript-y Word output
-  #
-  # This breaks with the "Politics, ideology, and religion" table in the 
-  # appendix with this error:
-  # Error in strrep(" ", col_widths[j] - nc): invalid 'times' value
-  #
-  # Maybe because group titles are too long?
-  # 
-  # hikmah-manuscript-docx: default
+  hikmah-manuscript-docx: default
