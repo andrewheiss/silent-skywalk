@@ -47,7 +47,7 @@ theme_set(theme_ngo())
 # H~5a~: Financial transparency
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 5~a~: Financial transparency
+## {{< fa flask-vial >}} Hypothesis 5~a~: Financial transparency
 
 **Donors will show increased willingness to donate to NGOs that are financially transparent**
 
@@ -176,7 +176,7 @@ bind_cols(
 ## Transparency
 
 ::: {.callout-tip icon=false}
-### {{< iconify fa6-solid flask-vial >}} Hypothesis 5~b~: Relationship with host government, organizational practices
+### {{< fa flask-vial >}} Hypothesis 5~b~: Relationship with host government, organizational practices
 
 **Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are also financially transparent**
 :::
@@ -319,7 +319,7 @@ bind_cols(
 ## Accountability
 
 ::: {.callout-tip icon=false}
-### {{< iconify fa6-solid flask-vial >}} Hypothesis 5~b2~: Relationship with host government, organizational practices
+### {{< fa flask-vial >}} Hypothesis 5~b2~: Relationship with host government, organizational practices
 
 **Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are accountable and hold regular third party audits**
 :::
@@ -463,7 +463,7 @@ bind_cols(
 ## H~5c~: Relationship with host government, organizational practices, and funding sources
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 5~c~: Relationship with host government, organizational practices, and funding sources
+## {{< fa flask-vial >}} Hypothesis 5~c~: Relationship with host government, organizational practices, and funding sources
 
 **Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are also financially transparent and are funded primarily by numerous small private donors**
 :::
@@ -565,7 +565,7 @@ p_h5c_amces
 # H~5d~: Relationship with host government, organizational practices, and issue area
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 5~d~: Relationship with host government, organizational practices, and issue area
+## {{< fa flask-vial >}} Hypothesis 5~d~: Relationship with host government, organizational practices, and issue area
 
 **Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are also financially transparent and work in less contentious areas (emergency response and refugee relief)**
 :::
@@ -663,7 +663,7 @@ p_h5d_amces
 # H~5e~: Relationship with host government, organizational practices, issue area, and funding sources
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 5~e~: Relationship with host government, organizational practices, issue area, and funding sources
+## {{< fa flask-vial >}} Hypothesis 5~e~: Relationship with host government, organizational practices, issue area, and funding sources
 
 **Donors will show increased willingness to donate to NGOs that are criticized by the government/under government crackdown when they are also financially transparent and work in less contentious areas (emergency response and refugee relief) and are funded by numerous small donors**
 :::
@@ -765,7 +765,7 @@ p_h5e_amces
 # H~5f~: Accountability
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 5~f~: Accountability
+## {{< fa flask-vial >}} Hypothesis 5~f~: Accountability
 
 **Donors should be no more or less likely to donate to NGOs that are accountable and hold regular third party audits**
 

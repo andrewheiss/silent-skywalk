@@ -46,7 +46,7 @@ theme_set(theme_ngo())
 # H~3a~: Issue area
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 3~a~: Issue area
+## {{< fa flask-vial >}} Hypothesis 3~a~: Issue area
 
 **Donors will show increased willingness to donate to NGOs working in less contentious issue areas (emergency response and refugee relief) over more contentious issue areas (environment and human rights).**
 :::
@@ -172,7 +172,7 @@ bind_cols(
 # H~3b~: Relationship with host government and issue area
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 3~b~: Relationship with host government and issue area
+## {{< fa flask-vial >}} Hypothesis 3~b~: Relationship with host government and issue area
 
 **Donors will show increased willingness to donate to NGOs facing government crackdown/criticism working in less contentious issue areas (emergency response and refugee relief) over more contentious issue areas (environment and human rights)**
 

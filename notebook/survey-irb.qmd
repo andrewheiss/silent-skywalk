@@ -6,15 +6,15 @@ This project has received IRB approval from the human subjects research committe
 
 <p class="text-center">
 <a href="files/byu-irb-approval.pdf" class="btn btn-success btn-md" target="_blank" role="button">
-{{< iconify fa6-solid circle-check >}} &nbsp; BYU IRB approval
+{{< fa circle-check >}} &nbsp; BYU IRB approval
 </a> 
 &nbsp;
 <a href="files/cnu-irb-approval.pdf" class="btn btn-md btn-success" target="_blank" role="button">
-{{< iconify fa6-solid circle-check >}} &nbsp; Christopher Newport IRB approval
+{{< fa circle-check >}} &nbsp; Christopher Newport IRB approval
 </a>
 &nbsp;
 <a href="files/gsu-irb-approval.pdf" class="btn btn-success btn-md" target="_blank" role="button">
-{{< iconify fa6-solid circle-check >}} &nbsp; Georgia State IRB approval
+{{< fa circle-check >}} &nbsp; Georgia State IRB approval
 </a>
 </p>
 

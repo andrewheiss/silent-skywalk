@@ -15,7 +15,7 @@ Why Donors Donate: Disentangling Organizational and Structural Heuristics for In
 ## Research Questions
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 Please list each research question included in this study.
 :::
@@ -43,7 +43,7 @@ We use a conjoint survey experiment to examine the impact of organizational feat
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 For each of the research questions listed in the previous section, provide one or multiple specific and testable hypotheses. Please state if the hypotheses are directional or non-directional. If directional, state the direction. A predicted effect is also appropriate here.
 :::
@@ -98,7 +98,7 @@ We will not use any existing data.
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 Please describe the process by which you will collect your data. If you are using human subjects, this should include the population from which you obtain subjects, recruitment efforts, payment for participation, how subjects will be selected for eligibility from the initial pool (e.g. inclusion and exclusion rules), and your study timeline. For studies that don’t include human subjects, include information about how you will collect samples, duration of data gathering efforts, source or location of samples, or batch numbers you will use.
 :::
@@ -116,7 +116,7 @@ We will provide Centiment with a link to the survey, which is hosted by Qualtric
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 Describe the sample size of your study. How many units will be analyzed in the study? This could be the number of people, birds, classrooms, plots, interactions, or countries included. If the units are not individuals, then describe the size requirements for each unit. If you are using a clustered or multilevel design, how many units are you collecting at each level of the analysis?
 :::
@@ -128,7 +128,7 @@ Our target sample size is 1,000 participants.
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 This could include a power analysis or an arbitrary constraint such as time, money, or personnel.
 :::
@@ -140,7 +140,7 @@ A sample size of at least 500 respondents is typical for estimating a hierarchic
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 If your data collection procedures do not give you full control over your exact sample size, specify how you will decide when to terminate your data collection. 
 :::
@@ -157,7 +157,7 @@ Centiment will monitor how many surveys are successfully completed and will soli
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 Describe all variables you plan to manipulate and the levels or treatment arms of each variable. For observational studies and meta-analyses, simply state that this is not applicable.
 :::
@@ -210,7 +210,7 @@ This results in five manipulated variables:
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 Describe each variable that you will measure. This will include outcome measures, as well as any predictors or covariates that you will measure. You do not need to include any variables that you plan on collecting if they are not going to be included in the confirmatory analyses of this study.
 :::
@@ -299,7 +299,7 @@ We measure several other covariates that inform and predict an individual's choi
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 If any measurements are going to be combined into an index (or even a mean), what measures will you use and how will they be combined? Include either a formula or a precise description of your method. If your are using a more complicated statistical method to combine measures (e.g. a factor analysis), you can note that here but describe the exact method in the analysis plan section.
 :::
@@ -326,7 +326,7 @@ For studies that involve human subjects, they will not know the treatment group 
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 Describe your study design. Examples include two-group, factorial, randomized block, and repeated measures. Is it a between (unpaired), within-subject (paired), or mixed design? Describe any counterbalancing required. Typical study designs for observation studies include cohort, cross sectional, and case-control studies. 
 :::
@@ -338,7 +338,7 @@ We use a fractional factorial design. Since no single respondent can possibly se
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 If you are doing a randomized study, how will you randomize, and at what level? 
 :::
@@ -355,7 +355,7 @@ Every respondent will be randomly assigned a version of the fractional factorial
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 What statistical model will you use to test each hypothesis? Please include the type of model (e.g. ANOVA, multiple regression, SEM, etc) and the specification of the model (this includes each variable that will be included as predictors, outcomes, or covariates). Please specify any interactions that will be tested and remember that any test not included here must be noted as an exploratory test in your final article.
 :::
@@ -376,7 +376,7 @@ where $y$ = which alternative the respondent chooses to donate, $X$ = design mat
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 If you plan on transforming, centering, recoding the data, or will require a coding scheme for categorical variables, please describe that process.
 :::
@@ -486,7 +486,7 @@ We collapse several of our variables into dichotomous and trichotomous versions,
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 If not specified previously, will you be conducting any confirmatory analyses to follow up on effects in your statistical model, such as subgroup analyses, pairwise or complex contrasts, or follow-up tests from interactions? Remember that any analyses not specified in this research plan must be noted as exploratory.
 :::
@@ -517,7 +517,7 @@ We will also include these groups of variables simultaneously as we check the pe
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 What criteria will you use to make inferences? Please describe the information you’ll use (e.g. specify the p-values, Bayes factors, specific model fit indices), as well as cut-off criterion, where appropriate. Will you be using one or two tailed tests for each of your analyses? If you are comparing multiple conditions or testing multiple hypotheses, will you account for this? 
 :::
@@ -536,7 +536,7 @@ Finally, we will employ the posterior distribution of model parameters to conduc
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 How will you determine which data points or samples (if any) to exclude from your analyses? How will outliers be handled?
 :::
@@ -550,7 +550,7 @@ We include one question ("*Q2.11*: Please select blue from the following list:")
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 How will you deal with incomplete or missing data?
 :::
@@ -562,7 +562,7 @@ Because all survey questions are required, we do not anticipate issues with inco
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 If you plan to explore your data set to look for unexpected differences or relationships, you may describe those tests here. An exploratory test is any test where a prediction is not made up front, or there are multiple possible tests that you are going to use. A statistically significant finding in an exploratory test is a great way to form a new confirmatory hypothesis, which could be registered at a later time. 
 :::
@@ -577,7 +577,7 @@ In our third research question, we are interested in finding the optimal mix of 
 
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 Upload an analysis script with clear comments. This optional step is helpful in order to create a process that is completely transparent and increase the likelihood that your analysis can be replicated. We recommend that you run the code on a simulated dataset in order to check that it will run without errors.
 :::
@@ -590,7 +590,7 @@ Nothing.
 # Other
 
 ::: {.callout-note icon=false}
-### {{< iconify fa6-solid circle-question >}}&ensp; OSF question
+### {{< fa circle-question >}}&ensp; OSF question
 
 If there is any additional information that you feel needs to be included in your preregistration, please enter it here.
 :::

@@ -47,7 +47,7 @@ theme_set(theme_ngo())
 # H~4a~: Funding sources
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 4~a~: Funding sources
+## {{< fa flask-vial >}} Hypothesis 4~a~: Funding sources
 
 **Donors will show increased willingness to donate to NGOs that are funded primarily by numerous small private donors compared to NGOs that are funded by a handful of wealthy private donors and government grants**
 
@@ -175,7 +175,7 @@ bind_cols(
 # H~4b~: Relationship with host government and funding sources
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 4~b~: Relationship with host government and funding sources
+## {{< fa flask-vial >}} Hypothesis 4~b~: Relationship with host government and funding sources
 
 **Donors will show increased willingness to donate to NGOs that are facing government crackdown and are funded primarily by numerous small private donors**
 :::
@@ -321,7 +321,7 @@ bind_cols(
 ## H~4c~: Relationship with host government, funding sources, and issue area
 
 ::: {.callout-tip icon=false}
-## {{< iconify fa6-solid flask-vial >}} Hypothesis 4~c~: Relationship with host government, funding sources, and issue area
+## {{< fa flask-vial >}} Hypothesis 4~c~: Relationship with host government, funding sources, and issue area
 
 **Donors will show increased willingness to donate to NGOs that are facing government crackdown and are funded primarily by numerous small private donors and work in less contentious areas (emergency response and refugee relief)**
 :::

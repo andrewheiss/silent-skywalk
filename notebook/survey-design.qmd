@@ -75,7 +75,7 @@ tribble(
 Participants were then presented with random combinations of these attributes and asked to select which hypothetical organization they'd be willing to donate to. Participants see 12 iterations of a question that looks like this:
 
 ::: {.callout-tip icon=false}
-### {{< iconify fa6-solid check-to-slot >}}&emsp; Example conjoint survey question
+### {{< fa check-to-slot >}}&emsp; Example conjoint survey question
 
 ***Q4.x*: For each of the next 12 questions, imagine you are selecting an organization you will donate to and that each of the listed organizations exists. Which of the following organizations would you donate to?**
 

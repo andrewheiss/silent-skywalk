@@ -6,7 +6,7 @@ We preregistered this study with the [Center for Open Science's](https://cos.io/
 
 <p class="text-center">
 <a href="https://osf.io/hsbyd" class="btn btn-success btn-md" target="_blank" role="button">
-{{< iconify fa6-solid compass-drafting >}} &nbsp; OSF preregistered pre-analysis plan &raquo;
+{{< fa compass-drafting >}} &nbsp; OSF preregistered pre-analysis plan &raquo;
 </a> 
 </p>
 

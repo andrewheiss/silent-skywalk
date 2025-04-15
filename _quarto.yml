@@ -115,13 +115,13 @@ website:
     
   page-footer:
     left: |
-      Content {{< iconify fa6-brands creative-commons >}} 2018–2025 by Suparna Chaudhry, Marc Dotson, and Andrew Heiss<br>
-      All content licensed under a {{< iconify fa6-brands creative-commons >}}
-      {{< iconify fa6-brands creative-commons-by >}} 
+      Content {{< fa brands creative-commons >}} 2018–2025 by Suparna Chaudhry, Marc Dotson, and Andrew Heiss<br>
+      All content licensed under a {{< fa brands creative-commons >}}
+      {{< fa brands creative-commons-by >}} 
       [Creative Commons Attribution 4.0 International license (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)
     right: |
-      Made with {{< iconify fa6-brands r-project >}} and [Quarto](https://quarto.org/)<br>
-      [View the source at {{< iconify fa6-brands github >}} GitHub](https://github.com/andrewheiss/silent-skywalk)
+      Made with {{< fa brands r-project >}} and [Quarto](https://quarto.org/)<br>
+      [View the source at {{< fa brands github >}} GitHub](https://github.com/andrewheiss/silent-skywalk)
 
 format:
   html:
