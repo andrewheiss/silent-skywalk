@@ -1,7 +1,7 @@
 ---
 title: 'Appendix for "Navigating Hostility: The Effect of Nonprofit Transparency and Accountability on Donor Preferences in the Face of Shrinking Civic Space"'
 short-title: 'Appendix for "Navigating Hostility"'
-date: "2025-01-22"
+date: "2025-04-14"
 author:
 - name: Suparna Chaudhry
   affiliation: Lewis and Clark College
@@ -87,8 +87,15 @@ tar_config_set(
 )
 
 tar_load(c(
-  participant_summary, model_summary_table, feature_lookup, level_lookup, cps_diffs
+  participant_summary, model_summary_table, feature_lookup, level_lookup, 
+  cps_diffs, data_sans_conjoint
 ))
+
+details <- list(
+  n = nrow(data_sans_conjoint),
+  n_nice = label_comma()(nrow(data_sans_conjoint)),
+  combos = 2 * 2 * 3 * 4 * 4 * 3
+)
 
 preds_all <- tar_read(preds_conditional_treatment_only)
 
@@ -320,6 +327,10 @@ tbl_participant_summary <- participant_summary$participant_summary %>%
   ) %>% 
   split(~category)
 
+summary_notes <- list(
+  `*` = list(i = 0, j = 2, text = tt_md(paste0("N = ", details$n_nice, " respondents.")))
+)
+
 inner <- glue("
 rowsep=0pt, row{<<header_rows>>}={abovesep=3pt, belowsep=0pt},
 cells={font=\\footnotesize}
@@ -330,7 +341,7 @@ cells={font=\\footnotesize}
 
 tbl_participant_summary$Demographics %>% 
   select(-category, -Question) %>% 
-  tt(width = c(0.6, 0.15, 0.15)) %>%
+  tt(width = c(0.6, 0.15, 0.15), notes = summary_notes) %>%
   group_tt(j = list("Demographics" = 1:3)) %>%
   group_tt(
     i = tbl_participant_summary$Demographics$Question, 
@@ -373,7 +384,7 @@ cells={font=\\footnotesize}
 
 tbl_participant_summary$`Attitudes toward charity` %>% 
   select(-category, -Question) %>% 
-  tt(width = c(0.6, 0.15, 0.15)) %>%
+  tt(width = c(0.6, 0.15, 0.15), notes = summary_notes) %>%
   group_tt(j = list("Attitudes toward charity" = 1:3)) %>%
   group_tt(
     i = tbl_participant_summary$`Attitudes toward charity`$Question, 
@@ -408,7 +419,7 @@ cells={font=\\footnotesize}
 
 tbl_participant_summary$`Politics, ideology, and religion` %>% 
   select(-category, -Question) %>%
-  tt(width = c(0.6, 0.15, 0.15)) %>%
+  tt(width = c(0.6, 0.15, 0.15), notes = summary_notes) %>%
   group_tt(j = list("Politics, ideology, and religion" = 1:3)) %>%
   group_tt(
     i = tbl_participant_summary$`Politics, ideology, and religion`$Question,
@@ -484,7 +495,7 @@ Complete results from the model, along with posterior predictive checks, goodnes
 
 When working with the results for our multinomial regression model, we rely on estimated marginal means (EMMs) rather than raw regression coefficients because of the complexity of the model. At its core, a "marginal mean" refers to the literal mean in the margins in a contingency table of model predictions, and differences in marginal means are equivalent to marginal effects or regression coefficients.
 
-To find the causal effects defined in each of our estimands, we calculate EMMs by finding the fitted probability-scale values for each cell in a balanced reference grid of all 576 possible combinations of feature levels (2 transparency × 2 accountability × 3 government relationships × 4 organizations × 4 issues × 3 funding = 576 rows). We then calculate group averages and contrasts in group averages for each of the features of interest, marginalizing over all other features.
+To find the causal effects defined in each of our estimands, we calculate EMMs by finding the fitted probability-scale values for each cell in a balanced reference grid of all `r details$combos` possible combinations of feature levels (2 transparency × 2 accountability × 3 government relationships × 4 organizations × 4 issues × 3 funding = `r details$combos` rows). We then calculate group averages and contrasts in group averages for each of the features of interest, marginalizing over all other features.
 
 ## Raw model coefficients
 
@@ -495,7 +506,7 @@ As seen in @tbl-coefs-orig, the model returns three sets of coefficients per con
 #| tbl-cap: Original multinomial logistic regression model coefficients
 #| include: true
 notes <- c(
-  "Estimates are median posterior log odds from a multinomial logistic regression model with three possible categories, and the columns for µ1, µ2, and µ3 represent estimates for each of the outcomes;",
+  paste0("N = ", details$n_nice, " respondents. Estimates are median posterior log odds from a multinomial logistic regression model with three possible categories, and the columns for µ1, µ2, and µ3 represent estimates for each of the outcomes;"),
   "95% credible intervals (equal-tailed quantile intervals) in brackets."
 )
 
@@ -524,7 +535,7 @@ modelsummary(
 
 ## Converting coefficients to estimated marginal means
 
-To convert EMMs and AMCEs to a more interpretable probability scale (rather than the original log odds scale), we generate predicted values (marginalized across the three µ terms) for each of the 576 unique combinations of feature levels. @tbl-grid-example provides an excerpt from this grid, showing six rows where accountability, organization, issue area, and funding are identical and held constant, while transparency and government relations vary.
+To convert EMMs and AMCEs to a more interpretable probability scale (rather than the original log odds scale), we generate predicted values (marginalized across the three µ terms) for each of the `r details$combos` unique combinations of feature levels. @tbl-grid-example provides an excerpt from this grid, showing six rows where accountability, organization, issue area, and funding are identical and held constant, while transparency and government relations vary.
 
 ```{r}
 #| label: tbl-grid-example
@@ -627,7 +638,7 @@ cells={font=\\scriptsize}, row{1}={valign=b}
 )
 
 notes <- list(
-  `*` = list(i = 0, j = c(2, 4), text = tt_md("Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.")),
+  `*` = list(i = 0, j = c(2, 4), text = tt_md(paste0("N = ", details$combos, " estimated marginal means collapsed into feature-specific means. Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets."))),
   `†` = list(i = 0, j = 5, text = tt_md("The probability of direction (*p*~direction~) is the probability that the posterior AMCE is strictly positive or negative—it is the proportion of the posterior AMCE that is the sign of the median."))
 )
 
@@ -705,7 +716,7 @@ cells={font=\\footnotesize}, row{1}={valign=b}
 )
 
 notes <- list(
-  `*` = list(i = 0, j = 2, text = tt_md("Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets."))
+  `*` = list(i = 0, j = 2, text = tt_md(paste0("N = ", details$combos, " estimated marginal means collapsed into feature-specific means. Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.")))
 )
 
 mms_trans_acc_all_tbl %>%
@@ -831,7 +842,7 @@ cells={font=\\footnotesize}, row{1}={valign=b}
 )
 
 notes <- list(
-  `*` = list(i = 0, j = c(2, 4), text = tt_md("Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets.")),
+  `*` = list(i = 0, j = c(2, 4), text = tt_md(paste0("N = ", details$combos, " estimated marginal means collapsed into feature-specific means. Values are on the percentage-point scale; single value is posterior median; 95% credible interval in brackets."))),
   `†` = list(i = 0, j = 5, text = tt_md("The probability of direction (*p*~direction~) is the probability that the posterior AMCE is strictly positive or negative—it is the proportion of the posterior AMCE that is the sign of the median."))
 )
 
@@ -1059,7 +1070,7 @@ We made the following deviations from our preregistered protocol [@WillrothAther
 ::: {.callout-important icon=false}
 ### Consensed preregistration
 
-This is an anonymized and condensed version of our full OSF preregistration protocol.
+This is an anonymized and condensed version of our full OSF preregistration protocol, which is available at <https://doi.org/10.17605/OSF.IO/HSBYD>.
 :::
 
 {{< include text/preregistration.md >}}
